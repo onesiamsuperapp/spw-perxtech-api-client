@@ -72,6 +72,13 @@ export interface IPerxService {
   redeemVoucher(userToken: string, voucherId: string): Promise<PerxVoucher>
   redeemVoucher(userToken: string, voucherId: string, confirm: boolean): Promise<PerxVoucher>
 
+  /**
+   * Release locked voucher from PerxService
+   * 
+   * @param userToken 
+   * @param voucherId 
+   */
+  releaseVoucher(userToken: string, voucherId: string): Promise<PerxVoucher>
 }
 
 export class PerxService implements IPerxService {
