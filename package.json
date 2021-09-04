@@ -1,5 +1,5 @@
 {
-  "name": "perx-api-client",
+  "name": "perxtech-api-client",
   "version": "0.0.1",
   "description": "PerxTech API client written in TypeScript",
   "main": "lib/cjs/index.js",
