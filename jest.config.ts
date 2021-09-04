@@ -5,8 +5,10 @@ const config: Config.InitialOptions = {
   testEnvironment: 'node',
   testTimeout: 300000,
   testMatch: [
-    '**/__tests__/services/**.ts',
-    '**/__tests__/services-core/**.ts'
+    '**/__tests__/**.ts',
+  ],
+  setupFiles: [
+    'dotenv/config',
   ],
   verbose: true
 }

@@ -1,6 +1,7 @@
 import { autoserializeAs, Deserialize, inheritSerialization } from 'cerialize'
 import { isArray } from 'lodash'
 import { PerxError } from '../error'
+import { PerxLoyalty } from './LoyaltyProgram'
 import { PerxReward } from './Reward'
 import { PerxVoucher } from './Voucher'
 
@@ -138,7 +139,7 @@ export class TokenResponse extends BasePerxResponse {
   @autoserializeAs('refresh_token')
   refreshToken: string | null = null
 
-  @autoserializeAs('expries_in')
+  @autoserializeAs('expires_in')
   expiresIn: number = 0
 
   @autoserializeAs('scope')
@@ -155,4 +156,8 @@ export class VouchersResponse extends ItemListPerxResponse<PerxVoucher> {
 
 export class VoucherResponse extends ObjectPerxResponse<PerxVoucher> {
   public constructor() { super(PerxVoucher) }
+}
+
+export class LoyaltyProgramResponse extends ObjectPerxResponse<PerxLoyalty> {
+  public constructor() { super(PerxLoyalty) }
 }

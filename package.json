@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json && tsc -p tsconfig.cjs.json",
     "clean": "rm -rf node_modules/ && rm -rf libs/",
-    "test": "jest --config=jest.config.ts"
+    "test": "jest --config=jest.config.ts --runInBand"
   },
   "repository": {
     "type": "git",
@@ -30,6 +30,7 @@
   "devDependencies": {
     "@types/jest": "^26.0.20",
     "@types/lodash": "^4.14.168",
+    "dotenv": "^10.0.0",
     "jest": "^26.6.3",
     "ts-jest": "^26.5.3",
     "ts-node": "^9.1.1",

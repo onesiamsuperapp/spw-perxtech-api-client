@@ -12,6 +12,8 @@ import {
   VouchersResponse,
   PerxReward,
   PerxVoucher,
+  PerxLoyalty,
+  LoyaltyProgramResponse,
 } from './models'
 
 export interface PerxFilterScope {
@@ -39,12 +41,12 @@ export interface IPerxService {
   getRewards(userToken: string, scope: Partial<PerxFilterScope>): Promise<PerxReward[]>
 
   /**
-   * Issue a reward for specific user
+   * Issue a voucher from particular reward for specific user
    *
    * @param userToken 
    * @param rewardId 
    */
-  issueReward(userToken: string, rewardId: string): Promise<PerxVoucher>
+  issueVoucher(userToken: string, rewardId: number | string): Promise<PerxVoucher>
 
   /**
    * List vouchers for specific users
@@ -69,8 +71,8 @@ export interface IPerxService {
    * @param confirm 
    * @returns 
    */
-  redeemVoucher(userToken: string, voucherId: string): Promise<PerxVoucher>
-  redeemVoucher(userToken: string, voucherId: string, confirm: boolean): Promise<PerxVoucher>
+  redeemVoucher(userToken: string, voucherId: number | string): Promise<PerxVoucher>
+  redeemVoucher(userToken: string, voucherId: number | string, confirm: boolean): Promise<PerxVoucher>
 
   /**
    * Release locked voucher from PerxService
@@ -78,7 +80,12 @@ export interface IPerxService {
    * @param userToken 
    * @param voucherId 
    */
-  releaseVoucher(userToken: string, voucherId: string): Promise<PerxVoucher>
+  releaseVoucher(userToken: string, voucherId: number | string): Promise<PerxVoucher>
+
+  /**
+   * Query perx loyalty points
+   */
+  getLoyaltyProgram(userToken: string, loyaltyProgramId: string | number): Promise<PerxLoyalty>
 }
 
 export class PerxService implements IPerxService {
@@ -108,7 +115,7 @@ export class PerxService implements IPerxService {
       client_secret: this.config.clientSecret,
       grant_type: 'client_credentials',
       scope: `user_account(identifier:${userIdentifier})`,
-      expires_in: this.config.tokenDurationInSeconds - 300, // Expires it actually expire for 5 minutes
+      expires_in: this.config.tokenDurationInSeconds, // Expires it actually expire for 5 minutes
     })
 
     if (resp.status == 401) {
@@ -131,8 +138,8 @@ export class PerxService implements IPerxService {
     return result.data
   }
 
-  public async issueReward(userToken: string, rewardId: string): Promise<PerxVoucher> {
-    if (!/^\d+$/.test(rewardId)) {
+  public async issueVoucher(userToken: string, rewardId: number | string): Promise<PerxVoucher> {
+    if (!/^\d+$/.test(`${rewardId}`)) {
       throw PerxError.badRequest(`Invalid rewardId: ${rewardId}, expected rewardId as integer`)
     }
     const resp = await this.axios.post(`/v4/rewards/${rewardId}/issue`, {}, {
@@ -158,7 +165,10 @@ export class PerxService implements IPerxService {
     return result.data
   }
 
-  public async redeemVoucher(userToken: string, voucherId: string, confirm: boolean | undefined = undefined): Promise<PerxVoucher> {
+  public async redeemVoucher(userToken: string, voucherId: string | number, confirm: boolean | undefined = undefined): Promise<PerxVoucher> {
+    if (!/^\d+$/.test(`${voucherId}`)) {
+      throw PerxError.badRequest(`Invalid voucherId: ${voucherId}, expected voucherId as integer`)
+    }
     const resp = await this.axios.post(`/v4/vouchers/${voucherId}/redeem`, {}, {
       headers: {
         authorization: `Bearer ${userToken}`,
@@ -172,7 +182,10 @@ export class PerxService implements IPerxService {
     return result.data
   }
 
-  public async releaseVoucher(userToken: string, voucherId: string): Promise<PerxVoucher> {
+  public async releaseVoucher(userToken: string, voucherId: string | number): Promise<PerxVoucher> {
+    if (!/^\d+$/.test(`${voucherId}`)) {
+      throw PerxError.badRequest(`Invalid voucherId: ${voucherId}, expected voucherId as integer`)
+    }
     const resp = await this.axios.patch(`/v4/vouchers/${voucherId}/release`, {}, {
       headers: {
         authorization: `Bearer ${userToken}`,
@@ -181,6 +194,21 @@ export class PerxService implements IPerxService {
     })
 
     const result = BasePerxResponse.parseAndEval(resp.data, resp.status, VoucherResponse)
+    return result.data
+  }
+
+  public async getLoyaltyProgram(userToken: string, loyaltyProgramId: string | number): Promise<PerxLoyalty> {
+    if (!/^\d+$/.test(`${loyaltyProgramId}`)) {
+      throw PerxError.badRequest(`Invalid loyaltyProgramId: ${loyaltyProgramId}, expected loyaltyProgramId as integer`)
+    }
+    const resp = await this.axios.get(`/v4/loyalty/${loyaltyProgramId}`, {
+      headers: {
+        authorization: `Bearer ${userToken}`,
+      },
+      params: {}
+    })
+
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, LoyaltyProgramResponse)
     return result.data
   }
 

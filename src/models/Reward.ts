@@ -1,5 +1,6 @@
 import { autoserializeAs } from 'cerialize'
 import { ISODateTimeSerializer } from '../utils/cerialize'
+import { ShortPerxLoyalty } from './LoyaltyProgram'
 import { PerxCategory, PerxTag } from './Taxonomy'
 
 export class PerxImage {
@@ -8,13 +9,6 @@ export class PerxImage {
 
   @autoserializeAs('type')
   type!: string
-}
-
-export class PerxLoyalty {
-
-  @autoserializeAs('id')
-  id!: number
-
 }
 
 export class PerxBrand {
@@ -163,8 +157,8 @@ export class PerxReward {
   @autoserializeAs('terms_and_conditions')
   termsAndConditions: string | null = null
 
-  @autoserializeAs(PerxLoyalty, 'loyalty')
-  loyalty: PerxLoyalty[] = []
+  @autoserializeAs(ShortPerxLoyalty, 'loyalty')
+  loyalty: ShortPerxLoyalty[] = []
 
   @autoserializeAs(PerxTag, 'tags')
   tags: PerxTag[] = []
