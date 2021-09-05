@@ -1,5 +1,6 @@
 import type { PerxConfig } from './config'
 
+import { Serialize } from 'cerialize'
 import axios, { AxiosInstance } from 'axios'
 
 import { PerxError } from './error'
@@ -20,7 +21,6 @@ import {
   PerxTransactionReqeust,
   PerxTransactionResponse,
 } from './models'
-import { Serialize } from 'cerialize'
 
 export interface PerxFilterScope {
 

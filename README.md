@@ -1,6 +1,8 @@
 PerxTech API Client
 ==
 
+![Published](https://github.com/peatiscoding/perxtech-api-client/actions/workflows/publish.yml/badge.svg)
+
 The Perx's API client implemented for node.js using TypeScript.
 
 # Install:
