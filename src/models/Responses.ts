@@ -3,6 +3,7 @@ import { isArray } from 'lodash'
 import { PerxError } from '../error'
 import { PerxCustomer } from './Customer'
 import { PerxLoyalty } from './LoyaltyProgram'
+import { PerxLoyaltyTransaction } from './LoyaltyTransaction'
 import { PerxReward } from './Reward'
 import { PerxTransaction } from './Transaction'
 import { PerxVoucher } from './Voucher'
@@ -170,4 +171,8 @@ export class PerxCustomerResponse extends ObjectPerxResponse<PerxCustomer> {
 
 export class PerxTransactionResponse extends ObjectPerxResponse<PerxTransaction> {
   public constructor() { super(PerxTransaction) }
+}
+
+export class PerxLoyaltyTransactionResponse extends ObjectPerxResponse<PerxLoyaltyTransaction> {
+  public constructor() { super(PerxLoyaltyTransaction) }
 }

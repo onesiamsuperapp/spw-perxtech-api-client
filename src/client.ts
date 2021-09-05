@@ -20,6 +20,9 @@ import {
   PerxTransaction,
   PerxTransactionReqeust,
   PerxTransactionResponse,
+  PerxLoyaltyTransactionRequest,
+  PerxLoyaltyTransaction,
+  PerxLoyaltyTransactionResponse,
 } from './models'
 
 export interface PerxFilterScope {
@@ -100,7 +103,6 @@ export interface IPerxUserService {
     */
    getLoyaltyProgram(userToken: string, loyaltyProgramId: string | number): Promise<PerxLoyalty>
  
- 
    /**
     * Fetch specific perx's customer
     * @param userToken
@@ -110,6 +112,15 @@ export interface IPerxUserService {
 }
 
 export interface IPerxPosService {
+
+  /**
+   * Burn/Earn loyalty transaction (See static methods of `PerxLoyaltyTransactionRequest`)
+   * construct the request to make Burn/Earn transaction.
+   * 
+   * @param applicationToken 
+   * @param request 
+   */
+  submitLoyaltyTransaction(applicationToken: string, request: PerxLoyaltyTransactionRequest): Promise<PerxLoyaltyTransaction>
 
   /**
    * Submit new transaction to perx service via POS Access.
@@ -284,6 +295,19 @@ export class PerxService implements IPerxService {
     })
 
     const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxTransactionResponse)
+    return result.data
+  }
+
+  public async submitLoyaltyTransaction(applicationToken: string, request: PerxLoyaltyTransactionRequest): Promise<PerxLoyaltyTransaction> {
+    const body = Serialize(request)
+    const resp = await this.axios.post('/v4/pos/loyalty_transactions', body, {
+      headers: {
+        authorization: `Bearer ${applicationToken}`,
+      },
+      params: {}
+    })
+
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxLoyaltyTransactionResponse)
     return result.data
   }
 

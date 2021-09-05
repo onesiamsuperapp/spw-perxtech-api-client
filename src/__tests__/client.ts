@@ -1,4 +1,5 @@
 import { IPerxService, PerxService } from '../client'
+import { PerxLoyaltyTransactionRequest } from '../models'
 
 describe('PerxService', () => {
 
@@ -97,6 +98,7 @@ describe('PerxService', () => {
   })
 
   describe('application session', () => {
+    const pointsToEarnAndBurn: number = 121
     const ctx = {
       accessToken: '',
     }
@@ -106,6 +108,50 @@ describe('PerxService', () => {
       expect(tokenResp.tokenType).toMatch(/bearer/i)
       expect(tokenResp.scope).toBeUndefined()
       ctx.accessToken = tokenResp.accessToken
+    })
+
+    it('can earn the points for customer', async () => {
+      const earnRequest = PerxLoyaltyTransactionRequest.makeEarnRequest(
+        { type: 'id', id: +testableUserIdOnPerxServer },
+        +testableLoyaltyProgramIdOnPerxServer,
+        pointsToEarnAndBurn,
+        {},
+      )
+
+      expect(earnRequest.userAccount).toBeTruthy()
+      expect(earnRequest.userAccount.id).toBeTruthy()
+      expect(earnRequest.points).toEqual(pointsToEarnAndBurn)
+      expect(earnRequest.loyaltyProgramId).toEqual(+testableLoyaltyProgramIdOnPerxServer)
+
+      const earnResp = await client.submitLoyaltyTransaction(ctx.accessToken, earnRequest)
+      const nowMs = new Date().getTime()
+      expect(earnResp.id).toBeTruthy()
+      expect(earnResp.loyaltyProgramId).toEqual(+testableLoyaltyProgramIdOnPerxServer)
+      expect(earnResp.points).toEqual(pointsToEarnAndBurn)
+      expect(earnResp.transactedAt).toBeInstanceOf(Date)
+      expect(Math.abs(earnResp.transactedAt.getTime() - nowMs)).toBeLessThanOrEqual(1000)
+    })
+
+    it('can burn the points for customer', async () => {
+      const earnRequest = PerxLoyaltyTransactionRequest.makeBurnRequest(
+        { type: 'id', id: +testableUserIdOnPerxServer },
+        +testableLoyaltyProgramIdOnPerxServer,
+        pointsToEarnAndBurn,
+        {},
+      )
+
+      expect(earnRequest.userAccount).toBeTruthy()
+      expect(earnRequest.userAccount.id).toBeTruthy()
+      expect(earnRequest.points).toEqual(-pointsToEarnAndBurn)
+      expect(earnRequest.loyaltyProgramId).toEqual(+testableLoyaltyProgramIdOnPerxServer)
+
+      const earnResp = await client.submitLoyaltyTransaction(ctx.accessToken, earnRequest)
+      const nowMs = new Date().getTime()
+      expect(earnResp.id).toBeTruthy()
+      expect(earnResp.loyaltyProgramId).toEqual(+testableLoyaltyProgramIdOnPerxServer)
+      expect(earnResp.points).toEqual(-pointsToEarnAndBurn)
+      expect(earnResp.transactedAt).toBeInstanceOf(Date)
+      expect(Math.abs(earnResp.transactedAt.getTime() - nowMs)).toBeLessThanOrEqual(1000)
     })
   })
 })

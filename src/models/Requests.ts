@@ -55,3 +55,73 @@ export class PerxTransactionReqeust {
     return new PerxTransactionReqeust(userAccountId, data)
   }
 }
+
+export interface PerxRawUserAccountId {
+  type: 'id'
+  id: number
+}
+
+export interface PerxRawUserAccountIdentifier {
+  type: 'identifier'
+  identifier: string
+}
+
+export type PerxRawUserAccount = PerxRawUserAccountId | PerxRawUserAccountIdentifier
+
+export class PerxLoyaltyTransactionRequestUserAccount {
+  @autoserializeAs('identifier')
+  identifier?: string
+
+  @autoserializeAs('id')
+  id?: number
+
+  public constructor(userAccount: PerxRawUserAccount) {
+    if (userAccount.type === 'identifier') {
+      this.identifier = userAccount.identifier
+    } else {
+      this.id = userAccount.id
+    }
+  }
+}
+
+export class PerxLoyaltyTransactionRequest {
+  
+  @autoserializeAs(PerxLoyaltyTransactionRequestUserAccount, 'user_account')
+  userAccount: PerxLoyaltyTransactionRequestUserAccount
+
+  @autoserializeAs('properties')
+  properties: Record<string, string|number> = {}
+
+  @autoserializeAs('points')
+  points!: number
+
+  @autoserializeAs('loyalty_program_id')
+  loyaltyProgramId!: number
+
+  constructor(userAccount: PerxLoyaltyTransactionRequestUserAccount, loyaltyProgramId: number, points: number, properties: Record<string, string|number> = {}) {
+    this.userAccount = userAccount
+    this.points = points
+    this.loyaltyProgramId = loyaltyProgramId
+    this.properties = properties
+  }
+
+  public static makeBurnRequest(userAccount: PerxRawUserAccount, loyaltyProgramId: number, pointsToBurn: number, properties: Record<string, string|number> = {}): PerxLoyaltyTransactionRequest {
+    const request = new PerxLoyaltyTransactionRequest(
+      new PerxLoyaltyTransactionRequestUserAccount(userAccount),
+      loyaltyProgramId,
+      -pointsToBurn,
+      properties,
+    )
+    return request
+  }
+
+  public static makeEarnRequest(userAccount: PerxRawUserAccount, loyaltyProgramId: number, pointsToEarn: number, properties: Record<string, string|number> = {}): PerxLoyaltyTransactionRequest {
+    const request = new PerxLoyaltyTransactionRequest(
+      new PerxLoyaltyTransactionRequestUserAccount(userAccount),
+      loyaltyProgramId,
+      pointsToEarn,
+      properties,
+    )
+    return request
+  }
+}
