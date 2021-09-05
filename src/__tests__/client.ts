@@ -11,7 +11,8 @@ describe('PerxService', () => {
     tokenDurationInSeconds: testingTokenDurationInSeconds, // 5 mins is more than enough
   })
 
-  const testableUserIdentifierOnPerxServer = (process.env.TEST_PERX_USER_ID || '')
+  const testableUserIdentifierOnPerxServer = (process.env.TEST_PERX_USER_IDENTIFIER || '')
+  const testableUserIdOnPerxServer = (process.env.TEST_PERX_USER_ID || '')
   const testableLoyaltyProgramIdOnPerxServer = (process.env.TEST_PERX_LOYALTY_PROGRAM_ID || '')
 
   // Optional target, if not provide use first record in query to run the test
@@ -80,6 +81,16 @@ describe('PerxService', () => {
           expect(typeof loyalty.id).toEqual('number')
           expect(loyalty.id).toEqual(+testableLoyaltyProgramIdOnPerxServer)
           expect(loyalty.pointBalance).toBeTruthy()
+        })
+      })
+    }
+
+    if (testableUserIdOnPerxServer) {
+      describe('for customer', () => {
+        it('can query customer', async () => {
+          const customer = await client.getCustomer(ctx.accessToken, testableUserIdOnPerxServer)
+          expect(customer.identifier).toEqual(testableUserIdentifierOnPerxServer)
+          expect(customer.id).toEqual(+testableUserIdOnPerxServer)
         })
       })
     }

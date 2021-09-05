@@ -14,6 +14,8 @@ import {
   PerxVoucher,
   PerxLoyalty,
   LoyaltyProgramResponse,
+  PerxCustomer,
+  PerxCustomerResponse,
 } from './models'
 
 export interface PerxFilterScope {
@@ -86,6 +88,14 @@ export interface IPerxService {
    * Query perx loyalty points
    */
   getLoyaltyProgram(userToken: string, loyaltyProgramId: string | number): Promise<PerxLoyalty>
+
+
+  /**
+   * Fetch specific perx's customer
+   * @param userToken
+   * @param customerId
+   */
+  getCustomer(userToken: string, customerId: string | number): Promise<PerxCustomer>
 }
 
 export class PerxService implements IPerxService {
@@ -209,6 +219,21 @@ export class PerxService implements IPerxService {
     })
 
     const result = BasePerxResponse.parseAndEval(resp.data, resp.status, LoyaltyProgramResponse)
+    return result.data
+  }
+
+  public async getCustomer(userToken: string, customerId: string | number): Promise<PerxCustomer> {
+    if (!/^\d+$/.test(`${customerId}`)) {
+      throw PerxError.badRequest(`Invalid customerId: ${customerId}, expected customer as integer`)
+    }
+    const resp = await this.axios.get(`/v4/customers/${customerId}`, {
+      headers: {
+        authorization: `Bearer ${userToken}`,
+      },
+      params: {}
+    })
+
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxCustomerResponse)
     return result.data
   }
 

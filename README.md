@@ -51,7 +51,8 @@ TEST_PERX_CLIENT_ID=SOME_RANDOM_PERX_CLIENT_ID
 TEST_PERX_CLIENT_SECRET=SOME_RANDOM_PERX_CLIENT_SECRET
 
 # Perx's target account to run against
-TEST_PERX_USER_ID=66666
+TEST_PERX_USER_IDENTIFIER=66666   # Your focal customer's 'identifier' (NOT Perx's Id)
+TEST_PERX_USER_ID=253             # Your focal customer's 'id' (Yes this one is Perx's Id)
 
 # Perx's target reward id to issue as voucher, reserve the voucher and commit the voucher.
 TEST_PERX_REWARD_ID=111

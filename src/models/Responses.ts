@@ -1,6 +1,7 @@
 import { autoserializeAs, Deserialize, inheritSerialization } from 'cerialize'
 import { isArray } from 'lodash'
 import { PerxError } from '../error'
+import { PerxCustomer } from './Customer'
 import { PerxLoyalty } from './LoyaltyProgram'
 import { PerxReward } from './Reward'
 import { PerxVoucher } from './Voucher'
@@ -160,4 +161,8 @@ export class VoucherResponse extends ObjectPerxResponse<PerxVoucher> {
 
 export class LoyaltyProgramResponse extends ObjectPerxResponse<PerxLoyalty> {
   public constructor() { super(PerxLoyalty) }
+}
+
+export class PerxCustomerResponse extends ObjectPerxResponse<PerxCustomer> {
+  public constructor() { super(PerxCustomer) }
 }
