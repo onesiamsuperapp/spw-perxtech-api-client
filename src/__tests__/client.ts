@@ -22,7 +22,7 @@ describe('PerxService', () => {
     throw new Error('Unable to run test without proper configuration. Please revise your .env file. (in root folder)')
   }
 
-  describe('session', () => {
+  describe('customer session', () => {
     const ctx = {
       accessToken: '',
       rewardId: testableRewardId || -1,
@@ -31,7 +31,7 @@ describe('PerxService', () => {
     it('can issue user token', async () => {
       const tokenResp = await client.getUserToken(testableUserIdentifierOnPerxServer)
       expect(tokenResp.accessToken).toBeTruthy()
-      expect(tokenResp.tokenType).toEqual('bearer')
+      expect(tokenResp.tokenType).toMatch(/bearer/i)
       expect(tokenResp.scope).toEqual('user_account')
       expect(tokenResp.expiresIn).toEqual(testingTokenDurationInSeconds)
       ctx.accessToken = tokenResp.accessToken
@@ -94,5 +94,18 @@ describe('PerxService', () => {
         })
       })
     }
+  })
+
+  describe('application session', () => {
+    const ctx = {
+      accessToken: '',
+    }
+    it('can issue application token', async () => {
+      const tokenResp = await client.getApplicationToken()
+      expect(tokenResp.accessToken).toBeTruthy()
+      expect(tokenResp.tokenType).toMatch(/bearer/i)
+      expect(tokenResp.scope).toBeUndefined()
+      ctx.accessToken = tokenResp.accessToken
+    })
   })
 })

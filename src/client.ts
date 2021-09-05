@@ -16,7 +16,11 @@ import {
   LoyaltyProgramResponse,
   PerxCustomer,
   PerxCustomerResponse,
+  PerxTransaction,
+  PerxTransactionReqeust,
+  PerxTransactionResponse,
 } from './models'
+import { Serialize } from 'cerialize'
 
 export interface PerxFilterScope {
 
@@ -25,78 +29,97 @@ export interface PerxFilterScope {
   tagIds :string[]
 }
 
-export interface IPerxService {
-
+export interface IPerxAuthService {
   /**
    * Issue the token by assuming role of user (customer).
    * 
    * @param userIdentifier 
    */
-  getUserToken(userIdentifier: string): Promise<TokenResponse>
+   getUserToken(userIdentifier: string): Promise<TokenResponse>
 
-  /**
-   * List rewards for specific user
-   * 
-   * @param userToken 
-   * @param scope 
-   */
-  getRewards(userToken: string, scope: Partial<PerxFilterScope>): Promise<PerxReward[]>
-
-  /**
-   * Issue a voucher from particular reward for specific user
-   *
-   * @param userToken 
-   * @param rewardId 
-   */
-  issueVoucher(userToken: string, rewardId: number | string): Promise<PerxVoucher>
-
-  /**
-   * List vouchers for specific users
-   * 
-   * @param userToken
-   * @param scope 
-   */
-  getVouchers(userToken: string, scope: Partial<PerxFilterScope>): Promise<PerxVoucher[]>
-
-  /**
-   * Redeem the voucher with specific voucherId and pass confirm boolean flag
-   * 
-   * For 2 phase action
-   * if confirm flag = false, to reserve
-   * if confirm flag = true, to confirm
-   * 
-   * For single shot
-   * if confirm flag = undefined, to confirm right away
-   * 
-   * @param userToken 
-   * @param voucherId 
-   * @param confirm 
-   * @returns 
-   */
-  redeemVoucher(userToken: string, voucherId: number | string): Promise<PerxVoucher>
-  redeemVoucher(userToken: string, voucherId: number | string, confirm: boolean): Promise<PerxVoucher>
-
-  /**
-   * Release locked voucher from PerxService
-   * 
-   * @param userToken 
-   * @param voucherId 
-   */
-  releaseVoucher(userToken: string, voucherId: number | string): Promise<PerxVoucher>
-
-  /**
-   * Query perx loyalty points
-   */
-  getLoyaltyProgram(userToken: string, loyaltyProgramId: string | number): Promise<PerxLoyalty>
-
-
-  /**
-   * Fetch specific perx's customer
-   * @param userToken
-   * @param customerId
-   */
-  getCustomer(userToken: string, customerId: string | number): Promise<PerxCustomer>
+   /**
+    * Issue the application's token
+    */
+   getApplicationToken(): Promise<TokenResponse>
 }
+
+export interface IPerxUserService {
+
+   /**
+    * List rewards for specific user
+    * 
+    * @param userToken 
+    * @param scope 
+    */
+   getRewards(userToken: string, scope: Partial<PerxFilterScope>): Promise<PerxReward[]>
+ 
+   /**
+    * Issue a voucher from particular reward for specific user
+    *
+    * @param userToken 
+    * @param rewardId 
+    */
+   issueVoucher(userToken: string, rewardId: number | string): Promise<PerxVoucher>
+ 
+   /**
+    * List vouchers for specific users
+    * 
+    * @param userToken
+    * @param scope 
+    */
+   getVouchers(userToken: string, scope: Partial<PerxFilterScope>): Promise<PerxVoucher[]>
+ 
+   /**
+    * Redeem the voucher with specific voucherId and pass confirm boolean flag
+    * 
+    * For 2 phase action
+    * if confirm flag = false, to reserve
+    * if confirm flag = true, to confirm
+    * 
+    * For single shot
+    * if confirm flag = undefined, to confirm right away
+    * 
+    * @param userToken 
+    * @param voucherId 
+    * @param confirm 
+    * @returns 
+    */
+   redeemVoucher(userToken: string, voucherId: number | string): Promise<PerxVoucher>
+   redeemVoucher(userToken: string, voucherId: number | string, confirm: boolean): Promise<PerxVoucher>
+ 
+   /**
+    * Release locked voucher from PerxService
+    * 
+    * @param userToken 
+    * @param voucherId 
+    */
+   releaseVoucher(userToken: string, voucherId: number | string): Promise<PerxVoucher>
+ 
+   /**
+    * Query perx loyalty points
+    */
+   getLoyaltyProgram(userToken: string, loyaltyProgramId: string | number): Promise<PerxLoyalty>
+ 
+ 
+   /**
+    * Fetch specific perx's customer
+    * @param userToken
+    * @param customerId
+    */
+   getCustomer(userToken: string, customerId: string | number): Promise<PerxCustomer>
+}
+
+export interface IPerxPosService {
+
+  /**
+   * Submit new transaction to perx service via POS Access.
+   * 
+   * @param transaction 
+   */
+  submitTransaction(applicationToken: string, transaction: PerxTransactionReqeust): Promise<PerxTransaction>
+}
+
+export type IPerxService = IPerxAuthService & IPerxUserService & IPerxPosService
 
 export class PerxService implements IPerxService {
 
@@ -126,6 +149,20 @@ export class PerxService implements IPerxService {
       grant_type: 'client_credentials',
       scope: `user_account(identifier:${userIdentifier})`,
       expires_in: this.config.tokenDurationInSeconds, // Expires it actually expire for 5 minutes
+    })
+
+    if (resp.status == 401) {
+      throw PerxError.unauthorized()
+    }
+
+    return BasePerxResponse.parseAndEval(resp.data, resp.status, TokenResponse)
+  }
+
+  public async getApplicationToken(): Promise<TokenResponse> {
+    const resp = await this.axios.post('/v4/oauth/token', {
+      client_id: this.config.clientId,
+      client_secret: this.config.clientSecret,
+      grant_type: 'client_credentials',
     })
 
     if (resp.status == 401) {
@@ -234,6 +271,19 @@ export class PerxService implements IPerxService {
     })
 
     const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxCustomerResponse)
+    return result.data
+  }
+
+  public async submitTransaction(applicationToken: string, transaction: PerxTransactionReqeust): Promise<PerxTransaction> {
+    const body = Serialize(transaction)
+    const resp = await this.axios.post('/v4/pos/transactions', body, {
+      headers: {
+        authorization: `Bearer ${applicationToken}`,
+      },
+      params: {}
+    })
+
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxTransactionResponse)
     return result.data
   }
 

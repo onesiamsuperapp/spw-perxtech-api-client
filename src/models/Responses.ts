@@ -4,6 +4,7 @@ import { PerxError } from '../error'
 import { PerxCustomer } from './Customer'
 import { PerxLoyalty } from './LoyaltyProgram'
 import { PerxReward } from './Reward'
+import { PerxTransaction } from './Transaction'
 import { PerxVoucher } from './Voucher'
 
 export class BasePerxResponse {
@@ -144,7 +145,7 @@ export class TokenResponse extends BasePerxResponse {
   expiresIn: number = 0
 
   @autoserializeAs('scope')
-  scope!: string
+  scope?: string
 }
 
 export class RewardsRespopnse extends ItemListPerxResponse<PerxReward> {
@@ -165,4 +166,8 @@ export class LoyaltyProgramResponse extends ObjectPerxResponse<PerxLoyalty> {
 
 export class PerxCustomerResponse extends ObjectPerxResponse<PerxCustomer> {
   public constructor() { super(PerxCustomer) }
+}
+
+export class PerxTransactionResponse extends ObjectPerxResponse<PerxTransaction> {
+  public constructor() { super(PerxTransaction) }
 }
