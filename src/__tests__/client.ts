@@ -102,12 +102,19 @@ describe('PerxService', () => {
     const ctx = {
       accessToken: '',
     }
+
     it('can issue application token', async () => {
       const tokenResp = await client.getApplicationToken()
       expect(tokenResp.accessToken).toBeTruthy()
       expect(tokenResp.tokenType).toMatch(/bearer/i)
       expect(tokenResp.scope).toBeUndefined()
       ctx.accessToken = tokenResp.accessToken
+    })
+
+
+    it('can get customer detail', async () => {
+      const detail = await client.getCustomerDetail(ctx.accessToken, +testableUserIdOnPerxServer)
+      expect(detail.identifier).toBeTruthy()
     })
 
     it('can earn the points for customer', async () => {
