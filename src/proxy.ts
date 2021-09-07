@@ -57,6 +57,20 @@ export class PerxProxyManager implements IPerxProxyManager {
 
   public constructor(public readonly identification: PerxIdentification, public readonly perxService: IPerxService) {
   }
+  public static async assureApplicationToken(perxService: IPerxService): Promise<TokenResponse> {
+    const applicationTokenCacheKey = 'application'
+    const nowMs = new Date().getTime()
+    const _token = this._tokens[applicationTokenCacheKey]
+    if (_token && _token.expiredAt.getTime() > nowMs) {
+      return _token.response
+    }
+    const tokenResp = await perxService.getApplicationToken()
+    this._tokens[applicationTokenCacheKey] = {
+      expiredAt: new Date(nowMs + tokenResp.expiresIn * 1000),
+      response: tokenResp,
+    }
+    return tokenResp
+  }
 
   /**
    * Use this method to access exposedToken
@@ -74,8 +88,8 @@ export class PerxProxyManager implements IPerxProxyManager {
     }
   
     if (identification.type === 'id') {
-      const tokenResp = await perxService.getApplicationToken()
-      const response = await perxService.getCustomerDetail(tokenResp.accessToken, identification.id)
+      const appTokenResp = await this.assureApplicationToken(perxService)
+      const response = await perxService.getCustomerDetail(appTokenResp.accessToken, identification.id)
       if (response.identifier) {
         identifier = response.identifier
       }
@@ -94,7 +108,6 @@ export class PerxProxyManager implements IPerxProxyManager {
       response,
     }
     return response
-
   }
 
   /**
