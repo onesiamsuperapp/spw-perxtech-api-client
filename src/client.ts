@@ -128,6 +128,13 @@ export interface IPerxPosService {
    * @param transaction 
    */
   submitTransaction(applicationToken: string, transaction: PerxTransactionReqeust): Promise<PerxTransaction>
+
+  /**
+   * get customer detail via POS Access.
+   * 
+   * @param userId 
+  */
+  getCustomerDetail(applicationToken: string, userId: number): Promise<PerxCustomer>
 }
 
 export type IPerxService = IPerxAuthService & IPerxUserService & IPerxPosService
@@ -167,6 +174,19 @@ export class PerxService implements IPerxService {
     }
 
     return BasePerxResponse.parseAndEval(resp.data, resp.status, TokenResponse)
+  }
+
+  public async getCustomerDetail(applicationToken: string, userId: number): Promise<PerxCustomer> {
+    const resp = await this.axios.get(`/v4/pos/user_accounts/${userId}`, {
+      headers: {
+        authorization: `Bearer ${applicationToken}`,
+      },
+    })
+    if (resp.status == 401) {
+      throw PerxError.unauthorized()
+    }
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxCustomerResponse)
+    return result.data
   }
 
   public async getApplicationToken(): Promise<TokenResponse> {
