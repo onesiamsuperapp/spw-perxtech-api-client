@@ -9,6 +9,7 @@ import {
 } from './'
 import chunk from 'lodash/chunk'
 import { PerxError } from './error'
+import { PerxLoyalty } from './models'
 
 
 export interface PerxId {
@@ -185,4 +186,17 @@ export class PerxProxyManager implements IPerxProxyManager {
   public async getRewardsCategories(parentCategory?: string): Promise<any> {
     // Query reward categories
   }
+
+
+  /**
+   * Query loyalty program from Perx
+   * 
+   * @param loyaltyProgramId
+   * @returns
+   */
+  public async getLoyaltyProgram(loyaltyProgramId: number | string): Promise<PerxLoyalty> {
+    const token = await PerxProxyManager.assureToken(this.identification, this.perxService)
+    return this.perxService.getLoyaltyProgram(token.accessToken, loyaltyProgramId)
+  }
+
 }
