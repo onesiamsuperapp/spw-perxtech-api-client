@@ -29,7 +29,15 @@ export interface PerxFilterScope {
 
   categoryIds: string[]
 
+  /**
+   * tagIds to apply against
+   */
   tagIds :string[]
+
+  /**
+   * translated to: `filter_by_points_balance`
+   */
+  onlyWithEnoughPoints: boolean
 }
 
 export interface IPerxAuthService {
