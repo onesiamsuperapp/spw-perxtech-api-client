@@ -28,7 +28,19 @@ describe('PerxProxyManager', () => {
       })
       expect(resp.accessToken).toBeTruthy()
     })
+  })
 
+  describe('user', () => {
+    it('can query the customer', async () => {
+      const user = manager.user({
+        type: 'id',
+        id: +testableUserIdOnPerxServer,
+      })
+
+      const me = await user.getMe()
+      expect(me.id).toEqual(+testableUserIdOnPerxServer)
+      expect(me.identifier).toEqual(testableUserIdentifierOnPerxServer)
+    })
   })
 
   describe('identifier', () => {

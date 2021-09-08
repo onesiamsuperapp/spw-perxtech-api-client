@@ -91,6 +91,11 @@ export interface IPerxUserProxy {
    * @returns
    */
   getLoyaltyProgram(loyaltyProgramId: number | string): Promise<PerxLoyalty>
+
+  /**
+   * Get perx's self customer identity
+   */
+  getMe(): Promise<PerxCustomer>
 }
 
 /**
@@ -98,7 +103,7 @@ export interface IPerxUserProxy {
  */
 export interface IPerxPosProxy {
   /**
-   * HArd burn/earn points
+   * Hard burn/earn points
    * 
    * @param applicationToken 
    * @param request 

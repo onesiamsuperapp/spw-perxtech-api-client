@@ -1,5 +1,5 @@
 import type { IPerxUserProxy } from './manager'
-import type { IPerxService, PerxFilterScope, PerxLoyalty, PerxReward, PerxVoucher, TokenResponse } from '..'
+import type { IPerxService, PerxCustomer, PerxFilterScope, PerxLoyalty, PerxReward, PerxVoucher, TokenResponse } from '..'
 import { chunk } from 'lodash'
 
 export class PerxUserProxy implements IPerxUserProxy {
@@ -61,6 +61,11 @@ export class PerxUserProxy implements IPerxUserProxy {
     return this._forEachVoucher(voucherIds, (token, voucherId) => {
       return this.perxService.releaseVoucher(token.accessToken, voucherId)
     })
+  }
+
+  public async getMe(): Promise<PerxCustomer> {
+    const token = await this.getToken()
+    return this.perxService.getMe(token.accessToken)
   }
 
   public async getLoyaltyProgram(loyaltyProgramId: number | string): Promise<PerxLoyalty> {
