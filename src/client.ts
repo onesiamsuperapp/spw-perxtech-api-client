@@ -25,6 +25,7 @@ import {
   PerxLoyaltyTransaction,
   PerxLoyaltyTransactionResponse,
   PerxLoyaltyTransactionsHistoryResponse,
+  PerxRewardSearchResultResponse,
 } from './models'
 
 export interface PerxFilterScope {
@@ -58,13 +59,21 @@ export interface IPerxAuthService {
 
 export interface IPerxUserService {
 
-   /**
-    * List rewards for specific user
-    * 
-    * @param userToken 
-    * @param scope 
-    */
+  /**
+   * List rewards for specific user
+   * 
+   * @param userToken 
+   * @param scope 
+   */
    getRewards(userToken: string, scope: Partial<PerxFilterScope>): Promise<PerxReward[]>
+
+  /**
+   * Search rewards for that matched the keyword
+   * 
+   * @param userToken 
+   * @param keyword 
+   */
+  searchRewards(userToken: string, keyword: string): Promise<PerxRewardSearchResultResponse>
  
    /**
     * Issue a voucher from particular reward for specific user
@@ -114,10 +123,10 @@ export interface IPerxUserService {
    getLoyaltyProgram(userToken: string, loyaltyProgramId: string | number): Promise<PerxLoyalty>
  
  
-   /**
-    * Query perx loyalty list
-    */
-    getLoyaltyPrograms(userToken: string): Promise<PerxLoyalty[]>
+  /**
+   * Query perx loyalty list
+   */
+  getLoyaltyPrograms(userToken: string): Promise<PerxLoyalty[]>
 
    /**
     * Fetch specific perx's customer
@@ -134,13 +143,13 @@ export interface IPerxUserService {
     */
    getMe(userToken: string): Promise<PerxCustomer>
 
-   /**
-    * Fetch customer's transaction history from Perx's service
-    * 
-    * @param userToken
-    * @param page start with 1
-    * @param perPage desinate the page size
-    */
+  /**
+   * Fetch customer's transaction history from Perx's service
+   * 
+   * @param userToken
+   * @param page start with 1
+   * @param perPage desinate the page size
+   */
   queryLoyaltyTransactionsHistory(userToken: string, page: number, perPage: number): Promise<PerxLoyaltyTransactionsHistoryResponse>
 }
 
@@ -323,7 +332,6 @@ export class PerxService implements IPerxService {
     return result.data
   }
 
-
   public async getLoyaltyPrograms(userToken: string): Promise<PerxLoyalty[]> {
     const resp = await this.axios.get('/v4/loyalty', {
       headers: {
@@ -379,6 +387,20 @@ export class PerxService implements IPerxService {
 
     const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxLoyaltyTransactionResponse)
     return result.data
+  }
+
+  public async searchRewards(userToken: string, keyword: string): Promise<PerxRewardSearchResultResponse> {
+    const resp = await this.axios.get('/v4/search', {
+      headers: {
+        authorization: `Bearer ${userToken}`,
+      },
+      params: {
+        search_string: keyword,
+      }
+    })
+
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxRewardSearchResultResponse)
+    return result
   }
 
   public async queryLoyaltyTransactionsHistory(userToken: string, page: number, perPage: number): Promise<PerxLoyaltyTransactionsHistoryResponse> {

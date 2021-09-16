@@ -14,6 +14,7 @@ import {
   PerxTransaction,
   PerxTransactionReqeust,
   PerxLoyaltyTransactionsHistoryResponse,
+  PerxRewardSearchResultResponse,
 } from '../models'
 import { PerxPosProxy } from './pos'
 import { PerxUserProxy } from './user'
@@ -42,6 +43,13 @@ export interface IPerxUserProxy {
    * @param scope 
    */
   queryRewards(scope: Partial<PerxFilterScope>): Promise<PerxReward[]>
+
+  /**
+   * Search existing Perx's rewards
+   * 
+   * @param keyword 
+   */
+  searchRewards(keyword: string): Promise<PerxRewardSearchResultResponse>
 
   /**
    * Cliam a reward, resulting a Voucher.
@@ -92,7 +100,6 @@ export interface IPerxUserProxy {
    * @returns
    */
   getLoyaltyProgram(loyaltyProgramId: number | string): Promise<PerxLoyalty>
-
 
   /**
    * Listing loyalty programs from Perx

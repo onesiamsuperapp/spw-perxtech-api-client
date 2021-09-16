@@ -1,5 +1,15 @@
 import type { IPerxUserProxy } from './manager'
-import type { IPerxService, PerxCustomer, PerxFilterScope, PerxLoyalty, PerxLoyaltyTransactionsHistoryResponse, PerxReward, PerxVoucher, TokenResponse } from '..'
+import type {
+  IPerxService,
+  PerxCustomer,
+  PerxFilterScope,
+  PerxLoyalty,
+  PerxLoyaltyTransactionsHistoryResponse,
+  PerxReward,
+  PerxRewardSearchResultResponse,
+  PerxVoucher,
+  TokenResponse,
+} from '..'
 import { chunk } from 'lodash'
 
 export class PerxUserProxy implements IPerxUserProxy {
@@ -7,33 +17,21 @@ export class PerxUserProxy implements IPerxUserProxy {
   public constructor(public readonly getToken: () => Promise<TokenResponse>, private readonly perxService: IPerxService) {
   }
 
-  /**
-   * Query list of Rewards from Perx (so that it can be claimed)
-   * 
-   * @param scope
-   * @returns
-   */
   public async queryRewards(scope: Partial<PerxFilterScope>): Promise<PerxReward[]> {
     const token = await this.getToken()
     return this.perxService.getRewards(token.accessToken, scope)
   }
 
-  /**
-   * Issue the reward from service layer
-   * 
-   * @param rewardId 
-   */
+  public async searchRewards(keyword: string): Promise<PerxRewardSearchResultResponse> {
+    const token = await this.getToken()
+    return this.perxService.searchRewards(token.accessToken, keyword)
+  }
+
   public async issueReward(rewardId: string): Promise<PerxVoucher> {
     const token = await this.getToken()
     return this.perxService.issueVoucher(token.accessToken, rewardId)
   }
 
-  /**
-   * Query list of vouchers from Perx
-   * 
-   * @param scope 
-   * @returns 
-   */
   public async queryVouchers(scope: Partial<PerxFilterScope>): Promise<PerxVoucher[]> {
     const token = await this.getToken()
     return this.perxService.getVouchers(token.accessToken, scope)

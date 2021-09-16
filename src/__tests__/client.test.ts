@@ -15,6 +15,7 @@ describe('PerxService', () => {
   const testableUserIdentifierOnPerxServer = (process.env.TEST_PERX_USER_IDENTIFIER || '')
   const testableUserIdOnPerxServer = (process.env.TEST_PERX_USER_ID || '')
   const testableLoyaltyProgramIdOnPerxServer = (process.env.TEST_PERX_LOYALTY_PROGRAM_ID || '')
+  const testableSearchKeyword = (process.env.TEST_PERX_REWARD_SEARCH_KEYWORD || '')
 
   // Optional target, if not provide use first record in query to run the test
   const testableRewardId = +(process.env.TEST_PERX_REWARD_ID || '-1')
@@ -50,6 +51,17 @@ describe('PerxService', () => {
           ctx.rewardId = rewards[0].id
         }
       })
+
+      if (testableSearchKeyword) {
+        it('can search rewards', async () => {
+          const searchResults = await client.searchRewards(ctx.accessToken, testableSearchKeyword)
+          expect(searchResults).toBeTruthy()
+          expect(searchResults.data).toBeInstanceOf(Array)
+          expect(searchResults.data.length).toBeGreaterThan(1)
+          expect(searchResults.data[0].documentType).toEqual('reward')
+          expect(searchResults.data[0].reward).toBeTruthy()
+        })
+      }
   
       it('can claim the rewards as voucher', async () => {
         const voucher = await client.issueVoucher(ctx.accessToken, `${ctx.rewardId}`)

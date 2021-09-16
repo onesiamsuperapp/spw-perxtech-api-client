@@ -1,11 +1,15 @@
 import { autoserializeAs, Deserialize, inheritSerialization } from 'cerialize'
-import { isArray } from 'lodash'
+import {
+  isArray,
+  get,
+} from 'lodash'
 import { PerxLoyaltyTransactionHistoryEntry } from '.'
 import { PerxError } from '../error'
 import { PerxCustomer } from './Customer'
 import { PerxLoyalty } from './LoyaltyProgram'
 import { PerxLoyaltyTransaction } from './LoyaltyTransaction'
 import { PerxReward } from './Reward'
+import { PerxRewardSearchResult } from './SearchResult'
 import { PerxTransaction } from './Transaction'
 import { PerxVoucher } from './Voucher'
 
@@ -129,7 +133,10 @@ export abstract class ObjectPerxResponse<Obj> extends BasePerxResponse {
 @inheritSerialization(BasePerxResponse)
 export abstract class ItemListPerxResponse<Item> extends BasePerxResponse {
 
-  protected constructor(private cnstr: new () => Item) {
+  protected constructor(
+    private cnstr: new () => Item,
+    protected readonly dataKeyPath: string = 'data'
+  ) {
     super()
   }
 
@@ -139,7 +146,7 @@ export abstract class ItemListPerxResponse<Item> extends BasePerxResponse {
   meta!: PerxPagingMeta
 
   protected afterDeserialized(json: any) {
-    const deserialized = Deserialize(json.data, this.cnstr)
+    const deserialized = Deserialize(get(json, this.dataKeyPath), this.cnstr)
     if (!isArray(deserialized)) {
       throw new Error('Failed to deserialize item entries')
     }
@@ -209,4 +216,9 @@ export class PerxLoyaltyTransactionResponse extends ObjectPerxResponse<PerxLoyal
 @inheritSerialization(ItemListPerxResponse)
 export class PerxLoyaltyTransactionsHistoryResponse extends ItemListPerxResponse<PerxLoyaltyTransactionHistoryEntry> {
   public constructor() { super(PerxLoyaltyTransactionHistoryEntry) }
+}
+
+@inheritSerialization(ItemListPerxResponse)
+export class PerxRewardSearchResultResponse extends ItemListPerxResponse<PerxRewardSearchResult> {
+  public constructor() { super(PerxRewardSearchResult, 'data.rewards')}
 }
