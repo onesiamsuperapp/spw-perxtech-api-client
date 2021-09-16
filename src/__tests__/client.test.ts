@@ -91,6 +91,15 @@ describe('PerxService', () => {
           expect(typeof loyalties[0].id).toEqual('number')
           expect(loyalties[0].pointBalance).toBeTruthy()
         })
+
+        it('can query get users transaction histroy from Perx', async () => {
+          const resp = await client.queryLoyaltyTransactionsHistory(ctx.accessToken, 1, 5)
+          expect(resp).toBeTruthy()
+          expect(resp.data).toBeInstanceOf(Array)
+          expect(resp.data.length).toBeGreaterThanOrEqual(0)
+          expect(resp.meta).toBeTruthy()
+          expect(resp.meta.count).toBeGreaterThanOrEqual(0)
+        })
       })
     }
 

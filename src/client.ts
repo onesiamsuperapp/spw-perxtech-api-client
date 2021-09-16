@@ -24,6 +24,7 @@ import {
   PerxLoyaltyTransactionRequest,
   PerxLoyaltyTransaction,
   PerxLoyaltyTransactionResponse,
+  PerxLoyaltyTransactionsHistoryResponse,
 } from './models'
 
 export interface PerxFilterScope {
@@ -132,6 +133,15 @@ export interface IPerxUserService {
     * @param userToken
     */
    getMe(userToken: string): Promise<PerxCustomer>
+
+   /**
+    * Fetch customer's transaction history from Perx's service
+    * 
+    * @param userToken
+    * @param page start with 1
+    * @param perPage desinate the page size
+    */
+  queryLoyaltyTransactionsHistory(userToken: string, page: number, perPage: number): Promise<PerxLoyaltyTransactionsHistoryResponse>
 }
 
 export interface IPerxPosService {
@@ -371,8 +381,19 @@ export class PerxService implements IPerxService {
     return result.data
   }
 
-  public async getLoyaltyTransactionHistory(userToken: string): Promise<PerxLoyaltyTransaction[]> {
-    return []
+  public async queryLoyaltyTransactionsHistory(userToken: string, page: number, perPage: number): Promise<PerxLoyaltyTransactionsHistoryResponse> {
+    const resp = await this.axios.get('/v4/loyalty/transactions_history', {
+      headers: {
+        authorization: `Bearer ${userToken}`,
+      },
+      params: {
+        page,
+        size: perPage,
+      }
+    })
+
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxLoyaltyTransactionsHistoryResponse)
+    return result
   }
 
   private static fromScopeToQueryParams(scope: Partial<PerxFilterScope>): Record<string, string[]> {

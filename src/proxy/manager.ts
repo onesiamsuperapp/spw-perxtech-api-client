@@ -13,6 +13,7 @@ import {
   PerxLoyaltyTransactionRequest,
   PerxTransaction,
   PerxTransactionReqeust,
+  PerxLoyaltyTransactionsHistoryResponse,
 } from '../models'
 import { PerxPosProxy } from './pos'
 import { PerxUserProxy } from './user'
@@ -99,6 +100,15 @@ export interface IPerxUserProxy {
    * @returns
    */
   queryLoyaltyPrograms(): Promise<PerxLoyalty[]>
+
+  /**
+   * Query Perx transactions history of given user
+   * @param page 
+   * @param perPage 
+   */
+  queryTransactionsHistory(): Promise<PerxLoyaltyTransactionsHistoryResponse>
+  queryTransactionsHistory(page: number): Promise<PerxLoyaltyTransactionsHistoryResponse>
+  queryTransactionsHistory(page: number, perPage: number): Promise<PerxLoyaltyTransactionsHistoryResponse>
 
   /**
    * Get perx's self customer identity

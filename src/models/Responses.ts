@@ -1,5 +1,6 @@
 import { autoserializeAs, Deserialize, inheritSerialization } from 'cerialize'
 import { isArray } from 'lodash'
+import { PerxLoyaltyTransactionHistoryEntry } from '.'
 import { PerxError } from '../error'
 import { PerxCustomer } from './Customer'
 import { PerxLoyalty } from './LoyaltyProgram'
@@ -146,6 +147,7 @@ export abstract class ItemListPerxResponse<Item> extends BasePerxResponse {
   }
 }
 
+@inheritSerialization(BasePerxResponse)
 export class TokenResponse extends BasePerxResponse {
 
   @autoserializeAs('access_token')
@@ -164,34 +166,47 @@ export class TokenResponse extends BasePerxResponse {
   scope?: string
 }
 
+@inheritSerialization(ItemListPerxResponse)
 export class RewardsRespopnse extends ItemListPerxResponse<PerxReward> {
   public constructor() { super(PerxReward) }
 }
 
+@inheritSerialization(ItemListPerxResponse)
 export class VouchersResponse extends ItemListPerxResponse<PerxVoucher> {
   public constructor() { super(PerxVoucher) }
 }
 
+@inheritSerialization(ObjectPerxResponse)
 export class VoucherResponse extends ObjectPerxResponse<PerxVoucher> {
   public constructor() { super(PerxVoucher) }
 }
 
+@inheritSerialization(ObjectPerxResponse)
 export class LoyaltyProgramResponse extends ObjectPerxResponse<PerxLoyalty> {
   public constructor() { super(PerxLoyalty) }
 }
 
+@inheritSerialization(ItemListPerxResponse)
 export class LoyaltyProgramsResponse extends ItemListPerxResponse<PerxLoyalty> {
   public constructor() { super(PerxLoyalty) }
 }
 
+@inheritSerialization(ObjectPerxResponse)
 export class PerxCustomerResponse extends ObjectPerxResponse<PerxCustomer> {
   public constructor() { super(PerxCustomer) }
 }
 
+@inheritSerialization(ObjectPerxResponse)
 export class PerxTransactionResponse extends ObjectPerxResponse<PerxTransaction> {
   public constructor() { super(PerxTransaction) }
 }
 
+@inheritSerialization(ObjectPerxResponse)
 export class PerxLoyaltyTransactionResponse extends ObjectPerxResponse<PerxLoyaltyTransaction> {
   public constructor() { super(PerxLoyaltyTransaction) }
+}
+
+@inheritSerialization(ItemListPerxResponse)
+export class PerxLoyaltyTransactionsHistoryResponse extends ItemListPerxResponse<PerxLoyaltyTransactionHistoryEntry> {
+  public constructor() { super(PerxLoyaltyTransactionHistoryEntry) }
 }
