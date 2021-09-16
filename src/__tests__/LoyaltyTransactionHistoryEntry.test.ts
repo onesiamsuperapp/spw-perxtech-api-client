@@ -102,7 +102,7 @@ const _fixture = {
 }
 
 
-describe('LoyaltyTransactionHistoryEntry', () => {
+describe('Perx LoyaltyTransactionHistoryEntry', () => {
   it.each`
     name                      | fixtureData
     ${'simple'}               | ${_fixture.simple}

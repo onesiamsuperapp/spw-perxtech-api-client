@@ -27,7 +27,7 @@ const _fixture = {
   }
 }
 
-describe('Response', () => {
+describe('Perx Response', () => {
   describe('Paging Meta', () => {
     it.each`
       name                      | fixtureData
@@ -38,7 +38,7 @@ describe('Response', () => {
 
       expect(o).toBeInstanceOf(PerxPagingMeta)
 
-      const policy = makePolicy(o, fixtureData, true)
+      const policy = makePolicy(o, fixtureData)
       const fieldCompare: Array<[string, ComparePolicy]> = [
         ['size', policy.equal],
         ['page', policy.equal],
