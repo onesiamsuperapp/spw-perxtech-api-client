@@ -69,6 +69,21 @@ export class PerxPagingMeta {
 
   @autoserializeAs('page')
   page!: number
+
+  @autoserializeAs('current_page')
+  currentPage!: number
+
+  @autoserializeAs('per_page')
+  perPage!: number
+
+  @autoserializeAs('prev_page')
+  prevPage: number | null = null
+
+  @autoserializeAs('next_page')
+  nextPage: number | null = null
+
+  @autoserializeAs('total_count')
+  totalCount: number | null = null
   
   @autoserializeAs('lat')
   lat: string | null = null

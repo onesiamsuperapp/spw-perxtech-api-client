@@ -351,6 +351,10 @@ export class PerxService implements IPerxService {
     return result.data
   }
 
+  public async getLoyaltyTransactionHistory(userToken: string): Promise<PerxLoyaltyTransaction[]> {
+    return []
+  }
+
   private static fromScopeToQueryParams(scope: Partial<PerxFilterScope>): Record<string, string[]> {
     const out: Record<string, string[]> = {}
     if (scope.categoryIds) {
