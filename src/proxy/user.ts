@@ -73,6 +73,12 @@ export class PerxUserProxy implements IPerxUserProxy {
     return this.perxService.getLoyaltyProgram(token.accessToken, loyaltyProgramId)
   }
 
+
+  public async queryLoyaltyPrograms(): Promise<PerxLoyalty[]> {
+    const token = await this.getToken()
+    return this.perxService.getLoyaltyPrograms(token.accessToken)
+  }
+
   private async _forEachVoucher<R>(voucherIds: string[], callback: (token: TokenResponse, voucherId: string) => Promise<R>): Promise<R[]> {
     const token = await this.getToken()
     let results: R[] = []

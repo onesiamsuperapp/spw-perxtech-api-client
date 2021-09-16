@@ -15,6 +15,7 @@ import {
   PerxVoucher,
   PerxLoyalty,
   LoyaltyProgramResponse,
+  LoyaltyProgramsResponse,
   PerxCustomer,
   PerxCustomerResponse,
   PerxTransaction,
@@ -111,6 +112,12 @@ export interface IPerxUserService {
     */
    getLoyaltyProgram(userToken: string, loyaltyProgramId: string | number): Promise<PerxLoyalty>
  
+ 
+   /**
+    * Query perx loyalty list
+    */
+    getLoyaltyPrograms(userToken: string): Promise<PerxLoyalty[]>
+
    /**
     * Fetch specific perx's customer
     * 
@@ -303,6 +310,19 @@ export class PerxService implements IPerxService {
     })
 
     const result = BasePerxResponse.parseAndEval(resp.data, resp.status, LoyaltyProgramResponse)
+    return result.data
+  }
+
+
+  public async getLoyaltyPrograms(userToken: string): Promise<PerxLoyalty[]> {
+    const resp = await this.axios.get('/v4/loyalty', {
+      headers: {
+        authorization: `Bearer ${userToken}`,
+      },
+      params: {}
+    })
+
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, LoyaltyProgramsResponse)
     return result.data
   }
 

@@ -180,6 +180,10 @@ export class LoyaltyProgramResponse extends ObjectPerxResponse<PerxLoyalty> {
   public constructor() { super(PerxLoyalty) }
 }
 
+export class LoyaltyProgramsResponse extends ItemListPerxResponse<PerxLoyalty> {
+  public constructor() { super(PerxLoyalty) }
+}
+
 export class PerxCustomerResponse extends ObjectPerxResponse<PerxCustomer> {
   public constructor() { super(PerxCustomer) }
 }
