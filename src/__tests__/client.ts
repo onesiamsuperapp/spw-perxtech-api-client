@@ -83,6 +83,14 @@ describe('PerxService', () => {
           expect(loyalty.id).toEqual(+testableLoyaltyProgramIdOnPerxServer)
           expect(loyalty.pointBalance).toBeTruthy()
         })
+
+        it('can query list user loyalty program', async () => {
+          const loyalties = await client.getLoyaltyPrograms(ctx.accessToken)
+          expect(loyalties.length).toBeGreaterThan(0)
+          expect(loyalties[0].tierPoints).toBeTruthy()
+          expect(typeof loyalties[0].id).toEqual('number')
+          expect(loyalties[0].pointBalance).toBeTruthy()
+        })
       })
     }
 
