@@ -29,7 +29,15 @@ export interface PerxFilterScope {
 
   categoryIds: string[]
 
+  /**
+   * tagIds to apply against
+   */
   tagIds :string[]
+
+  /**
+   * translated to: `filter_by_points_balance`
+   */
+  onlyWithEnoughPoints: boolean
 }
 
 export interface IPerxAuthService {
@@ -105,10 +113,18 @@ export interface IPerxUserService {
  
    /**
     * Fetch specific perx's customer
+    * 
     * @param userToken
     * @param customerId
     */
    getCustomer(userToken: string, customerId: string | number): Promise<PerxCustomer>
+
+   /**
+    * Fetch myself as customer
+    * 
+    * @param userToken
+    */
+   getMe(userToken: string): Promise<PerxCustomer>
 }
 
 export interface IPerxPosService {
@@ -290,8 +306,12 @@ export class PerxService implements IPerxService {
     return result.data
   }
 
-  public async getCustomer(userToken: string, customerId: string | number): Promise<PerxCustomer> {
-    if (!/^\d+$/.test(`${customerId}`)) {
+  public async getMe(userToken: string): Promise<PerxCustomer> {
+    return this.getCustomer(userToken, 'me')
+  }
+
+  public async getCustomer(userToken: string, customerId: string | number = 'me'): Promise<PerxCustomer> {
+    if (!/^(me|\d+)$/.test(`${customerId}`)) {
       throw PerxError.badRequest(`Invalid customerId: ${customerId}, expected customer as integer`)
     }
     const resp = await this.axios.get(`/v4/customers/${customerId}`, {

@@ -18,25 +18,38 @@ describe('PerxProxyManager', () => {
   if (!testableUserIdentifierOnPerxServer) {
     throw new Error('Unable to run test without proper configuration. Please revise your .env file. (in root folder)')
   }
+  const manager = new PerxProxyManager(client)
+
   describe('id', () => {
     it('can assureToken with id', async () => {
-      const resp = await PerxProxyManager.assureToken({
+      const resp = await manager.assureToken({
         type: 'id',
         id: +testableUserIdOnPerxServer,
-      }, client)
+      })
       expect(resp.accessToken).toBeTruthy()
     })
+  })
 
+  describe('user', () => {
+    it('can query the customer', async () => {
+      const user = manager.user({
+        type: 'id',
+        id: +testableUserIdOnPerxServer,
+      })
+
+      const me = await user.getMe()
+      expect(me.id).toEqual(+testableUserIdOnPerxServer)
+      expect(me.identifier).toEqual(testableUserIdentifierOnPerxServer)
+    })
   })
 
   describe('identifier', () => {
     it('can assureToken with identifier', async () => {
-      const resp = await PerxProxyManager.assureToken({
+      const resp = await manager.assureToken({
         type: 'identifier',
         identifier: testableUserIdentifierOnPerxServer,
-      }, client)
+      })
       expect(resp.accessToken).toBeTruthy()
     })
-
   })
 })
