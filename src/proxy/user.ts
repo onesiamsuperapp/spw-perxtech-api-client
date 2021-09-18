@@ -9,6 +9,8 @@ import type {
   PerxRewardSearchResultResponse,
   PerxVoucher,
   TokenResponse,
+  PerxVoucherScope,
+  PerxVouchersResponse,
 } from '..'
 import { chunk } from 'lodash'
 
@@ -32,7 +34,7 @@ export class PerxUserProxy implements IPerxUserProxy {
     return this.perxService.issueVoucher(token.accessToken, rewardId)
   }
 
-  public async queryVouchers(scope: Partial<PerxFilterScope>): Promise<PerxVoucher[]> {
+  public async queryVouchers(scope: Partial<PerxVoucherScope>): Promise<PerxVouchersResponse> {
     const token = await this.getToken()
     return this.perxService.getVouchers(token.accessToken, scope)
   }

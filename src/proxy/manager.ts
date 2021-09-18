@@ -5,6 +5,7 @@ import {
   PerxFilterScope,
   IPerxService,
   PerxError,
+  PerxVoucherScope,
 } from '..'
 import {
   PerxCustomer,
@@ -15,6 +16,7 @@ import {
   PerxTransactionReqeust,
   PerxLoyaltyTransactionsHistoryResponse,
   PerxRewardSearchResultResponse,
+  PerxVouchersResponse,
 } from '../models'
 import { PerxPosProxy } from './pos'
 import { PerxUserProxy } from './user'
@@ -63,7 +65,7 @@ export interface IPerxUserProxy {
    * 
    * @param scope 
    */
-  queryVouchers(scope: Partial<PerxFilterScope>): Promise<PerxVoucher[]>
+  queryVouchers(scope: Partial<PerxVoucherScope>): Promise<PerxVouchersResponse>
 
   /**
    * Mark the voucher to be ready to use.

@@ -62,6 +62,56 @@ export class BasePerxResponse {
   }
 }
 
+/**
+ * Support following details
+ * {
+      "count": 63,
+      "size": 10,
+      "page": 1,
+      "total_pages": 7,
+      "order": null,
+      "type": null
+    }
+ */
+export class PerxPagingVoucherMeta {
+  
+  /**
+   * Total count of complete query scope
+   */
+  @autoserializeAs('count')
+  count: number = 0
+
+  /**
+   * Total count of items within this page
+   */
+  @autoserializeAs('size')
+  size: number = 0
+
+  /**
+   * current page
+   */
+  @autoserializeAs('page')
+  page: number = 1
+
+  /**
+   * total number of pages
+   */
+  @autoserializeAs('total_pages')
+  totalPages: number = 0
+
+  /**
+   * current order sequence
+   */
+  @autoserializeAs('order')
+  order: 'asc' | 'desc' | null = null
+
+  /**
+   * Type of query scope used.
+   */
+  @autoserializeAs('type')
+  type: string | null = null
+}
+
 export class PerxPagingMeta {
   @autoserializeAs('count')
   count!: number
@@ -178,9 +228,14 @@ export class RewardsRespopnse extends ItemListPerxResponse<PerxReward> {
   public constructor() { super(PerxReward) }
 }
 
-@inheritSerialization(ItemListPerxResponse)
-export class VouchersResponse extends ItemListPerxResponse<PerxVoucher> {
-  public constructor() { super(PerxVoucher) }
+@inheritSerialization(BasePerxResponse)
+export class PerxVouchersResponse extends BasePerxResponse {
+
+  @autoserializeAs(PerxVoucher, 'data')
+  public data: PerxVoucher[] = []
+
+  @autoserializeAs(PerxPagingVoucherMeta, 'meta')
+  meta!: PerxPagingVoucherMeta
 }
 
 @inheritSerialization(ObjectPerxResponse)

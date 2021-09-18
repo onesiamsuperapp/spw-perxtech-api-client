@@ -10,7 +10,7 @@ import {
   RewardsRespopnse,
   TokenResponse,
   VoucherResponse,
-  VouchersResponse,
+  PerxVouchersResponse,
   PerxReward,
   PerxVoucher,
   PerxLoyalty,
@@ -26,7 +26,17 @@ import {
   PerxLoyaltyTransactionResponse,
   PerxLoyaltyTransactionsHistoryResponse,
   PerxRewardSearchResultResponse,
+  PerxVoucherState,
 } from './models'
+
+export interface PerxVoucherScope {
+  size: number
+  page: number
+  sortBy: 'issued_date' | 'valid_to'
+  order: 'asc' | 'desc'
+  state: PerxVoucherState
+  type: 'active' | 'all' | 'expired' | 'gifted' | 'redeemed' | 'redemption_in_progress'
+}
 
 export interface PerxFilterScope {
 
@@ -89,7 +99,7 @@ export interface IPerxUserService {
     * @param userToken
     * @param scope 
     */
-   getVouchers(userToken: string, scope: Partial<PerxFilterScope>): Promise<PerxVoucher[]>
+   getVouchers(userToken: string, scope: Partial<PerxVoucherScope>): Promise<PerxVouchersResponse>
  
    /**
     * Redeem the voucher with specific voucherId and pass confirm boolean flag
@@ -272,17 +282,23 @@ export class PerxService implements IPerxService {
     return result.data
   }
 
-  public async getVouchers(userToken: string, scope: Partial<PerxFilterScope>): Promise<PerxVoucher[]> {
-    const params = PerxService.fromScopeToQueryParams(scope)
+  public async getVouchers(userToken: string, scope: Partial<PerxVoucherScope>): Promise<PerxVouchersResponse> {
     const resp = await this.axios.get('/v4/vouchers', {
       headers: {
         authorization: `Bearer ${userToken}`,
       },
-      params,
+      params: {
+        size: scope?.size || 24,
+        page: scope?.page || 1,
+        state: scope.state || undefined,
+        type: scope.type || undefined,
+        sort_by: scope.sortBy || undefined,
+        order: scope.order || undefined,
+      },
     })
 
-    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, VouchersResponse)
-    return result.data
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxVouchersResponse)
+    return result
   }
 
   public async redeemVoucher(userToken: string, voucherId: string | number, confirm: boolean | undefined = undefined): Promise<PerxVoucher> {

@@ -1,5 +1,9 @@
+import { PerxVoucherScope } from '..'
 import { IPerxService, PerxService } from '../client'
-import { PerxLoyaltyTransactionRequest } from '../models'
+import {
+  PerxLoyaltyTransactionRequest,
+  PerxVoucher,
+} from '../models'
 
 describe('PerxService', () => {
 
@@ -39,11 +43,42 @@ describe('PerxService', () => {
       ctx.accessToken = tokenResp.accessToken
     })
 
+    it.each`
+      scope                         | mustMatch
+      ${{}}                         | ${() => true }
+      ${{state: 'expired'}}         | ${(o: PerxVoucher) => o.state === 'expired' }
+      ${{type: 'expired'}}          | ${(o: PerxVoucher) => o.state === 'expired' }
+      ${{type: 'all'}}              | ${(o: PerxVoucher) => ['expired', 'issued','redemption_in_progress', 'released', 'redeemed'].indexOf(o.state) >= 0 }
+      ${{state: 'issued'}}          | ${(o: PerxVoucher) => o.state === 'issued' }
+      ${{state: 'redeemed'}}        | ${(o: PerxVoucher) => o.state === 'redeemed' }
+    `('list vouchers $scope', async ({ scope, mustMatch }: { scope: PerxVoucherScope, mustMatch: (o: PerxVoucher) => boolean}) => {
+      const perPage = 10
+      const vouchers = await client.getVouchers(ctx.accessToken, { ...scope, page: 1, size: perPage })
+      expect(vouchers).toBeTruthy()
+      expect(vouchers.data).toBeTruthy()
+      expect(vouchers.data.every(mustMatch)).toBeTruthy()
+
+      expect(vouchers.meta.page).toEqual(1)
+      expect(vouchers.meta.size).toBeLessThanOrEqual(perPage)
+      if (scope.type) {
+        expect(vouchers.meta.type).toEqual(scope.type)
+      }
+
+      if (vouchers.meta.count > vouchers.meta.size) {
+        expect(vouchers.meta.totalPages).toBeGreaterThan(1)
+
+        const nextPageVouchers = await client.getVouchers(ctx.accessToken, { ...scope, page: 2, size: perPage })
+        expect(nextPageVouchers).toBeTruthy()
+        expect(nextPageVouchers.data).toBeTruthy()
+        expect(nextPageVouchers.data.every(mustMatch)).toBeTruthy()
+      }
+    })
+
     describe('for reward & voucher', () => {
       it('can query rewards', async () => {
         const rewards = await client.getRewards(ctx.accessToken, {})
         expect(rewards).toBeInstanceOf(Array)
-        expect(rewards.length).toBeGreaterThan(1)
+        expect(rewards.length).toBeGreaterThanOrEqual(1)
         expect(rewards[0].id).toBeTruthy()
         expect(typeof rewards[0].id).toBe('number')
   
