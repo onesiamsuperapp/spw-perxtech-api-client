@@ -80,6 +80,7 @@ describe('PerxService', () => {
     describe('for reward & voucher', () => {
       it.each`
         scope                               | mustMatch
+        ${{ tagIds: [1, 112] }}             | ${(o: PerxReward) => o.tags.some((t) => t.id === 1 || t.id === 112)}
         ${{}}                               | ${() => true}
       `('can query rewards: $scope', async ({ scope, mustMatch }: { scope: PerxRewardScope, mustMatch: (o: PerxReward) => boolean}) => {
         const resp = await client.getRewards(ctx.accessToken, scope)

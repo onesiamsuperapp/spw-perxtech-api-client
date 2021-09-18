@@ -106,7 +106,7 @@ export interface IPerxUserService {
    * @param userToken 
    * @param scope 
    */
-   getRewards(userToken: string, scope: Partial<PerxRewardScope>): Promise<PerxRewardsResponse>
+  getRewards(userToken: string, scope: Partial<PerxRewardScope>): Promise<PerxRewardsResponse>
 
   /**
    * Search rewards for that matched the keyword

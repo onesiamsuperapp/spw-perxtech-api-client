@@ -1,7 +1,39 @@
 import { autoserializeAs } from 'cerialize'
 import { ISODateTimeSerializer } from '../utils/cerialize'
-import { ShortPerxLoyalty } from './LoyaltyProgram'
-import { PerxCategory, PerxTag } from './Taxonomy'
+
+import {
+  PerxCategory,
+  PerxTag,
+} from './Taxonomy'
+
+/**
+ * Mapped against
+ * 
+ * {
+    "attained": true,
+    "loyalty_id": 2,
+    "loyalty_name": "Titanium",
+    "loyalty_points_required_for_redemption": null,
+    "sneak_peek": false
+    }
+ */
+export class PerxRewardLoyaltyScope {
+
+  @autoserializeAs('loyalty_id')
+  loyaltyId!: number
+
+  @autoserializeAs('attained')
+  attained: boolean = false
+
+  @autoserializeAs('loyalty_name')
+  loyaltyName: string | null = null
+
+  @autoserializeAs('loyalty_points_required_for_redemption')
+  loyaltyPointsRequiredForRedemption: number | null = null
+
+  @autoserializeAs('sneak_peek')
+  sneakPeek: boolean = false
+}
 
 export class PerxImage {
   @autoserializeAs('url')
@@ -121,7 +153,7 @@ export class PerxReward {
   @autoserializeAs('ecommerce_only')
   ecommerceOnly: boolean = false
 
-  @autoserializeAs('brands')
+  @autoserializeAs(PerxBrand, 'brands')
   brands: PerxBrand[] = []
 
   @autoserializeAs('subtitle')
@@ -157,8 +189,8 @@ export class PerxReward {
   @autoserializeAs('terms_and_conditions')
   termsAndConditions: string | null = null
 
-  @autoserializeAs(ShortPerxLoyalty, 'loyalty')
-  loyalty: ShortPerxLoyalty[] = []
+  @autoserializeAs(PerxRewardLoyaltyScope, 'loyalty')
+  loyalty: PerxRewardLoyaltyScope[] = []
 
   @autoserializeAs(PerxTag, 'tags')
   tags: PerxTag[] = []

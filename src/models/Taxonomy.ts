@@ -7,7 +7,7 @@ export class PerxTaxonomy {
   id!: number
 
   @autoserializeAs('title')
-  title: string = ''
+  title: string | null = null
 
   @autoserializeAs('name')
   name?: string
