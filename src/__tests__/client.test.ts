@@ -1,9 +1,12 @@
-import { PerxVoucherScope } from '..'
-import { IPerxService, PerxService } from '../client'
 import {
+  IPerxService,
+  PerxService,
   PerxLoyaltyTransactionRequest,
   PerxVoucher,
-} from '../models'
+  PerxRewardScope,
+  PerxVoucherScope,
+  PerxReward,
+} from '..'
 
 describe('PerxService', () => {
 
@@ -75,12 +78,15 @@ describe('PerxService', () => {
     })
 
     describe('for reward & voucher', () => {
-      it('can query rewards', async () => {
-        const rewards = await client.getRewards(ctx.accessToken, {})
+      it.each`
+        scope                               | mustMatch
+        ${{}}                               | ${() => true}
+      `('can query rewards: $scope', async ({ scope, mustMatch }: { scope: PerxRewardScope, mustMatch: (o: PerxReward) => boolean}) => {
+        const resp = await client.getRewards(ctx.accessToken, scope)
+        const rewards = resp.data
         expect(rewards).toBeInstanceOf(Array)
         expect(rewards.length).toBeGreaterThanOrEqual(1)
-        expect(rewards[0].id).toBeTruthy()
-        expect(typeof rewards[0].id).toBe('number')
+        expect(rewards.every(mustMatch)).toBeTruthy()
   
         if (ctx.rewardId <= 0) {
           ctx.rewardId = rewards[0].id

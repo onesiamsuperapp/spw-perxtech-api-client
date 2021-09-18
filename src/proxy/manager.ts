@@ -1,13 +1,11 @@
 import {
-  PerxReward,
   PerxVoucher,
   TokenResponse,
-  PerxFilterScope,
+  PerxRewardScope,
   IPerxService,
   PerxError,
   PerxVoucherScope,
-} from '..'
-import {
+  PerxRewardsResponse,
   PerxCustomer,
   PerxLoyalty,
   PerxLoyaltyTransaction,
@@ -17,7 +15,7 @@ import {
   PerxLoyaltyTransactionsHistoryResponse,
   PerxRewardSearchResultResponse,
   PerxVouchersResponse,
-} from '../models'
+} from '..'
 import { PerxPosProxy } from './pos'
 import { PerxUserProxy } from './user'
 
@@ -44,7 +42,7 @@ export interface IPerxUserProxy {
    * 
    * @param scope 
    */
-  queryRewards(scope: Partial<PerxFilterScope>): Promise<PerxReward[]>
+  queryRewards(scope: Partial<PerxRewardScope>): Promise<PerxRewardsResponse>
 
   /**
    * Search existing Perx's rewards

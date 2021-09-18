@@ -2,15 +2,15 @@ import type { IPerxUserProxy } from './manager'
 import type {
   IPerxService,
   PerxCustomer,
-  PerxFilterScope,
+  PerxRewardScope,
   PerxLoyalty,
   PerxLoyaltyTransactionsHistoryResponse,
-  PerxReward,
   PerxRewardSearchResultResponse,
   PerxVoucher,
   TokenResponse,
   PerxVoucherScope,
   PerxVouchersResponse,
+  PerxRewardsResponse,
 } from '..'
 import { chunk } from 'lodash'
 
@@ -19,7 +19,7 @@ export class PerxUserProxy implements IPerxUserProxy {
   public constructor(public readonly getToken: () => Promise<TokenResponse>, private readonly perxService: IPerxService) {
   }
 
-  public async queryRewards(scope: Partial<PerxFilterScope>): Promise<PerxReward[]> {
+  public async queryRewards(scope: Partial<PerxRewardScope>): Promise<PerxRewardsResponse> {
     const token = await this.getToken()
     return this.perxService.getRewards(token.accessToken, scope)
   }

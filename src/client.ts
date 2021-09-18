@@ -7,11 +7,10 @@ import { PerxError } from './error'
 
 import {
   BasePerxResponse,
-  RewardsRespopnse,
+  PerxRewardsResponse,
   TokenResponse,
   VoucherResponse,
   PerxVouchersResponse,
-  PerxReward,
   PerxVoucher,
   PerxLoyalty,
   LoyaltyProgramResponse,
@@ -38,19 +37,51 @@ export interface PerxVoucherScope {
   type: 'active' | 'all' | 'expired' | 'gifted' | 'redeemed' | 'redemption_in_progress'
 }
 
-export interface PerxFilterScope {
+export interface PerxRewardScope {
 
-  categoryIds: string[]
+  /**
+   * Page's sequence start with 1 *NOT* 0.
+   */
+  page: number
+
+  /**
+   * How much should Perx retrieve per page
+   */
+  pageSize: number
+
+  /**
+   * Category's Name
+   * 
+   * !warning: This is not exact match search!
+   */
+  categoryNamePrefix: string
+
+  /**
+   * mapped to: `filter_for_catalogs`
+   * !warning: from manualy testing The API doesn't support multiple value
+   */
+  catalogId: string
+
+  /**
+   * mapped to: `filter_for_brands`
+   * !warning: from manualy testing The API doesn't support multiple vlaue
+   */
+  brandId: string
 
   /**
    * tagIds to apply against
    */
-  tagIds :string[]
+  tagIds: string[]
 
   /**
-   * translated to: `filter_by_points_balance`
+   * translated to: `filter_by_points_balance` // undefined or none
    */
-  onlyWithEnoughPoints: boolean
+  filterByPointsBalance: boolean
+
+  /**
+   * Sorting
+   */
+  sortBy: 'name' | 'id' | 'updated_at' | 'begins_at' | 'ends_at'
 }
 
 export interface IPerxAuthService {
@@ -75,7 +106,7 @@ export interface IPerxUserService {
    * @param userToken 
    * @param scope 
    */
-   getRewards(userToken: string, scope: Partial<PerxFilterScope>): Promise<PerxReward[]>
+   getRewards(userToken: string, scope: Partial<PerxRewardScope>): Promise<PerxRewardsResponse>
 
   /**
    * Search rewards for that matched the keyword
@@ -255,17 +286,16 @@ export class PerxService implements IPerxService {
     return BasePerxResponse.parseAndEval(resp.data, resp.status, TokenResponse)
   }
 
-  public async getRewards(userToken: string, scope: Partial<PerxFilterScope>): Promise<PerxReward[]> {
-    const params = PerxService.fromScopeToQueryParams(scope)
+  public async getRewards(userToken: string, scope: Partial<PerxRewardScope>): Promise<PerxRewardsResponse> {
     const resp = await this.axios.get('/v4/rewards', {
       headers: {
         authorization: `Bearer ${userToken}`,
       },
-      params,
+      params: PerxService.fromRewardsScopeToQueryParams(scope),
     })
 
-    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, RewardsRespopnse)
-    return result.data
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxRewardsResponse)
+    return result
   }
 
   public async issueVoucher(userToken: string, rewardId: number | string): Promise<PerxVoucher> {
@@ -434,13 +464,19 @@ export class PerxService implements IPerxService {
     return result
   }
 
-  private static fromScopeToQueryParams(scope: Partial<PerxFilterScope>): Record<string, string[]> {
-    const out: Record<string, string[]> = {}
-    if (scope.categoryIds) {
-      out.categories = scope.categoryIds
+  private static fromRewardsScopeToQueryParams(scope: Partial<PerxRewardScope>): Record<string, string | string[]> {
+    const out: Record<string, string | string[]> = {}
+    if (scope.catalogId) {
+      out.filter_for_catalogs = scope.catalogId
     }
     if (scope.tagIds) {
       out.tag_ids = scope.tagIds
+    }
+    if (scope.filterByPointsBalance) {
+      out.filter_by_points_balance = 'true'
+    }
+    if (scope.sortBy) {
+      out.sort_by = scope.sortBy
     }
     return out
   }

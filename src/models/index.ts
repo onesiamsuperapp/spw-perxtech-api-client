@@ -1,3 +1,4 @@
+export * from './Requests'
 export * from './Responses'
 export * from './Reward'
 export * from './Taxonomy'

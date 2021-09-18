@@ -224,7 +224,7 @@ export class TokenResponse extends BasePerxResponse {
 }
 
 @inheritSerialization(ItemListPerxResponse)
-export class RewardsRespopnse extends ItemListPerxResponse<PerxReward> {
+export class PerxRewardsResponse extends ItemListPerxResponse<PerxReward> {
   public constructor() { super(PerxReward) }
 }
 
