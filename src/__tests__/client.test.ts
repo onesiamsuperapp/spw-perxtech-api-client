@@ -207,7 +207,7 @@ describe('PerxService', () => {
       expect(earnResp.loyaltyProgramId).toEqual(+testableLoyaltyProgramIdOnPerxServer)
       expect(earnResp.points).toEqual(pointsToEarnAndBurn)
       expect(earnResp.transactedAt).toBeInstanceOf(Date)
-      expect(Math.abs(earnResp.transactedAt.getTime() - nowMs)).toBeLessThanOrEqual(1000)
+      expect(Math.abs(earnResp.transactedAt.getTime() - nowMs)).toBeLessThanOrEqual(5000)
     })
 
     it('can burn the points for customer', async () => {
@@ -229,7 +229,7 @@ describe('PerxService', () => {
       expect(earnResp.loyaltyProgramId).toEqual(+testableLoyaltyProgramIdOnPerxServer)
       expect(earnResp.points).toEqual(-pointsToEarnAndBurn)
       expect(earnResp.transactedAt).toBeInstanceOf(Date)
-      expect(Math.abs(earnResp.transactedAt.getTime() - nowMs)).toBeLessThanOrEqual(1000)
+      expect(Math.abs(earnResp.transactedAt.getTime() - nowMs)).toBeLessThanOrEqual(5000)
     })
   })
 })
