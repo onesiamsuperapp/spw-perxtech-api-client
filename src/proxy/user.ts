@@ -11,6 +11,7 @@ import type {
   PerxVoucherScope,
   PerxVouchersResponse,
   PerxRewardsResponse,
+  PerxCategory,
 } from '..'
 import { chunk } from 'lodash'
 
@@ -37,6 +38,11 @@ export class PerxUserProxy implements IPerxUserProxy {
   public async queryVouchers(scope: Partial<PerxVoucherScope>): Promise<PerxVouchersResponse> {
     const token = await this.getToken()
     return this.perxService.getVouchers(token.accessToken, scope)
+  }
+
+  public async listCategories(): Promise<PerxCategory[]> {
+    const token = await this.getToken()
+    return this.perxService.getCategories(token.accessToken)
   }
 
   public async reserveVouchers(voucherIds: string[]): Promise<PerxVoucher[]> {

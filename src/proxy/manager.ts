@@ -15,6 +15,7 @@ import {
   PerxLoyaltyTransactionsHistoryResponse,
   PerxRewardSearchResultResponse,
   PerxVouchersResponse,
+  PerxCategory,
 } from '..'
 import { PerxPosProxy } from './pos'
 import { PerxUserProxy } from './user'
@@ -50,6 +51,11 @@ export interface IPerxUserProxy {
    * @param keyword 
    */
   searchRewards(keyword: string): Promise<PerxRewardSearchResultResponse>
+
+  /**
+   * List all categories within Perx's system
+   */
+  listCategories(): Promise<PerxCategory[]>
 
   /**
    * Cliam a reward, resulting a Voucher.
