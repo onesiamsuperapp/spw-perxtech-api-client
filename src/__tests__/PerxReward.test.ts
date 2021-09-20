@@ -293,6 +293,7 @@ describe('Perx Voucher', () => {
         ['attained', policy.equal],
         ['loyalty_id', policy.equal],
         ['loyalty_name', policy.equal],
+        ['loyalty_program_id', policy.equal],
         ['loyalty_points_required_for_redemption', policy.equal],
         ['sneak_peek', policy.equal],
       ])]

@@ -72,6 +72,9 @@ export class PerxRewardPrice {
 
   @autoserializeAs('reward_amount')
   rewardAmount: string = '0.0'
+
+  @autoserializeAs('loyalty_program_id')
+  loyaltyProgramId: number | null = null
 }
 
 export class PerxRewardInventory {
