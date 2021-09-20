@@ -25,6 +25,8 @@ import {
   PerxLoyaltyTransactionResponse,
   PerxLoyaltyTransactionsHistoryResponse,
   PerxRewardSearchResultResponse,
+  PerxCategoriesResultResponse,
+  PerxCategory,
   PerxVoucherState,
 } from './models'
 
@@ -186,14 +188,21 @@ export interface IPerxUserService {
     * @param userToken
     * @param customerId
     */
-   getCustomer(userToken: string, customerId: string | number): Promise<PerxCustomer>
+  getCustomer(userToken: string, customerId: string | number): Promise<PerxCustomer>
 
    /**
     * Fetch myself as customer
     * 
     * @param userToken
     */
-   getMe(userToken: string): Promise<PerxCustomer>
+  getMe(userToken: string): Promise<PerxCustomer>
+
+  /**
+   * List all existing categories
+   * 
+   * @param userToken 
+   */
+  getCategories(userToken: string): Promise<PerxCategory[]>
 
   /**
    * Fetch customer's transaction history from Perx's service
@@ -469,6 +478,19 @@ export class PerxService implements IPerxService {
 
     const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxRewardSearchResultResponse)
     return result
+  }
+
+  public async getCategories(userToken: string): Promise<PerxCategory[]> {
+    const resp = await this.axios.get('/v4/categories', {
+      headers: {
+        authorization: `Bearer ${userToken}`,
+      },
+      params: {
+      }
+    })
+
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxCategoriesResultResponse)
+    return result.data
   }
 
   public async queryLoyaltyTransactionsHistory(userToken: string, page: number, perPage: number): Promise<PerxLoyaltyTransactionsHistoryResponse> {

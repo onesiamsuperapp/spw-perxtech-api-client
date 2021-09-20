@@ -37,6 +37,7 @@ describe('PerxService', () => {
       rewardId: testableRewardId || -1,
       voucherId: -1,
     }
+
     it('can issue user token', async () => {
       const tokenResp = await client.getUserToken(testableUserIdentifierOnPerxServer)
       expect(tokenResp.accessToken).toBeTruthy()
@@ -44,6 +45,14 @@ describe('PerxService', () => {
       expect(tokenResp.scope).toEqual('user_account')
       expect(tokenResp.expiresIn).toEqual(testingTokenDurationInSeconds)
       ctx.accessToken = tokenResp.accessToken
+    })
+
+    it('can list categories', async () => {
+      const categories = await client.getCategories(ctx.accessToken)
+      expect(categories).toBeTruthy()
+      expect(categories.length).toBeGreaterThanOrEqual(1)
+      expect(categories[0].id).toBeTruthy()
+      expect(categories[0].title).toBeTruthy()
     })
 
     it.each`
