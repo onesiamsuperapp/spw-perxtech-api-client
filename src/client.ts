@@ -79,9 +79,20 @@ export interface PerxRewardScope {
   filterByPointsBalance: boolean
 
   /**
+   * translated to: `filter_for_merchants`
+   * !warning: from manualy testing The API doesn't support multiple value
+   */
+  filterForMerchants: string
+
+  /**
    * Sorting
    */
   sortBy: 'name' | 'id' | 'updated_at' | 'begins_at' | 'ends_at'
+
+  /**
+   * sortBy's order
+   */
+  order: 'asc' | 'desc'
 }
 
 export interface IPerxAuthService {
@@ -231,11 +242,21 @@ export class PerxService implements IPerxService {
    *
    * @param config 
    */
-  public constructor(public readonly config: PerxConfig) {
+  public constructor(public readonly config: PerxConfig, public readonly debug: boolean = false) {
     this.axios = axios.create({
       baseURL: this.config.baseURL,
       validateStatus: (status: number) => status < 450,     // all statuses are to be parsed by service layer.
     })
+    if (debug) {
+      this.axios.interceptors.request.use((config) => {
+        console.log(`REQ> ${config.url}`, config)
+        return config
+      })
+      this.axios.interceptors.response.use((resp) => {
+        console.log(`RESP< ${resp.config.url}`, resp.data)
+        return resp
+      })
+    }
   }
 
   /**
@@ -287,11 +308,12 @@ export class PerxService implements IPerxService {
   }
 
   public async getRewards(userToken: string, scope: Partial<PerxRewardScope>): Promise<PerxRewardsResponse> {
+    const params = PerxService.fromRewardsScopeToQueryParams(scope)
     const resp = await this.axios.get('/v4/rewards', {
       headers: {
         authorization: `Bearer ${userToken}`,
       },
-      params: PerxService.fromRewardsScopeToQueryParams(scope),
+      params,
     })
 
     const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxRewardsResponse)
@@ -477,6 +499,21 @@ export class PerxService implements IPerxService {
     }
     if (scope.sortBy) {
       out.sort_by = scope.sortBy
+    }
+    if (scope.order) {
+      out.order = scope.order
+    }
+    if (scope.categoryNamePrefix) {
+      out.categories = scope.categoryNamePrefix
+    }
+    if (scope.page) {
+      out.page = `${scope.page}`
+    }
+    if (scope.pageSize) {
+      out.size = `${scope.pageSize}`
+    }
+    if (scope.filterForMerchants) {
+      out.filter_for_merchants = scope.filterForMerchants
     }
     return out
   }
