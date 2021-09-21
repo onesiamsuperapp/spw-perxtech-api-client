@@ -1,6 +1,5 @@
 import {
   PerxVoucher,
-  TokenResponse,
   PerxRewardScope,
   IPerxService,
   PerxError,
@@ -190,18 +189,68 @@ export interface IPerxProxyManager {
   getRewardsCategories(parentCategory?: string): Promise<any>
 }
 
+export interface IPerxToken {
+  accessToken: string
+}
+
+export interface TokenPool {
+
+  /**
+   * Responsible for storing the token with given ttlInMs
+   * 
+   * @param key 
+   * @param token 
+   * @param ttlInMs 
+   */
+  cache(key: string, token: IPerxToken, ttlInMs: number): Promise<void>
+
+  /**
+   * Responsible for retriving the token from the cache pool. If
+   * the cahced item is invalid, or no longer available return null.
+   * 
+   * @param key 
+   */
+  get(key: string): Promise<IPerxToken | null>
+}
+
 /**
+ * Default implementation of Token pool handler
  * 
+ * API consumer can replace this with Other Implementation such as Redis.
  */
-export class PerxProxyManager implements IPerxProxyManager {
+export class InMemoryTokenPool implements TokenPool {
 
   /**
    * !Never access this parameter directly!
    * !use `assureToken` instead.
    */
-  private static _tokens: Record<string, { response: TokenResponse, expiredAt: Date }> = {}
+  private _mem: Record<string, { response: IPerxToken, expiredAt: Date }> = {}
 
-  public constructor(public readonly perxService: IPerxService) {
+  public async cache(key: string, token: IPerxToken, ttlInMs: number): Promise<void> {
+    const nowMs = new Date().getTime()
+    this._mem[key] = {
+      response: token,
+      expiredAt: new Date(nowMs + ttlInMs)
+    }
+  }
+
+  public async get(key: string): Promise<IPerxToken | null> {
+    const nowMs = new Date().getTime()
+    const _token = this._mem[key]
+    if (_token && _token.expiredAt.getTime() > nowMs) {
+      return _token.response
+    }
+    return null
+  }
+}
+
+/**
+ * 
+ */
+export class PerxProxyManager implements IPerxProxyManager {
+
+
+  public constructor(public readonly perxService: IPerxService, private pool: TokenPool = new InMemoryTokenPool()) {
   }
 
   public user(identification: PerxIdentification): IPerxUserProxy {
@@ -218,7 +267,7 @@ export class PerxProxyManager implements IPerxProxyManager {
    * Use this method to access exposedToken
    * @returns 
    */
-  public async assureToken(identification: PerxIdentification): Promise<TokenResponse> {
+  public async assureToken(identification: PerxIdentification): Promise<IPerxToken> {
     let identifier: string | null = null
 
     const key = identification.type === 'id'
@@ -226,12 +275,11 @@ export class PerxProxyManager implements IPerxProxyManager {
       : `identifier:${identification.identifier}`
     const perxService = this.perxService
 
-    const nowMs = new Date().getTime()
-    const _token = PerxProxyManager._tokens[key]
-    if (_token && _token.expiredAt.getTime() > nowMs) {
-      return _token.response
+    const _token = await this.pool.get(key)
+    if (_token) {
+      return _token
     }
-  
+
     if (identification.type === 'id') {
       const appTokenResp = await this.assureApplicationToken()
       const response = await perxService.getCustomerDetail(appTokenResp.accessToken, identification.id)
@@ -248,10 +296,7 @@ export class PerxProxyManager implements IPerxProxyManager {
     }
 
     const response = await perxService.getUserToken(identifier)
-    PerxProxyManager._tokens[key] = {
-      expiredAt: new Date(nowMs + response.expiresIn * 1000),
-      response,
-    }
+    this.pool.cache(key, { accessToken: response.accessToken }, response.expiresIn * 1000)
     return response
   }
 
@@ -261,19 +306,15 @@ export class PerxProxyManager implements IPerxProxyManager {
    * @param perxService
    * @returns
    */
-  public async assureApplicationToken(): Promise<TokenResponse> {
+  public async assureApplicationToken(): Promise<IPerxToken> {
     const applicationTokenCacheKey = 'application'
-    const nowMs = new Date().getTime()
     const perxService = this.perxService
-    const _token = PerxProxyManager._tokens[applicationTokenCacheKey]
-    if (_token && _token.expiredAt.getTime() > nowMs) {
-      return _token.response
+    const resp = await this.pool.get(applicationTokenCacheKey)
+    if (resp) {
+      return resp
     }
     const tokenResp = await perxService.getApplicationToken()
-    PerxProxyManager._tokens[applicationTokenCacheKey] = {
-      expiredAt: new Date(nowMs + tokenResp.expiresIn * 1000),
-      response: tokenResp,
-    }
+    this.pool.cache(applicationTokenCacheKey, { accessToken: tokenResp.accessToken }, tokenResp.expiresIn * 1000)
     return tokenResp
   }
 

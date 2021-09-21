@@ -1,3 +1,4 @@
+import { IPerxToken } from '.'
 import {
   IPerxService,
   PerxCustomer,
@@ -5,13 +6,12 @@ import {
   PerxLoyaltyTransactionRequest,
   PerxTransaction,
   PerxTransactionReqeust,
-  TokenResponse
 } from '..'
 import type { IPerxPosProxy } from './manager'
 
 export class PerxPosProxy implements IPerxPosProxy {
 
-  public constructor(private readonly getToken: () => Promise<TokenResponse>, private readonly perxService: IPerxService) {
+  public constructor(private readonly getToken: () => Promise<IPerxToken>, private readonly perxService: IPerxService) {
   }
 
   /**

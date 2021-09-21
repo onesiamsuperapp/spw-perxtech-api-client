@@ -7,18 +7,18 @@ import type {
   PerxLoyaltyTransactionsHistoryResponse,
   PerxRewardSearchResultResponse,
   PerxVoucher,
-  TokenResponse,
   PerxVoucherScope,
   PerxVouchersResponse,
   PerxRewardsResponse,
   PerxCategory,
   PerxRewardReservation,
+  IPerxToken,
 } from '..'
 import { chunk } from 'lodash'
 
 export class PerxUserProxy implements IPerxUserProxy {
 
-  public constructor(public readonly getToken: () => Promise<TokenResponse>, private readonly perxService: IPerxService) {
+  public constructor(public readonly getToken: () => Promise<IPerxToken>, private readonly perxService: IPerxService) {
   }
 
   public async queryRewards(scope: Partial<PerxRewardScope>): Promise<PerxRewardsResponse> {
@@ -105,7 +105,7 @@ export class PerxUserProxy implements IPerxUserProxy {
     return this.perxService.queryLoyaltyTransactionsHistory(token.accessToken, page, perPage)
   }
 
-  private async _forEachVoucher<R>(voucherIds: string[], callback: (token: TokenResponse, voucherId: string) => Promise<R>): Promise<R[]> {
+  private async _forEachVoucher<R>(voucherIds: string[], callback: (token: IPerxToken, voucherId: string) => Promise<R>): Promise<R[]> {
     const token = await this.getToken()
     let results: R[] = []
     for(const chunkedVoucherIds of chunk(voucherIds, 5)) {
