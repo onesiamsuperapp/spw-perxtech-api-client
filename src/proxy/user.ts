@@ -12,6 +12,7 @@ import type {
   PerxVouchersResponse,
   PerxRewardsResponse,
   PerxCategory,
+  PerxRewardReservation,
 } from '..'
 import { chunk } from 'lodash'
 
@@ -49,6 +50,21 @@ export class PerxUserProxy implements IPerxUserProxy {
     return this._forEachVoucher(voucherIds, (token, voucherId) => {
       return this.perxService.redeemVoucher(token.accessToken, voucherId, false)
     })
+  }
+
+  public async reserveReward(rewardId: string): Promise<PerxRewardReservation> {
+    const token = await this.getToken()
+    return this.perxService.reserveReward(token.accessToken, rewardId)
+  }
+
+  public async releaseReservedReward(reservationId: string): Promise<PerxVoucher> {
+    const token = await this.getToken()
+    return this.perxService.releaseRewardReservation(token.accessToken, reservationId)
+  }
+
+  public async confirmReservedReward(reservationId: string): Promise<PerxVoucher> {
+    const token = await this.getToken()
+    return this.perxService.confirmRewardReservation(token.accessToken, reservationId)
   }
 
   public async confirmVouchers(voucherIds: string[]): Promise<PerxVoucher[]> {

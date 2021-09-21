@@ -6,6 +6,7 @@ import {
   PerxRewardScope,
   PerxVoucherScope,
   PerxReward,
+  PerxRewardReservation,
 } from '..'
 
 describe('PerxService', () => {
@@ -113,6 +114,42 @@ describe('PerxService', () => {
           expect(searchResults.data[0].reward).toBeTruthy()
         })
       }
+
+      describe('reserve & release reward', () => {
+        let reservation: PerxRewardReservation | null = null
+
+        it('can reserve reward as reservedVoucher', async () => {
+          reservation = await client.reserveReward(ctx.accessToken, `${ctx.rewardId}`)
+          expect(reservation).toBeTruthy()
+          expect(typeof reservation.id).toBe('number')
+          expect(reservation.state).toEqual('reserved')
+        })
+
+        it('can release reserved reward', async () => {
+          let voucher = await client.releaseRewardReservation(ctx.accessToken, `${reservation!.id}`)
+          expect(voucher).toBeTruthy()
+          expect(typeof voucher.id).toBe('number')
+          expect(voucher.state).toEqual('released')
+        })
+      })
+
+      describe('reserve & confirm reward', () => {
+        let reservation: PerxRewardReservation | null = null
+
+        it('can reserve reward as reservedVoucher', async () => {
+          reservation = await client.reserveReward(ctx.accessToken, `${ctx.rewardId}`)
+          expect(reservation).toBeTruthy()
+          expect(typeof reservation.id).toBe('number')
+          expect(reservation.state).toEqual('reserved')
+        })
+
+        it('can release reserved reward', async () => {
+          let voucher = await client.confirmRewardReservation(ctx.accessToken, `${reservation!.id}`)
+          expect(voucher).toBeTruthy()
+          expect(typeof voucher.id).toBe('number')
+          expect(voucher.state).toEqual('issued')
+        })
+      })
   
       it('can claim the rewards as voucher', async () => {
         const voucher = await client.issueVoucher(ctx.accessToken, `${ctx.rewardId}`)

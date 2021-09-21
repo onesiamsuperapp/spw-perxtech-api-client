@@ -16,6 +16,7 @@ import {
   PerxRewardSearchResultResponse,
   PerxVouchersResponse,
   PerxCategory,
+  PerxRewardReservation,
 } from '..'
 import { PerxPosProxy } from './pos'
 import { PerxUserProxy } from './user'
@@ -63,6 +64,27 @@ export interface IPerxUserProxy {
    * @param rewardId
    */
   issueReward(rewardId: string): Promise<PerxVoucher>
+
+  /**
+   * Reserve a reward
+   * 
+   * @param scope 
+   */
+  reserveReward(rewardId: string): Promise<PerxRewardReservation>
+
+  /**
+   * release reserved reward
+   * 
+   * @param scope 
+   */
+  releaseReservedReward(rewardId: string): Promise<PerxVoucher>
+
+  /**
+   * confirm the the reserved reward
+   * 
+   * @param scope 
+   */
+  confirmReservedReward(rewardId: string): Promise<PerxVoucher>
 
   /**
    * Listing claimed rewards (vouchers)

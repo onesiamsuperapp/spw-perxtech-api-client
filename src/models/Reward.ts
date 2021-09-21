@@ -115,6 +115,46 @@ export class PerxRewardInventory {
   rewardLimitPerUserPerPeriodBalance: number | null = null
 }
 
+/**
+ * Representation of Reward's reservation
+ * 
+ * Example Payload
+ * 
+    "id": 173,
+    "voucher_code": "*****************",
+    "voucher_key": null,
+    "voucher_type": "code",
+    "state": "reserved",
+    "custom_fields": {
+        "reward_price": {}
+    },
+    "reserved_expires_at": "2021-09-21T01:42:58.000Z"
+ */
+export class PerxRewardReservation {
+  
+  @autoserializeAs('id')
+  id!: number
+
+  @autoserializeAs('voucher_code')
+  voucherCode!: string
+
+  @autoserializeAs('voucher_key')
+  voucherKey: string | null = null
+
+  @autoserializeAs('state')
+  state!: string
+
+  @autoserializeAs('voucher_type')
+  voucherType: string | null = null
+
+  @autoserializeAs('custom_fields')
+  customFields: any = {}
+
+  @autoserializeAs(ISODateTimeSerializer, 'reserved_expires_at')
+  reservedExpiresAt: Date | null = null
+
+}
+
 export class PerxReward {
 
   @autoserializeAs('id')

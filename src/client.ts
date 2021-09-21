@@ -28,6 +28,8 @@ import {
   PerxCategoriesResultResponse,
   PerxCategory,
   PerxVoucherState,
+  PerxRewardReservation,
+  PerxRewardReservationResponse,
 } from './models'
 
 export interface PerxVoucherScope {
@@ -128,6 +130,37 @@ export interface IPerxUserService {
    * @param keyword 
    */
   searchRewards(userToken: string, keyword: string): Promise<PerxRewardSearchResultResponse>
+
+
+  /**
+   * Reserve reward for particular user
+   * 
+   * This API can be commit and release by saving the id generated `ReservationId`, and use it to corresponding APIs
+   * 
+   * @param userToken 
+   * @param rewardId 
+   */
+  reserveReward(userToken: string, rewardId: string): Promise<PerxRewardReservation>
+
+  /**
+   * Release reward's reservation with its id.
+   * 
+   * Reservation ID is generated from reserveReward() API
+   * 
+   * @param userToken 
+   * @param reservationId 
+   */
+  releaseRewardReservation(userToken: string, reservationId: string): Promise<PerxVoucher>
+
+  /**
+   * Confirm reward's reservation with its id.
+   * 
+   * Reservation ID is generated from reserveReward() API
+   * 
+   * @param userToken 
+   * @param reservationId 
+   */
+   confirmRewardReservation(userToken: string, reservationId: string): Promise<PerxVoucher>
  
    /**
     * Issue a voucher from particular reward for specific user
@@ -135,7 +168,7 @@ export interface IPerxUserService {
     * @param userToken 
     * @param rewardId 
     */
-   issueVoucher(userToken: string, rewardId: number | string): Promise<PerxVoucher>
+  issueVoucher(userToken: string, rewardId: number | string): Promise<PerxVoucher>
  
    /**
     * List vouchers for specific users
@@ -143,7 +176,7 @@ export interface IPerxUserService {
     * @param userToken
     * @param scope 
     */
-   getVouchers(userToken: string, scope: Partial<PerxVoucherScope>): Promise<PerxVouchersResponse>
+  getVouchers(userToken: string, scope: Partial<PerxVoucherScope>): Promise<PerxVouchersResponse>
  
    /**
     * Redeem the voucher with specific voucherId and pass confirm boolean flag
@@ -160,8 +193,8 @@ export interface IPerxUserService {
     * @param confirm 
     * @returns 
     */
-   redeemVoucher(userToken: string, voucherId: number | string): Promise<PerxVoucher>
-   redeemVoucher(userToken: string, voucherId: number | string, confirm: boolean): Promise<PerxVoucher>
+  redeemVoucher(userToken: string, voucherId: number | string): Promise<PerxVoucher>
+  redeemVoucher(userToken: string, voucherId: number | string, confirm: boolean): Promise<PerxVoucher>
  
    /**
     * Release locked voucher from PerxService
@@ -169,12 +202,12 @@ export interface IPerxUserService {
     * @param userToken 
     * @param voucherId 
     */
-   releaseVoucher(userToken: string, voucherId: number | string): Promise<PerxVoucher>
+  releaseVoucher(userToken: string, voucherId: number | string): Promise<PerxVoucher>
  
    /**
     * Query perx loyalty points
     */
-   getLoyaltyProgram(userToken: string, loyaltyProgramId: string | number): Promise<PerxLoyalty>
+  getLoyaltyProgram(userToken: string, loyaltyProgramId: string | number): Promise<PerxLoyalty>
  
  
   /**
@@ -251,16 +284,18 @@ export class PerxService implements IPerxService {
    *
    * @param config 
    */
-  public constructor(public readonly config: PerxConfig, public readonly debug: boolean = false) {
+  public constructor(public readonly config: PerxConfig, public readonly debug: 'request' | 'response' | 'all' | 'none' = 'none') {
     this.axios = axios.create({
       baseURL: this.config.baseURL,
       validateStatus: (status: number) => status < 450,     // all statuses are to be parsed by service layer.
     })
-    if (debug) {
+    if (debug === 'request' || debug === 'all') {
       this.axios.interceptors.request.use((config) => {
         console.log(`REQ> ${config.url}`, config)
         return config
       })
+    }
+    if (debug === 'response' || debug === 'all') {
       this.axios.interceptors.response.use((resp) => {
         console.log(`RESP< ${resp.config.url}`, resp.data)
         return resp
@@ -360,6 +395,51 @@ export class PerxService implements IPerxService {
 
     const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxVouchersResponse)
     return result
+  }
+
+  public async reserveReward(userToken: string, rewardId: string): Promise<PerxRewardReservation> {
+    if (!/^\d+$/.test(`${rewardId}`)) {
+      throw PerxError.badRequest(`Invalid rewardId: ${rewardId}, expected rewardId as integer`)
+    }
+    const resp = await this.axios.post(`/v4/rewards/${rewardId}/reserve`, {}, {
+      headers: {
+        authorization: `Bearer ${userToken}`,
+      },
+      params: {}
+    })
+  
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxRewardReservationResponse)
+    return result.data
+  }
+
+  public async releaseRewardReservation(userToken: string, reservationId: string): Promise<PerxVoucher> {
+    if (!/^\d+$/.test(`${reservationId}`)) {
+      throw PerxError.badRequest(`Invalid reservationId: ${reservationId}, expected reservationId as integer`)
+    }
+    const resp = await this.axios.patch(`/v4/vouchers/${reservationId}/release`, {}, {
+      headers: {
+        authorization: `Bearer ${userToken}`,
+      },
+      params: {}
+    })
+
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, VoucherResponse)
+    return result.data
+  }
+
+  public async confirmRewardReservation(userToken: string, reservationId: string): Promise<PerxVoucher> {
+    if (!/^\d+$/.test(`${reservationId}`)) {
+      throw PerxError.badRequest(`Invalid reservationId: ${reservationId}, expected reservationId as integer`)
+    }
+    const resp = await this.axios.patch(`/v4/vouchers/${reservationId}/confirm`, {}, {
+      headers: {
+        authorization: `Bearer ${userToken}`,
+      },
+      params: {}
+    })
+
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, VoucherResponse)
+    return result.data
   }
 
   public async redeemVoucher(userToken: string, voucherId: string | number, confirm: boolean | undefined = undefined): Promise<PerxVoucher> {
