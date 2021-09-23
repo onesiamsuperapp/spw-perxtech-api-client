@@ -65,11 +65,27 @@ export interface IPerxUserProxy {
   issueReward(rewardId: string): Promise<PerxVoucher>
 
   /**
-   * Reserve a reward
+   * Reserve a reward for particular token's owner (expires in 15mins)
    * 
-   * @param scope 
+   * WARNING: call this method while there is a reservation of the same
+   * Reward exists will not issue a new token for the user. Rather it 
+   * will pick current one to return!
+   * 
+   * @param rewardId
    */
   reserveReward(rewardId: string): Promise<PerxRewardReservation>
+
+  /**
+   * Reserve a reward with specific timeout.
+   * 
+   * WARNING: call this method while there is a reservation of the same
+   * Reward exists will not issue a new token for the user. Rather it 
+   * will pick current one to return!
+   * 
+   * @param rewardId
+   * @param timeoutInMs
+   */
+  reserveReward(rewardId: string, timeoutInMs: number): Promise<PerxRewardReservation>
 
   /**
    * release reserved reward

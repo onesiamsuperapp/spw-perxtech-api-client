@@ -52,9 +52,9 @@ export class PerxUserProxy implements IPerxUserProxy {
     })
   }
 
-  public async reserveReward(rewardId: string): Promise<PerxRewardReservation> {
+  public async reserveReward(rewardId: string, timeoutInMs: number = 900 * 1000): Promise<PerxRewardReservation> {
     const token = await this.getToken()
-    return this.perxService.reserveReward(token.accessToken, rewardId)
+    return this.perxService.reserveReward(token.accessToken, rewardId, timeoutInMs)
   }
 
   public async releaseReservedReward(reservationId: string): Promise<PerxVoucher> {

@@ -138,9 +138,20 @@ export interface IPerxUserService {
    * This API can be commit and release by saving the id generated `ReservationId`, and use it to corresponding APIs
    * 
    * @param userToken 
-   * @param rewardId 
+   * @param rewardId
    */
   reserveReward(userToken: string, rewardId: string): Promise<PerxRewardReservation>
+
+  /**
+   * Reserve reward for particular user
+   * 
+   * This API can be commit and release by saving the id generated `ReservationId`, and use the corresponding APIs
+   * 
+   * @param userToken 
+   * @param rewardId 
+   * @param timeoutInMs 
+   */
+  reserveReward(userToken: string, rewardId: string, timeoutInMs: number): Promise<PerxRewardReservation>
 
   /**
    * Release reward's reservation with its id.
@@ -397,7 +408,7 @@ export class PerxService implements IPerxService {
     return result
   }
 
-  public async reserveReward(userToken: string, rewardId: string): Promise<PerxRewardReservation> {
+  public async reserveReward(userToken: string, rewardId: string, timeoutInMs: number = 900 * 1000): Promise<PerxRewardReservation> {
     if (!/^\d+$/.test(`${rewardId}`)) {
       throw PerxError.badRequest(`Invalid rewardId: ${rewardId}, expected rewardId as integer`)
     }
@@ -405,7 +416,9 @@ export class PerxService implements IPerxService {
       headers: {
         authorization: `Bearer ${userToken}`,
       },
-      params: {}
+      params: {
+        timeout: timeoutInMs,
+      }
     })
   
     const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxRewardReservationResponse)
