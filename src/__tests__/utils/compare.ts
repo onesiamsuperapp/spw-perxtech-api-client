@@ -19,19 +19,13 @@ export const makePolicy = <C>(o: C, targetFixture: any, debug = false): CompareP
       const camelKey = toCamel(k)
       const target = get(o, camelKey)
       const fixtured = get(targetFixture, k)
-      if (debug) {
-        console.log('k', k, 'vs', camelKey)
-      }
-      expect(target).toEqual(fixtured)
+      expect({ [k]: camelKey, value: target }).toEqual({ [k]: camelKey, value: fixtured })
     },
     isoDate: (k: string) => {
       const camelKey = toCamel(k)
       const target = get(o, camelKey)
       const fixtured = get(targetFixture, k) as string
-      if (debug) {
-        console.log('k', k, 'vs', camelKey)
-      }
-      expect(target).toEqual(fixtured && new Date(fixtured) || null)
+      expect({ [k]: camelKey, value: target }).toEqual({ [k]: camelKey, value: fixtured && new Date(fixtured) || null })
     },
     nested: (nested: [string, ComparePolicy][]): ComparePolicy => (prefix: string) => {
       const camelKey = toCamel(prefix)

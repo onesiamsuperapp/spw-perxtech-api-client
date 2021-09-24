@@ -1,6 +1,7 @@
 import { Deserialize } from 'cerialize'
 import { makePolicy, ComparePolicy } from './utils/compare'
-import { PerxCategory, PerxReward, PerxRewardLoyaltyScope } from '..'
+import { PerxCategory, PerxReward, PerxRewardInventory, PerxRewardLoyaltyScope } from '..'
+import { get } from 'lodash'
 
 const _fixture = {
   withLoyaltyConstraints: {
@@ -259,7 +260,7 @@ const _fixture = {
   },
 }
 
-describe('Perx Voucher', () => {
+describe('Perx Reward', () => {
   it.each`
     name                                | fixtureData
     ${'with loyalty constraint'}        | ${_fixture.withLoyaltyConstraints}
@@ -298,6 +299,420 @@ describe('Perx Voucher', () => {
         ['sneak_peek', policy.equal],
       ])]
     ]
+    for (const f of fieldCompare) {
+      const fieldName = f[0]
+      const policyComparer = f[1]
+      policyComparer(fieldName)
+    }
+  })
+})
+
+const _inventoryFixture = {
+  '5total': {
+    'NoPeriodLimit': {
+      'NoLimit': {
+        'NoClaimed': {
+          "minutes_per_period": null,
+          "minutes_per_user_per_period": null,
+          "minutes_per_user_period": null,
+          "per_user_period_start": null,
+          "period_start": null,
+          "reward_limit_per_period": null,
+          "reward_limit_per_period_balance": null,
+          "reward_limit_per_user": null,
+          "reward_limit_per_user_balance": null,
+          "reward_limit_per_user_per_period": null,
+          "reward_limit_per_user_per_period_balance": null,
+          "reward_limit_per_user_period_balance": null,
+          "reward_total_balance": 5,
+          "reward_total_limit": 5
+        },
+        'SelfClaimed': {
+          "minutes_per_period": null,
+          "minutes_per_user_per_period": null,
+          "minutes_per_user_period": null,
+          "per_user_period_start": null,
+          "period_start": null,
+          "reward_limit_per_period": null,
+          "reward_limit_per_period_balance": null,
+          "reward_limit_per_user": null,
+          "reward_limit_per_user_balance": null,
+          "reward_limit_per_user_per_period": null,
+          "reward_limit_per_user_per_period_balance": null,
+          "reward_limit_per_user_period_balance": null,
+          "reward_total_balance": 4,
+          "reward_total_limit": 5
+        },
+        'SomeoneClaimed': {
+          "minutes_per_period": null,
+          "minutes_per_user_per_period": null,
+          "minutes_per_user_period": null,
+          "per_user_period_start": null,
+          "period_start": null,
+          "reward_limit_per_period": null,
+          "reward_limit_per_period_balance": null,
+          "reward_limit_per_user": null,
+          "reward_limit_per_user_balance": null,
+          "reward_limit_per_user_per_period": null,
+          "reward_limit_per_user_per_period_balance": null,
+          "reward_limit_per_user_period_balance": null,
+          "reward_total_balance": 4,
+          "reward_total_limit": 5
+        },
+      },
+      '1perUser': {
+        'NoClaimed': {
+          "minutes_per_period": null,
+          "minutes_per_user_per_period": null,
+          "minutes_per_user_period": null,
+          "per_user_period_start": null,
+          "period_start": null,
+          "reward_limit_per_period": null,
+          "reward_limit_per_period_balance": null,
+          "reward_limit_per_user": 1,
+          "reward_limit_per_user_balance": {
+              "available_amount": 1,
+              "limit_error_klass": null,
+              "limit_type": "account_lifetime"
+          },
+          "reward_limit_per_user_per_period": null,
+          "reward_limit_per_user_per_period_balance": null,
+          "reward_limit_per_user_period_balance": null,
+          "reward_total_balance": 5,
+          "reward_total_limit": 5
+        },
+        'SomeoneClaimed': {
+          "minutes_per_period": null,
+          "minutes_per_user_per_period": null,
+          "minutes_per_user_period": null,
+          "per_user_period_start": null,
+          "period_start": null,
+          "reward_limit_per_period": null,
+          "reward_limit_per_period_balance": null,
+          "reward_limit_per_user": 1,
+          "reward_limit_per_user_balance": {
+              "available_amount": 1,
+              "limit_error_klass": null,
+              "limit_type": "account_lifetime"
+          },
+          "reward_limit_per_user_per_period": null,
+          "reward_limit_per_user_per_period_balance": null,
+          "reward_limit_per_user_period_balance": null,
+          "reward_total_balance": 4,
+          "reward_total_limit": 5
+        },
+        'SelfClaimed': {
+          "minutes_per_period": null,
+          "minutes_per_user_per_period": null,
+          "minutes_per_user_period": null,
+          "per_user_period_start": null,
+          "period_start": null,
+          "reward_limit_per_period": null,
+          "reward_limit_per_period_balance": null,
+          "reward_limit_per_user": 1,
+          "reward_limit_per_user_balance": {
+              "available_amount": 0,
+              "limit_error_klass": {
+                  "code": 4103,
+                  "message": "No rewards available for the specified user due to account lifetime limit"
+              },
+              "limit_type": "account_lifetime"
+          },
+          "reward_limit_per_user_per_period": null,
+          "reward_limit_per_user_per_period_balance": null,
+          "reward_limit_per_user_period_balance": null,
+          "reward_total_balance": 4,
+          "reward_total_limit": 5
+        }
+      },
+      '2perUser1perDay': {
+        'NoClaimed': {
+          "minutes_per_period": null,
+          "minutes_per_user_per_period": null,
+          "minutes_per_user_period": 1440,
+          "per_user_period_start": "2021-09-23T16:00:00Z",
+          "period_start": null,
+          "reward_limit_per_period": null,
+          "reward_limit_per_period_balance": null,
+          "reward_limit_per_user": 2,
+          "reward_limit_per_user_balance": {
+              "available_amount": 2,
+              "limit_error_klass": null,
+              "limit_type": "account_lifetime"
+          },
+          "reward_limit_per_user_per_period": 1,
+          "reward_limit_per_user_per_period_balance": {
+              "limit_type": "account_interval",
+              "available_amount": 1,
+              "limit_error_klass": null
+          },
+          "reward_limit_per_user_period_balance": null,
+          "reward_total_balance": 5,
+          "reward_total_limit": 5
+        },
+        'SelfClaimed': {
+          "minutes_per_period": null,
+          "minutes_per_user_per_period": null,
+          "minutes_per_user_period": 1440,
+          "per_user_period_start": "2021-09-23T16:00:00Z",
+          "period_start": null,
+          "reward_limit_per_period": null,
+          "reward_limit_per_period_balance": null,
+          "reward_limit_per_user": 2,
+          "reward_limit_per_user_balance": {
+              "available_amount": 1,
+              "limit_error_klass": null,
+              "limit_type": "account_lifetime"
+          },
+          "reward_limit_per_user_per_period": 1,
+          "reward_limit_per_user_per_period_balance": {
+              "limit_type": "account_interval",
+              "available_amount": 0,
+              "limit_error_klass": {
+                  "code": 4103,
+                  "message": "No rewards available for the specified user due to account interval limit"
+              }
+          },
+          "reward_limit_per_user_period_balance": null,
+          "reward_total_balance": 4,
+          "reward_total_limit": 5
+        },
+        'SomeoneClaimed': {
+          "minutes_per_period": null,
+          "minutes_per_user_per_period": null,
+          "minutes_per_user_period": 1440,
+          "per_user_period_start": "2021-09-23T16:00:00Z",
+          "period_start": null,
+          "reward_limit_per_period": null,
+          "reward_limit_per_period_balance": null,
+          "reward_limit_per_user": 2,
+          "reward_limit_per_user_balance": {
+              "available_amount": 2,
+              "limit_error_klass": null,
+              "limit_type": "account_lifetime"
+          },
+          "reward_limit_per_user_per_period": 1,
+          "reward_limit_per_user_per_period_balance": {
+              "limit_type": "account_interval",
+              "available_amount": 1,
+              "limit_error_klass": null
+          },
+          "reward_limit_per_user_period_balance": null,
+          "reward_total_balance": 4,
+          "reward_total_limit": 5
+        }
+      }
+    },
+    '2perDay': {
+      '1perUser': {
+        'NoClaimed': {
+          "minutes_per_period": 1440,
+          "minutes_per_user_per_period": null,
+          "minutes_per_user_period": null,
+          "per_user_period_start": null,
+          "period_start": "2021-09-23T16:00:00Z",
+          "reward_limit_per_period": 2,
+          "reward_limit_per_period_balance": 2,
+          "reward_limit_per_user": 1,
+          "reward_limit_per_user_balance": {
+              "available_amount": 1,
+              "limit_error_klass": null,
+              "limit_type": "account_lifetime"
+          },
+          "reward_limit_per_user_per_period": null,
+          "reward_limit_per_user_per_period_balance": null,
+          "reward_limit_per_user_period_balance": null,
+          "reward_total_balance": 5,
+          "reward_total_limit": 5
+        },
+        'SelfClaimed': {
+          "minutes_per_period": 1440,
+          "minutes_per_user_per_period": null,
+          "minutes_per_user_period": null,
+          "per_user_period_start": null,
+          "period_start": "2021-09-23T16:00:00Z",
+          "reward_limit_per_period": 2,
+          "reward_limit_per_period_balance": 1,
+          "reward_limit_per_user": 1,
+          "reward_limit_per_user_balance": {
+            "available_amount": 0,
+            "limit_error_klass": {
+              "code": 4103,
+              "message": "No rewards available for the specified user due to account lifetime limit"
+            },
+            "limit_type": "account_lifetime"
+          },
+          "reward_limit_per_user_per_period": null,
+          "reward_limit_per_user_per_period_balance": null,
+          "reward_limit_per_user_period_balance": null,
+          "reward_total_balance": 4,
+          "reward_total_limit": 5
+        },
+        'SomeoneClaimed': {
+          "minutes_per_period": 1440,
+          "minutes_per_user_per_period": null,
+          "minutes_per_user_period": null,
+          "per_user_period_start": null,
+          "period_start": "2021-09-23T16:00:00Z",
+          "reward_limit_per_period": 2,
+          "reward_limit_per_period_balance": 1,
+          "reward_limit_per_user": 1,
+          "reward_limit_per_user_balance": {
+              "available_amount": 1,
+              "limit_error_klass": null,
+              "limit_type": "account_lifetime"
+          },
+          "reward_limit_per_user_per_period": null,
+          "reward_limit_per_user_per_period_balance": null,
+          "reward_limit_per_user_period_balance": null,
+          "reward_total_balance": 4,
+          "reward_total_limit": 5
+        }
+      },
+      '2perUser1perDay': {
+        'NoClaimed': {
+          "minutes_per_period": 1440,
+          "minutes_per_user_per_period": null,
+          "minutes_per_user_period": 1440,
+          "per_user_period_start": "2021-09-23T16:00:00Z",
+          "period_start": "2021-09-23T16:00:00Z",
+          "reward_limit_per_period": 2,
+          "reward_limit_per_period_balance": 2,
+          "reward_limit_per_user": 2,
+          "reward_limit_per_user_balance": {
+              "available_amount": 2,
+              "limit_error_klass": null,
+              "limit_type": "account_lifetime"
+          },
+          "reward_limit_per_user_per_period": 1,
+          "reward_limit_per_user_per_period_balance": {
+              "limit_type": "account_interval",
+              "available_amount": 1,
+              "limit_error_klass": null
+          },
+          "reward_limit_per_user_period_balance": null,
+          "reward_total_balance": 5,
+          "reward_total_limit": 5
+        },
+        'SelfClaimed': {
+          "minutes_per_period": 1440,
+          "minutes_per_user_per_period": null,
+          "minutes_per_user_period": 1440,
+          "per_user_period_start": "2021-09-23T16:00:00Z",
+          "period_start": "2021-09-23T16:00:00Z",
+          "reward_limit_per_period": 2,
+          "reward_limit_per_period_balance": 1,
+          "reward_limit_per_user": 2,
+          "reward_limit_per_user_balance": {
+              "available_amount": 1,
+              "limit_error_klass": null,
+              "limit_type": "account_lifetime"
+          },
+          "reward_limit_per_user_per_period": 1,
+          "reward_limit_per_user_per_period_balance": {
+              "limit_type": "account_interval",
+              "available_amount": 0,
+              "limit_error_klass": {
+                  "code": 4103,
+                  "message": "No rewards available for the specified user due to account interval limit"
+              }
+          },
+          "reward_limit_per_user_period_balance": null,
+          "reward_total_balance": 4,
+          "reward_total_limit": 5
+        },
+        'SomeoneClaimed': {
+          "minutes_per_period": 1440,
+          "minutes_per_user_per_period": null,
+          "minutes_per_user_period": 1440,
+          "per_user_period_start": "2021-09-23T16:00:00Z",
+          "period_start": "2021-09-23T16:00:00Z",
+          "reward_limit_per_period": 2,
+          "reward_limit_per_period_balance": 1,
+          "reward_limit_per_user": 2,
+          "reward_limit_per_user_balance": {
+              "available_amount": 2,
+              "limit_error_klass": null,
+              "limit_type": "account_lifetime"
+          },
+          "reward_limit_per_user_per_period": 1,
+          "reward_limit_per_user_per_period_balance": {
+              "limit_type": "account_interval",
+              "available_amount": 1,
+              "limit_error_klass": null
+          },
+          "reward_limit_per_user_period_balance": null,
+          "reward_total_balance": 4,
+          "reward_total_limit": 5
+        }
+      }
+    }
+  }
+}
+
+describe('Perx Reward\'s inventory', () => {
+  it.each`
+    fixtureKey 
+    ${'5total.NoPeriodLimit.NoLimit.NoClaimed'} 
+    ${'5total.NoPeriodLimit.NoLimit.SelfClaimed'} 
+    ${'5total.NoPeriodLimit.NoLimit.SomeoneClaimed'} 
+    ${'5total.NoPeriodLimit.1perUser.NoClaimed'} 
+    ${'5total.NoPeriodLimit.1perUser.SelfClaimed'} 
+    ${'5total.NoPeriodLimit.1perUser.SomeoneClaimed'} 
+    ${'5total.NoPeriodLimit.2perUser1perDay.NoClaimed'} 
+    ${'5total.NoPeriodLimit.2perUser1perDay.SelfClaimed'} 
+    ${'5total.NoPeriodLimit.2perUser1perDay.SomeoneClaimed'} 
+    ${'5total.2perDay.1perUser.NoClaimed'} 
+    ${'5total.2perDay.1perUser.SelfClaimed'} 
+    ${'5total.2perDay.1perUser.SomeoneClaimed'}
+    ${'5total.2perDay.2perUser1perDay.NoClaimed'} 
+    ${'5total.2perDay.2perUser1perDay.SelfClaimed'} 
+    ${'5total.2perDay.2perUser1perDay.SomeoneClaimed'}
+  `('can deserialized $fixtureKey from JSON', ({ fixtureKey }) => {
+    const fixtureData = get(_inventoryFixture, fixtureKey)
+    const o: PerxRewardInventory = Deserialize(fixtureData, PerxRewardInventory)
+
+    expect(o).toBeInstanceOf(PerxRewardInventory)
+
+    const policy = makePolicy(o, fixtureData)
+    let fieldCompare: Array<[string, ComparePolicy]> = [
+      ['minutes_per_user_period', policy.equal],
+      ['minutes_per_period', policy.equal],
+      ['per_user_period_start', policy.isoDate],
+      ['period_start', policy.isoDate],
+      ['reward_limit_per_period', policy.equal],
+      ['reward_limit_per_period_balance', policy.equal],
+      ['reward_limit_per_user', policy.equal],
+      ['reward_limit_per_user_per_period', policy.equal],
+      ['reward_total_balance', policy.equal],
+      ['reward_total_limit', policy.equal],
+    ]
+
+    const balanceFields = [
+      'reward_limit_per_period_balance',
+      'reward_limit_per_user_balance',
+      'reward_limit_per_user_per_period_balance',
+    ]
+
+    for (const key of balanceFields) {
+      if (fixtureData[key]) {
+        const nestedPolicy: [string, ComparePolicy][] = [
+          ['available_amount', policy.equal],
+          ['limit_type', policy.equal],
+        ]
+
+        if (fixtureData[key]['limit_error_klass']) {
+          nestedPolicy.push(
+            ['limit_error_klass', policy.nested([
+              ['code', policy.equal],
+              ['message', policy.equal]
+            ])]
+          )
+        }
+        fieldCompare.push([key, policy.nested(nestedPolicy)])
+      }
+    }
+    // if (fixtureData.)
     for (const f of fieldCompare) {
       const fieldName = f[0]
       const policyComparer = f[1]

@@ -77,6 +77,35 @@ export class PerxRewardPrice {
   loyaltyProgramId: number | null = null
 }
 
+/**
+ * Mapped against
+ * 
+ * ```json
+ * {
+ *   "code": 4103,
+ *   "message": "No rewards available for the specified user due to account lifetime limit"
+ * }
+ * ```
+ */
+export class PerxRewardInventoryLimitErrorKlass {
+  @autoserializeAs('code')
+  code: number = 0
+
+  @autoserializeAs('message')
+  message: string = 'no error message mapped'
+}
+
+export class PerxRewardInventoryBalance {
+  @autoserializeAs('available_amount')
+  availableAmount: number = 0
+
+  @autoserializeAs('limit_type')
+  limitType: 'account_lifetime' | 'account_interval' = 'account_lifetime'
+
+  @autoserializeAs(PerxRewardInventoryLimitErrorKlass, 'limit_error_klass')
+  limitErrorKlass: PerxRewardInventoryLimitErrorKlass | null = null
+}
+
 export class PerxRewardInventory {
   @autoserializeAs('reward_total_limit')
   rewardTotalLimit: number | null = null
@@ -87,20 +116,20 @@ export class PerxRewardInventory {
   @autoserializeAs('minutes_per_period')
   minutesPerPeriod: number | null = null
 
-  // @autoserializeAs('period_start')
-  // periodStart: Date <Unknown Type>
+  @autoserializeAs(ISODateTimeSerializer, 'period_start')
+  periodStart: Date | null = null
 
   @autoserializeAs('reward_limit_per_period')
   rewardLimitPerPeriod: number | null = null
 
-  @autoserializeAs('reward_limit_per_period_balance')
-  rewardLimitPerPeriodBalance: number | null = null
+  @autoserializeAs(PerxRewardInventoryBalance, 'reward_limit_per_period_balance')
+  rewardLimitPerPeriodBalance: PerxRewardInventoryBalance | null = null
 
   @autoserializeAs('reward_limit_per_user')
   rewardLimitPerUser: number | null = null
 
-  @autoserializeAs('reward_limit_per_user_balance')
-  rewardLimitPerUserBalance: number | null = null
+  @autoserializeAs(PerxRewardInventoryBalance, 'reward_limit_per_user_balance')
+  rewardLimitPerUserBalance: PerxRewardInventoryBalance | null = null
 
   @autoserializeAs('minutes_per_user_period')
   minutesPerUserPeriod: number | null = null
@@ -111,8 +140,8 @@ export class PerxRewardInventory {
   @autoserializeAs('reward_limit_per_user_per_period')
   rewardLimitPerUserPerPeriod: number | null = null
 
-  @autoserializeAs('reward_limit_per_user_per_period_balance')
-  rewardLimitPerUserPerPeriodBalance: number | null = null
+  @autoserializeAs(PerxRewardInventoryBalance, 'reward_limit_per_user_per_period_balance')
+  rewardLimitPerUserPerPeriodBalance: PerxRewardInventoryBalance | null = null
 }
 
 /**
