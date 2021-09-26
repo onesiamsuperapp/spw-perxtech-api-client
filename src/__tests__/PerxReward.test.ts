@@ -308,6 +308,22 @@ describe('Perx Reward', () => {
 })
 
 const _inventoryFixture = {
+  'NoLimit': {
+    "minutes_per_period": null,
+    "minutes_per_user_per_period": null,
+    "minutes_per_user_period": null,
+    "per_user_period_start": null,
+    "period_start": null,
+    "reward_limit_per_period": null,
+    "reward_limit_per_period_balance": null,
+    "reward_limit_per_user": null,
+    "reward_limit_per_user_balance": null,
+    "reward_limit_per_user_per_period": null,
+    "reward_limit_per_user_per_period_balance": null,
+    "reward_limit_per_user_period_balance": null,
+    "reward_total_balance": null,
+    "reward_total_limit": null
+  },
   '5total': {
     'NoPeriodLimit': {
       'NoLimit': {
@@ -653,6 +669,7 @@ const _inventoryFixture = {
 describe('Perx Reward\'s inventory', () => {
   it.each`
     fixtureKey 
+    ${'NoLimit'}
     ${'5total.NoPeriodLimit.NoLimit.NoClaimed'} 
     ${'5total.NoPeriodLimit.NoLimit.SelfClaimed'} 
     ${'5total.NoPeriodLimit.NoLimit.SomeoneClaimed'} 

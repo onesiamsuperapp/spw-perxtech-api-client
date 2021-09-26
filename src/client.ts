@@ -612,6 +612,9 @@ export class PerxService implements IPerxService {
     if (scope.filterByPointsBalance) {
       out.filter_by_points_balance = 'true'
     }
+    if (scope.brandId) {
+      out.filter_for_brands = scope.brandId
+    }
     if (scope.sortBy) {
       out.sort_by = scope.sortBy
     }

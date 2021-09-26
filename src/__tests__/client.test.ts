@@ -91,6 +91,8 @@ describe('PerxService', () => {
       it.each`
         scope                               | mustMatch
         ${{ tagIds: [1, 112] }}             | ${(o: PerxReward) => o.tags.some((t) => t.id === 1 || t.id === 112)}
+        ${{ brandId: 34 }}                  | ${(o: PerxReward) => o.brands.some((t) => t.id === 34)}
+        ${{ brandId: 69 }}                  | ${(o: PerxReward) => o.brands.some((t) => t.id === 69)}
         ${{}}                               | ${() => true}
       `('can query rewards: $scope', async ({ scope, mustMatch }: { scope: PerxRewardScope, mustMatch: (o: PerxReward) => boolean}) => {
         const resp = await client.getRewards(ctx.accessToken, scope)
