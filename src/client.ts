@@ -619,7 +619,7 @@ export class PerxService implements IPerxService {
       out.sort_by = scope.sortBy
     }
     if (scope.order) {
-      out.order = scope.order
+      out.order_by = scope.order
     }
     if (scope.categoryNamePrefix) {
       out.categories = scope.categoryNamePrefix
