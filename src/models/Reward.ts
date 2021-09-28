@@ -201,6 +201,9 @@ export class PerxReward {
   // @autoserializeAs('favourite')
   // favourite!: <type is unknown>
 
+  @autoserializeAs('steps_to_redeem')
+  stepsToRedeem: string | null = null
+
   @autoserializeAs('merchant_id')
   merchantId: number | null = null
 
