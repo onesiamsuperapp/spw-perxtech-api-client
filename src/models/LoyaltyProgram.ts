@@ -47,6 +47,9 @@ export class PerxLoyaltyAgingPoint {
 @inheritSerialization(ShortPerxLoyalty)
 export class PerxLoyalty extends ShortPerxLoyalty {
 
+  @autoserializeAs('current_membership_tier_id')
+  currentMembershipTierId: number | null = null
+
   @autoserializeAs('current_membership_tier_name')
   currentMembershipTierName: string | null = null
 
