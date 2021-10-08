@@ -51,6 +51,8 @@ export interface IPerxUserProxy {
    * @param keyword 
    */
   searchRewards(keyword: string): Promise<PerxRewardSearchResultResponse>
+  searchRewards(keyword: string, page: number): Promise<PerxRewardSearchResultResponse>
+  searchRewards(keyword: string, page: number, size: number): Promise<PerxRewardSearchResultResponse>
 
   /**
    * List all categories within Perx's system
@@ -270,7 +272,7 @@ export class PerxProxyManager implements IPerxProxyManager {
   }
 
   public user(identification: PerxIdentification): IPerxUserProxy {
-    const user = new PerxUserProxy(() => this.assureToken(identification), this.perxService)    
+    const user = new PerxUserProxy(() => this.assureToken(identification), this.perxService)
     return user
   }
 

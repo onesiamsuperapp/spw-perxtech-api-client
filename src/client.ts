@@ -127,11 +127,12 @@ export interface IPerxUserService {
    * Search rewards for that matched the keyword
    * 
    * @param userToken 
-   * @param keyword 
+   * @param keyword keyword to search
+   * @param page start with 1
+   * @param size page size to load results
    */
-  searchRewards(userToken: string, keyword: string): Promise<PerxRewardSearchResultResponse>
-
-
+  searchRewards(userToken: string, keyword: string, page: number, size: number): Promise<PerxRewardSearchResultResponse>
+  
   /**
    * Reserve reward for particular user
    * 
@@ -559,13 +560,15 @@ export class PerxService implements IPerxService {
     return result.data
   }
 
-  public async searchRewards(userToken: string, keyword: string): Promise<PerxRewardSearchResultResponse> {
+  public async searchRewards(userToken: string, keyword: string, page: number, size: number): Promise<PerxRewardSearchResultResponse> {
     const resp = await this.axios.get('/v4/search', {
       headers: {
         authorization: `Bearer ${userToken}`,
       },
       params: {
         search_string: keyword,
+        page,
+        size
       }
     })
 

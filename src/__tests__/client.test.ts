@@ -7,6 +7,7 @@ import {
   PerxVoucherScope,
   PerxReward,
   PerxRewardReservation,
+  PerxPagingMeta,
 } from '..'
 
 describe('PerxService', () => {
@@ -107,14 +108,33 @@ describe('PerxService', () => {
       })
 
       if (testableSearchKeyword) {
-        it('can search rewards', async () => {
-          const searchResults = await client.searchRewards(ctx.accessToken, testableSearchKeyword)
+        const pageSize = 3
+        let firstPageMeta: PerxPagingMeta | null = null
+        it('can search rewards on first page', async () => {
+          const searchResults = await client.searchRewards(ctx.accessToken, testableSearchKeyword, 1, pageSize)
           expect(searchResults).toBeTruthy()
           expect(searchResults.data).toBeInstanceOf(Array)
           expect(searchResults.data.length).toBeGreaterThan(1)
+          expect(searchResults.data.length).toBeLessThanOrEqual(pageSize)
           expect(searchResults.data[0].documentType).toEqual('reward')
           expect(searchResults.data[0].reward).toBeTruthy()
+          expect(searchResults.meta.totalPages).toBeGreaterThanOrEqual(1)
+
+          firstPageMeta = searchResults.meta
         })
+
+        if (firstPageMeta) {
+          it('can search rewards on last page', async () => {
+            const meta = firstPageMeta!
+            const lastPageCount = (meta.count % pageSize) || pageSize
+            const lastPage = meta.totalPages
+            const lastSearchResults = await client.searchRewards(ctx.accessToken, testableSearchKeyword, lastPage, pageSize)
+            expect(lastSearchResults.data).toBeInstanceOf(Array)
+            expect(lastSearchResults.data.length).toEqual(lastPageCount)
+            expect(lastSearchResults.data[0].documentType).toEqual('reward')
+            expect(lastSearchResults.data[0].reward).toBeTruthy()
+          })
+        }
       }
 
       describe('reserve & release reward', () => {

@@ -26,9 +26,9 @@ export class PerxUserProxy implements IPerxUserProxy {
     return this.perxService.getRewards(token.accessToken, scope)
   }
 
-  public async searchRewards(keyword: string): Promise<PerxRewardSearchResultResponse> {
+  public async searchRewards(keyword: string, page: number = 1, size: number = 25): Promise<PerxRewardSearchResultResponse> {
     const token = await this.getToken()
-    return this.perxService.searchRewards(token.accessToken, keyword)
+    return this.perxService.searchRewards(token.accessToken, keyword, page, size)
   }
 
   public async issueReward(rewardId: string): Promise<PerxVoucher> {
