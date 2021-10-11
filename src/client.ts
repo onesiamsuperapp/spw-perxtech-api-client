@@ -26,7 +26,6 @@ import {
   PerxLoyaltyTransactionsHistoryResponse,
   PerxRewardSearchResultResponse,
   PerxCategoriesResultResponse,
-  PerxCategory,
   PerxVoucherState,
   PerxRewardReservation,
   PerxRewardReservationResponse,
