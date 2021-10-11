@@ -246,8 +246,9 @@ export interface IPerxUserService {
    * List all existing categories
    * 
    * @param userToken 
+   * @param parentId list categories with specific parentId null to list all.
    */
-  getCategories(userToken: string): Promise<PerxCategory[]>
+  getCategories(userToken: string, parentId: number | null, page: number, size: number): Promise<PerxCategoriesResultResponse>
 
   /**
    * Fetch customer's transaction history from Perx's service
@@ -568,7 +569,7 @@ export class PerxService implements IPerxService {
       params: {
         search_string: keyword,
         page,
-        size
+        size,
       }
     })
 
@@ -576,17 +577,20 @@ export class PerxService implements IPerxService {
     return result
   }
 
-  public async getCategories(userToken: string): Promise<PerxCategory[]> {
+  public async getCategories(userToken: string, parentId: number | null, page: number, size: number): Promise<PerxCategoriesResultResponse> {
     const resp = await this.axios.get('/v4/categories', {
       headers: {
         authorization: `Bearer ${userToken}`,
       },
       params: {
+        ...(parentId && { parent_id: parentId } || {}),
+        page,
+        size,
       }
     })
 
     const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxCategoriesResultResponse)
-    return result.data
+    return result
   }
 
   public async queryLoyaltyTransactionsHistory(userToken: string, page: number, perPage: number): Promise<PerxLoyaltyTransactionsHistoryResponse> {

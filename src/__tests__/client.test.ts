@@ -50,11 +50,13 @@ describe('PerxService', () => {
     })
 
     it('can list categories', async () => {
-      const categories = await client.getCategories(ctx.accessToken)
+      const categories = await client.getCategories(ctx.accessToken, null, 1, 1)
       expect(categories).toBeTruthy()
-      expect(categories.length).toBeGreaterThanOrEqual(1)
-      expect(categories[0].id).toBeTruthy()
-      expect(categories[0].title).toBeTruthy()
+      expect(categories.meta).toBeTruthy()
+      expect(categories.data).toBeInstanceOf(Array)
+      expect(categories.data.length).toBeGreaterThanOrEqual(1)
+      expect(categories.data[0].id).toBeTruthy()
+      expect(categories.data[0].title).toBeTruthy()
     })
 
     it.each`

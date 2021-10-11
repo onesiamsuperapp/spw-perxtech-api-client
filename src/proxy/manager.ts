@@ -16,6 +16,7 @@ import {
   PerxVouchersResponse,
   PerxCategory,
   PerxRewardReservation,
+  PerxCategoriesResultResponse,
 } from '..'
 import { PerxPosProxy } from './pos'
 import { PerxUserProxy } from './user'
@@ -55,9 +56,30 @@ export interface IPerxUserProxy {
   searchRewards(keyword: string, page: number, size: number): Promise<PerxRewardSearchResultResponse>
 
   /**
-   * List all categories within Perx's system
+   * List categories within Perx's system
+   * page starts with 1
    */
-  listCategories(): Promise<PerxCategory[]>
+  listCategories(page: number, pageSize: number): Promise<PerxCategoriesResultResponse>
+
+  /**
+   * List all perx categories by ParentID
+   * @param parentId
+   * @param page
+   * @param pageSize
+   */
+  listCategoriesByParentId(parentId: number, page: number, pageSize: number): Promise<PerxCategoriesResultResponse>
+
+  /**
+   * List all categories (chaining calls automatically)
+   */
+  listAllCategories(): Promise<PerxCategory[]>
+
+  /**
+   * List all categories (chaining calls automatically)
+   * 
+   * @param parentId
+   */
+  listAllCategories(parentId: number): Promise<PerxCategory[]>
 
   /**
    * Cliam a reward, resulting a Voucher.
@@ -203,8 +225,6 @@ export interface IPerxProxyManager {
   user(identifier: PerxIdentification): IPerxUserProxy
 
   pos(): IPerxPosProxy
-
-  getRewardsCategories(parentCategory?: string): Promise<any>
 }
 
 export interface IPerxToken {
@@ -334,13 +354,5 @@ export class PerxProxyManager implements IPerxProxyManager {
     const tokenResp = await perxService.getApplicationToken()
     this.pool.cache(applicationTokenCacheKey, { accessToken: tokenResp.accessToken }, tokenResp.expiresIn * 1000)
     return tokenResp
-  }
-
-  /**
-   * 
-   * @param parentCategory
-   */
-  public async getRewardsCategories(parentCategory?: string): Promise<any> {
-    // Query reward categories
   }
 }

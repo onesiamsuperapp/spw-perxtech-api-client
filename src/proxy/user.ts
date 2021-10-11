@@ -13,6 +13,7 @@ import type {
   PerxCategory,
   PerxRewardReservation,
   IPerxToken,
+  PerxCategoriesResultResponse,
 } from '..'
 import { chunk } from 'lodash'
 
@@ -41,9 +42,29 @@ export class PerxUserProxy implements IPerxUserProxy {
     return this.perxService.getVouchers(token.accessToken, scope)
   }
 
-  public async listCategories(): Promise<PerxCategory[]> {
+  public async listCategories(page: number, pageSize: number): Promise<PerxCategoriesResultResponse> {
+    return this.listCategoriesByParentId(null, page, pageSize)
+  }
+
+  public async listCategoriesByParentId(parentId: number | null, page: number, pageSize: number): Promise<PerxCategoriesResultResponse> {
     const token = await this.getToken()
-    return this.perxService.getCategories(token.accessToken)
+    return this.perxService.getCategories(token.accessToken, parentId, page, pageSize)
+  }
+
+  public async listAllCategories(parentId: number | null = null): Promise<PerxCategory[]> {
+    const token = await this.getToken()
+    let hasNextPage = false
+    let page = 1
+    const pageSize = 50
+    const output: PerxCategory[] = []
+    do {
+      const resp = await this.perxService.getCategories(token.accessToken, parentId, page, pageSize)
+      output.push(...resp.data)
+      const totalPages = resp.meta.totalPages
+      hasNextPage = totalPages > page
+      page = resp.meta.nextPage || (page + 1)
+    } while (hasNextPage)
+    return output
   }
 
   public async reserveVouchers(voucherIds: string[]): Promise<PerxVoucher[]> {

@@ -1,3 +1,4 @@
+import { uniq } from 'lodash'
 import { IPerxService, PerxService } from '../client'
 import { PerxProxyManager } from '../proxy'
 
@@ -40,6 +41,32 @@ describe('PerxProxyManager', () => {
       const me = await user.getMe()
       expect(me.id).toEqual(+testableUserIdOnPerxServer)
       expect(me.identifier).toEqual(testableUserIdentifierOnPerxServer)
+    })
+
+    it('can query categories', async () => {
+      const user = manager.user({
+        type: 'id',
+        id: +testableUserIdOnPerxServer,
+      })
+
+      const firstPage = await user.listCategories(1, 1)
+      expect(firstPage).toBeTruthy()
+      const hasCategory = firstPage.data.length > 0
+      if (hasCategory) {
+        expect(firstPage.data.length).toBeLessThanOrEqual(1)
+        expect(firstPage.meta).toBeTruthy()
+        expect(firstPage.meta.totalCount).toBeTruthy()
+        expect(firstPage.meta.nextPage).toBeTruthy()
+        expect(firstPage.meta.totalPages).toBeGreaterThanOrEqual(1)
+
+        // Try get all pages!
+
+        const allCats = await user.listAllCategories()
+        expect(allCats).toBeTruthy()
+        expect(allCats).toBeInstanceOf(Array)
+        expect(allCats.length).toEqual(firstPage.meta.totalCount)
+        expect(uniq(allCats.map((o) => o.id)).length).toEqual(firstPage.meta.totalCount)
+      }
     })
   })
 
