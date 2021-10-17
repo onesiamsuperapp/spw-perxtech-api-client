@@ -29,6 +29,9 @@ import {
   PerxVoucherState,
   PerxRewardReservation,
   PerxRewardReservationResponse,
+  PerxLoyaltyTransactionRequestUserAccount,
+  PerxLoyaltyTransactionReservationRequest,
+  IdObjectResponse,
 } from './models'
 
 export interface PerxVoucherScope {
@@ -171,7 +174,7 @@ export interface IPerxUserService {
    * @param userToken 
    * @param reservationId 
    */
-   confirmRewardReservation(userToken: string, reservationId: string): Promise<PerxVoucher>
+  confirmRewardReservation(userToken: string, reservationId: string): Promise<PerxVoucher>
  
    /**
     * Issue a voucher from particular reward for specific user
@@ -207,17 +210,9 @@ export interface IPerxUserService {
   redeemVoucher(userToken: string, voucherId: number | string): Promise<PerxVoucher>
   redeemVoucher(userToken: string, voucherId: number | string, confirm: boolean): Promise<PerxVoucher>
  
-   /**
-    * Release locked voucher from PerxService
-    * 
-    * @param userToken 
-    * @param voucherId 
-    */
-  releaseVoucher(userToken: string, voucherId: number | string): Promise<PerxVoucher>
- 
-   /**
-    * Query perx loyalty points
-    */
+  /**
+   * Query perx loyalty points
+   */
   getLoyaltyProgram(userToken: string, loyaltyProgramId: string | number): Promise<PerxLoyalty>
  
  
@@ -262,6 +257,12 @@ export interface IPerxUserService {
 export interface IPerxPosService {
 
   /**
+   * @param userToken 
+   * @param voucherId
+   */
+  posReleaseReservedVoucher(applicationToken: string, voucherId: number | string): Promise<PerxVoucher>
+
+  /**
    * Burn/Earn loyalty transaction (See static methods of `PerxLoyaltyTransactionRequest`)
    * construct the request to make Burn/Earn transaction.
    * 
@@ -271,7 +272,26 @@ export interface IPerxPosService {
   submitLoyaltyTransaction(applicationToken: string, request: PerxLoyaltyTransactionRequest): Promise<PerxLoyaltyTransaction>
 
   /**
+   * Reserve amount of Loyalty points to be confirm
+   * 
+   * @param applicationToken 
+   * @param request 
+   */
+  reserveLoyaltyPoints(applicationToken: string, request: PerxLoyaltyTransactionReservationRequest): Promise<PerxLoyaltyTransaction>
+
+  /**
+   * Reserve amount of Loyalty points to be confirm
+   * 
+   * @param applicationToken 
+   * @param request 
+   * @param loyaltyTransactionId that holding the value to release
+   */
+  releaseLoyaltyPoints(applicationToken: string, account: PerxLoyaltyTransactionRequestUserAccount, transactionId: string): Promise<boolean>
+
+  /**
    * Submit new transaction to perx service via POS Access.
+   * 
+   * An Amount Transaction should be submitted here.
    * 
    * @param transaction 
    */
@@ -473,15 +493,16 @@ export class PerxService implements IPerxService {
     return result.data
   }
 
-  public async releaseVoucher(userToken: string, voucherId: string | number): Promise<PerxVoucher> {
+  public async posReleaseReservedVoucher(applicationToken: string, voucherId: string | number): Promise<PerxVoucher> {
     if (!/^\d+$/.test(`${voucherId}`)) {
       throw PerxError.badRequest(`Invalid voucherId: ${voucherId}, expected voucherId as integer`)
     }
-    const resp = await this.axios.patch(`/v4/vouchers/${voucherId}/release`, {}, {
+    const resp = await this.axios.put(`/v4/pos/vouchers/${voucherId}/revert_redemption`, {}, {
       headers: {
-        authorization: `Bearer ${userToken}`,
+        authorization: `Bearer ${applicationToken}`,
       },
-      params: {}
+      params: {
+      }
     })
 
     const result = BasePerxResponse.parseAndEval(resp.data, resp.status, VoucherResponse)
@@ -558,6 +579,34 @@ export class PerxService implements IPerxService {
 
     const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxLoyaltyTransactionResponse)
     return result.data
+  }
+
+  public async reserveLoyaltyPoints(applicationToken: string, request: PerxLoyaltyTransactionReservationRequest): Promise<PerxLoyaltyTransaction> {
+    const body = Serialize(request)
+    const resp = await this.axios.post('/v4/pos/loyalty_transactions/reserve', body, {
+      headers: {
+        authorization: `Bearer ${applicationToken}`,
+      },
+      params: {}
+    })
+
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxLoyaltyTransactionResponse)
+    return result.data
+  }
+
+  public async releaseLoyaltyPoints(applicationToken: string, account: PerxLoyaltyTransactionRequestUserAccount, transactionId: string): Promise<boolean> {
+    const accountBody = Serialize(account)
+    const resp = await this.axios.put(`/v4/pos/loyalty_transactions/${transactionId}/revert_redemption`, {
+      user_account: accountBody,
+    }, {
+      headers: {
+        authorization: `Bearer ${applicationToken}`,
+      },
+      params: {}
+    })
+    
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, IdObjectResponse)
+    return result.data.id === transactionId
   }
 
   public async searchRewards(userToken: string, keyword: string, page: number, size: number): Promise<PerxRewardSearchResultResponse> {

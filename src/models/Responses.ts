@@ -287,3 +287,13 @@ export class PerxCategoriesResultResponse extends ItemListPerxResponse<PerxCateg
 export class PerxRewardReservationResponse extends ObjectPerxResponse<PerxRewardReservation> {
   public constructor() { super(PerxRewardReservation) }
 }
+
+class IdHolder {
+  @autoserializeAs('id')
+  id!: string
+}
+
+@inheritSerialization(ObjectPerxResponse)
+export class IdObjectResponse extends ObjectPerxResponse<IdHolder> {
+  public constructor() { super(IdHolder) }
+}

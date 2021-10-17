@@ -1,4 +1,5 @@
 import { uniq } from 'lodash'
+import { PerxLoyalty, PerxLoyaltyTransactionRequest, PerxLoyaltyTransactionRequestUserAccount, PerxLoyaltyTransactionReservationRequest } from '..'
 import { IPerxService, PerxService } from '../client'
 import { PerxProxyManager } from '../proxy'
 
@@ -13,13 +14,19 @@ describe('PerxProxyManager', () => {
     tokenDurationInSeconds: testingTokenDurationInSeconds, // 5 mins is more than enough
   })
 
+  const testableLoyaltyProgramIdOnPerxServer = (process.env.TEST_PERX_LOYALTY_PROGRAM_ID || '')
   const testableUserIdentifierOnPerxServer = (process.env.TEST_PERX_USER_IDENTIFIER || '')
   const testableUserIdOnPerxServer = (process.env.TEST_PERX_USER_ID || '')
+  // Optional target, if not provide use first record in query to run the test
+  const testableRewardId = +(process.env.TEST_PERX_REWARD_ID || '-1')
 
   if (!testableUserIdentifierOnPerxServer) {
     throw new Error('Unable to run test without proper configuration. Please revise your .env file. (in root folder)')
   }
   const manager = new PerxProxyManager(client)
+  const userAccount = new PerxLoyaltyTransactionRequestUserAccount({ type: 'id', id: +testableUserIdOnPerxServer })
+  const user = manager.user({ type: 'id', id: +testableUserIdOnPerxServer })
+  const pos = manager.pos()
 
   describe('id', () => {
     it('can assureToken with id', async () => {
@@ -69,6 +76,115 @@ describe('PerxProxyManager', () => {
       }
     })
   })
+
+  describe('LoyaltyPoints', () => {
+    let program: PerxLoyalty | undefined = undefined
+    const pointsToTest = 300
+    let reservedTransactionId: string = ''
+
+    it('can query the user points', async () => {
+      program = await user.getLoyaltyProgram(testableLoyaltyProgramIdOnPerxServer)
+
+      expect(program).toBeTruthy()
+      expect(program.pointBalance).toBeTruthy()
+    })
+
+    it('can added some points in', async () => {
+      await pos.submitLoyaltyTransaction(new PerxLoyaltyTransactionRequest(
+        userAccount,
+        +testableLoyaltyProgramIdOnPerxServer,
+        pointsToTest,
+        {},
+      ))
+      const newPrg = await user.getLoyaltyProgram(testableLoyaltyProgramIdOnPerxServer)
+      expect(newPrg).toBeTruthy()
+      expect(newPrg.pointBalance - program!.pointBalance).toEqual(pointsToTest)
+      program = newPrg
+    })
+
+    it('will throws an error when reserving points exceeds current balance', async () => {
+      const exceedingPoints = program!.pointBalance + 1
+      await expect(() => pos.reserveLoyaltyPoints(new PerxLoyaltyTransactionReservationRequest(
+        userAccount,
+        +testableLoyaltyProgramIdOnPerxServer,
+        exceedingPoints,
+      ))).rejects.toThrow(/enough/)
+    })
+
+    it('can reserve the loyalty points', async () => {
+      const reserved = await pos.reserveLoyaltyPoints(new PerxLoyaltyTransactionReservationRequest(
+        userAccount,
+        +testableLoyaltyProgramIdOnPerxServer,
+        pointsToTest,
+      ))
+
+      expect(reserved).toBeTruthy()
+      expect(reserved.id).toBeTruthy()
+      expect(`${reserved.loyaltyProgramId}`).toEqual(testableLoyaltyProgramIdOnPerxServer)
+      reservedTransactionId = `${reserved.id}`
+    })
+
+    it('can then release the reserved transaction', async () => {
+      const released = await pos.releaseLoyaltyPoints(
+        userAccount,
+        reservedTransactionId,
+      )
+
+      expect(released).toBeTruthy()
+    })
+  })
+
+  if (testableRewardId) {
+    describe('vouchers', () => {
+      const targetRewardId = `${testableRewardId}`
+      let targetVoucherId: string = ''
+  
+      it('can claim the reward', async () => {
+        const voucher = await user.issueReward(targetRewardId)
+        expect(voucher).toBeTruthy()
+        expect(voucher.issuedDate).toBeTruthy()
+        expect(voucher.id).toBeTruthy()
+        targetVoucherId = `${voucher.id}`
+      })
+
+      it('can reserve the voucher', async () => {
+        const reservedVochers = await user.reserveVouchers([ targetVoucherId ])
+        expect(reservedVochers).toBeInstanceOf(Array)
+        expect(reservedVochers.length).toEqual(1)
+        expect(reservedVochers[0].id).toEqual(+targetVoucherId)
+        expect(reservedVochers[0].state).toEqual('redemption_in_progress')
+      })
+
+      it('cannot be reserved for the second time', async () => {
+        await expect(() => user.reserveVouchers([ targetVoucherId ]))
+          .rejects.toThrow(/not permit/)
+      })
+
+      it('can be released', async () => {
+        const reservedVochers = await pos.releaseVouchers([ targetVoucherId ])
+        expect(reservedVochers).toBeInstanceOf(Array)
+        expect(reservedVochers.length).toEqual(1)
+        expect(reservedVochers[0].id).toEqual(+targetVoucherId)
+        expect(reservedVochers[0].state).toEqual('issued')
+      })
+
+      it('can then be reserved again', async () => {
+        const reservedVochers = await user.reserveVouchers([ targetVoucherId ])
+        expect(reservedVochers).toBeInstanceOf(Array)
+        expect(reservedVochers.length).toEqual(1)
+        expect(reservedVochers[0].id).toEqual(+targetVoucherId)
+        expect(reservedVochers[0].state).toEqual('redemption_in_progress')
+      })
+
+      it('can then be confirmed to use', async () => {
+        const reservedVochers = await user.confirmVouchers([ targetVoucherId ])
+        expect(reservedVochers).toBeInstanceOf(Array)
+        expect(reservedVochers.length).toEqual(1)
+        expect(reservedVochers[0].id).toEqual(+targetVoucherId)
+        expect(reservedVochers[0].state).toEqual('redeemed')
+      })
+    })
+  }
 
   describe('identifier', () => {
     it('can assureToken with identifier', async () => {

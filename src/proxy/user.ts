@@ -67,12 +67,6 @@ export class PerxUserProxy implements IPerxUserProxy {
     return output
   }
 
-  public async reserveVouchers(voucherIds: string[]): Promise<PerxVoucher[]> {
-    return this._forEachVoucher(voucherIds, (token, voucherId) => {
-      return this.perxService.redeemVoucher(token.accessToken, voucherId, false)
-    })
-  }
-
   public async reserveReward(rewardId: string, timeoutInMs: number = 900 * 1000): Promise<PerxRewardReservation> {
     const token = await this.getToken()
     return this.perxService.reserveReward(token.accessToken, rewardId, timeoutInMs)
@@ -88,6 +82,12 @@ export class PerxUserProxy implements IPerxUserProxy {
     return this.perxService.confirmRewardReservation(token.accessToken, reservationId)
   }
 
+  public async reserveVouchers(voucherIds: string[]): Promise<PerxVoucher[]> {
+    return this._forEachVoucher(voucherIds, (token, voucherId) => {
+      return this.perxService.redeemVoucher(token.accessToken, voucherId, false)
+    })
+  }
+
   public async confirmVouchers(voucherIds: string[]): Promise<PerxVoucher[]> {
     return this._forEachVoucher(voucherIds, (token, voucherId) => {
       return this.perxService.redeemVoucher(token.accessToken, voucherId, true)
@@ -97,12 +97,6 @@ export class PerxUserProxy implements IPerxUserProxy {
   public async redeemVouchers(voucherIds: string[]): Promise<PerxVoucher[]> {
     return this._forEachVoucher(voucherIds, (token, voucherId) => {
       return this.perxService.redeemVoucher(token.accessToken, voucherId)
-    })
-  }
-
-  public async releaseVouchers(voucherIds: string[]): Promise<PerxVoucher[]> {
-    return this._forEachVoucher(voucherIds, (token, voucherId) => {
-      return this.perxService.releaseVoucher(token.accessToken, voucherId)
     })
   }
 

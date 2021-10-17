@@ -84,6 +84,24 @@ export class PerxLoyaltyTransactionRequestUserAccount {
   }
 }
 
+export class PerxLoyaltyTransactionReservationRequest {
+  
+  @autoserializeAs(PerxLoyaltyTransactionRequestUserAccount, 'user_account')
+  userAccount: PerxLoyaltyTransactionRequestUserAccount
+
+  @autoserializeAs('amount_to_deduct')
+  points!: number
+
+  @autoserializeAs('loyalty_program_id')
+  loyaltyProgramId!: number
+
+  constructor(userAccount: PerxLoyaltyTransactionRequestUserAccount, loyaltyProgramId: number, points: number) {
+    this.userAccount = userAccount
+    this.points = points
+    this.loyaltyProgramId = loyaltyProgramId
+  }
+}
+
 export class PerxLoyaltyTransactionRequest {
   
   @autoserializeAs(PerxLoyaltyTransactionRequestUserAccount, 'user_account')

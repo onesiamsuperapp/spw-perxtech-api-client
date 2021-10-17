@@ -17,6 +17,8 @@ import {
   PerxCategory,
   PerxRewardReservation,
   PerxCategoriesResultResponse,
+  PerxLoyaltyTransactionReservationRequest,
+  PerxLoyaltyTransactionRequestUserAccount,
 } from '..'
 import { PerxPosProxy } from './pos'
 import { PerxUserProxy } from './user'
@@ -133,32 +135,25 @@ export interface IPerxUserProxy {
   queryVouchers(scope: Partial<PerxVoucherScope>): Promise<PerxVouchersResponse>
 
   /**
-   * Mark the voucher to be ready to use.
+   * Redeem the vouchers without marking/confirming/releasing
+   * 
+   * @param voucherIds 
+   */
+  redeemVouchers(voucherIds: string[]): Promise<PerxVoucher[]>
+
+  /**
+   * Mark the voucher as redemption in progress (can only be released by `pos.releaseVouchers()`)
    * 
    * @param voucherIds 
    */
   reserveVouchers(voucherIds: string[]): Promise<PerxVoucher[]>
 
   /**
-   * Confirm the reserved vouchers
+   * Confirm all vouchers those has been marked with `user.reserveVouchers`.
    * 
    * @param voucherIds
    */
   confirmVouchers(voucherIds: string[]): Promise<PerxVoucher[]>
-
-  /**
-   * Release the reserved vouchers
-   * 
-   * @param voucherIds 
-   */
-  releaseVouchers(voucherIds: string[]): Promise<PerxVoucher[]>
-
-  /**
-   * Redeem the vouchers without marking/confirming/releasing
-   * 
-   * @param voucherIds 
-   */
-  redeemVouchers(voucherIds: string[]): Promise<PerxVoucher[]>
 
   /**
    * Query loyalty program from Perx
@@ -194,6 +189,14 @@ export interface IPerxUserProxy {
  * Interface for POS Access
  */
 export interface IPerxPosProxy {
+
+  /**
+   * Release the reserved vouchers
+   * 
+   * @param voucherIds 
+   */
+   releaseVouchers(voucherIds: string[]): Promise<PerxVoucher[]>
+  
   /**
    * Hard burn/earn points
    * 
@@ -201,6 +204,21 @@ export interface IPerxPosProxy {
    * @param request 
    */
   submitLoyaltyTransaction(request: PerxLoyaltyTransactionRequest): Promise<PerxLoyaltyTransaction>
+
+  /**
+   * Reserve the loyalty points give back the `loyaltyTransactionId` that holding the specified loyalty points.
+   * 
+   * @param request 
+   */
+  reserveLoyaltyPoints(request: PerxLoyaltyTransactionReservationRequest): Promise<PerxLoyaltyTransaction>
+
+  /**
+   * release the loyalty points witheld by specific `loyaltyTransactionId`
+   * 
+   * @param account 
+   * @param loyaltyTransactionId
+   */
+  releaseLoyaltyPoints(account: PerxLoyaltyTransactionRequestUserAccount, loyaltyTransactionId: string): Promise<boolean>
 
   /**
    * Submit new transaction to perx service via POS Access.
