@@ -138,6 +138,19 @@ describe('PerxProxyManager', () => {
     describe('vouchers', () => {
       const targetRewardId = `${testableRewardId}`
       let targetVoucherId: string = ''
+
+      it('can claim the reward and use it right away', async () => {
+        const voucher = await user.issueReward(targetRewardId)
+        expect(voucher).toBeTruthy()
+        expect(voucher.issuedDate).toBeTruthy()
+        expect(voucher.id).toBeTruthy()
+
+        const used = await user.confirmVouchers([ `${voucher.id}` ])
+        expect(used).toBeInstanceOf(Array)
+        expect(used.length).toEqual(1)
+        expect(used[0].id).toEqual(voucher.id)
+        expect(used[0].state).toEqual('redeemed')
+      })
   
       it('can claim the reward', async () => {
         const voucher = await user.issueReward(targetRewardId)
