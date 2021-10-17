@@ -3,7 +3,7 @@ import {
   isArray,
   get,
 } from 'lodash'
-import { PerxCategory, PerxLoyaltyTransactionHistoryEntry, PerxRewardReservation } from '.'
+import { PerxCategory, PerxInvoice, PerxLoyaltyTransactionHistoryEntry, PerxRewardReservation } from '.'
 import { PerxError } from '../error'
 import { PerxCustomer } from './Customer'
 import { PerxLoyalty } from './LoyaltyProgram'
@@ -296,4 +296,9 @@ class IdHolder {
 @inheritSerialization(ObjectPerxResponse)
 export class IdObjectResponse extends ObjectPerxResponse<IdHolder> {
   public constructor() { super(IdHolder) }
+}
+
+@inheritSerialization(ObjectPerxResponse)
+export class PerxInvoiceCreationResponse extends ObjectPerxResponse<PerxInvoice> {
+  public constructor() { super(PerxInvoice) }
 }

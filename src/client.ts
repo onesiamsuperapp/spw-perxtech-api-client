@@ -32,6 +32,8 @@ import {
   PerxLoyaltyTransactionRequestUserAccount,
   PerxLoyaltyTransactionReservationRequest,
   IdObjectResponse,
+  PerxInvoiceRequest,
+  PerxInvoiceCreationResponse,
 } from './models'
 
 export interface PerxVoucherScope {
@@ -263,6 +265,14 @@ export interface IPerxPosService {
   posReleaseReservedVoucher(applicationToken: string, voucherId: number | string): Promise<PerxVoucher>
 
   /**
+   * POS operation, create invoice based on given request.
+   * 
+   * @param applicationToken 
+   * @param request 
+   */
+  posCreateInvoice(applicationToken: string, request: PerxInvoiceRequest): Promise<PerxInvoiceCreationResponse>
+
+  /**
    * Burn/Earn loyalty transaction (See static methods of `PerxLoyaltyTransactionRequest`)
    * construct the request to make Burn/Earn transaction.
    * 
@@ -300,8 +310,8 @@ export interface IPerxPosService {
   /**
    * get customer detail via POS Access.
    * 
-   * @param userId 
-  */
+   * @param userId
+   */
   getCustomerDetail(applicationToken: string, userId: number): Promise<PerxCustomer>
 }
 
@@ -607,6 +617,18 @@ export class PerxService implements IPerxService {
     
     const result = BasePerxResponse.parseAndEval(resp.data, resp.status, IdObjectResponse)
     return result.data.id === transactionId
+  }
+
+  public async posCreateInvoice(applicationToken: string, request: PerxInvoiceRequest): Promise<PerxInvoiceCreationResponse> {
+    const body = Serialize(request)
+    const resp = await this.axios.post('/v4/pos/invoices', body, {
+      headers: {
+        authorization: `Bearer ${applicationToken}`,
+      },
+    })
+  
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxInvoiceCreationResponse)
+    return result
   }
 
   public async searchRewards(userToken: string, keyword: string, page: number, size: number): Promise<PerxRewardSearchResultResponse> {

@@ -3,6 +3,8 @@ import { IPerxToken } from '.'
 import {
   IPerxService,
   PerxCustomer,
+  PerxInvoiceCreationResponse,
+  PerxInvoiceRequest,
   PerxLoyaltyTransaction,
   PerxLoyaltyTransactionRequest,
   PerxLoyaltyTransactionRequestUserAccount,
@@ -16,6 +18,11 @@ import type { IPerxPosProxy } from './manager'
 export class PerxPosProxy implements IPerxPosProxy {
 
   public constructor(private readonly getToken: () => Promise<IPerxToken>, private readonly perxService: IPerxService) {
+  }
+
+  public async createInvoice(request: PerxInvoiceRequest): Promise<PerxInvoiceCreationResponse> {
+    const applicationToken = await this.getToken()
+    return this.perxService.posCreateInvoice(applicationToken.accessToken, request)
   }
 
   /**

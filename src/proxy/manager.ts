@@ -19,6 +19,8 @@ import {
   PerxCategoriesResultResponse,
   PerxLoyaltyTransactionReservationRequest,
   PerxLoyaltyTransactionRequestUserAccount,
+  PerxInvoiceRequest,
+  PerxInvoiceCreationResponse,
 } from '..'
 import { PerxPosProxy } from './pos'
 import { PerxUserProxy } from './user'
@@ -191,11 +193,18 @@ export interface IPerxUserProxy {
 export interface IPerxPosProxy {
 
   /**
+   * create invoice based on given request.
+   * 
+   * @param request 
+   */
+  createInvoice(request: PerxInvoiceRequest): Promise<PerxInvoiceCreationResponse>
+
+  /**
    * Release the reserved vouchers
    * 
    * @param voucherIds 
    */
-   releaseVouchers(voucherIds: string[]): Promise<PerxVoucher[]>
+  releaseVouchers(voucherIds: string[]): Promise<PerxVoucher[]>
   
   /**
    * Hard burn/earn points

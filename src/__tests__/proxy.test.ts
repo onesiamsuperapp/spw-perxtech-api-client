@@ -1,5 +1,5 @@
 import { uniq } from 'lodash'
-import { PerxLoyalty, PerxLoyaltyTransactionRequest, PerxLoyaltyTransactionRequestUserAccount, PerxLoyaltyTransactionReservationRequest } from '..'
+import { PerxInvoiceRequest, PerxInvoiceRequestTransactionData, PerxInvoiceRequestUsedItem, PerxLoyalty, PerxLoyaltyTransactionRequest, PerxLoyaltyTransactionRequestUserAccount, PerxLoyaltyTransactionReservationRequest } from '..'
 import { IPerxService, PerxService } from '../client'
 import { PerxProxyManager } from '../proxy'
 
@@ -19,6 +19,10 @@ describe('PerxProxyManager', () => {
   const testableUserIdOnPerxServer = (process.env.TEST_PERX_USER_ID || '')
   // Optional target, if not provide use first record in query to run the test
   const testableRewardId = +(process.env.TEST_PERX_REWARD_ID || '-1')
+  const testableMerchantIds = (process.env.TEST_PERX_VALID_MERCHANT_ID || '')
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean)
 
   if (!testableUserIdentifierOnPerxServer) {
     throw new Error('Unable to run test without proper configuration. Please revise your .env file. (in root folder)')
@@ -108,7 +112,7 @@ describe('PerxProxyManager', () => {
         userAccount,
         +testableLoyaltyProgramIdOnPerxServer,
         exceedingPoints,
-      ))).rejects.toThrow(/enough/)
+      ))).rejects.toThrow(/not.*enough points/)
     })
 
     it('can reserve the loyalty points', async () => {
@@ -197,6 +201,104 @@ describe('PerxProxyManager', () => {
         expect(reservedVochers[0].state).toEqual('redeemed')
       })
     })
+  }
+
+  if (testableRewardId && testableMerchantIds.length >= 2) {
+    const firstMerchantId = testableMerchantIds[0]
+    const secondMerchantId = testableMerchantIds[1]
+    const sourceRewardId = `${testableRewardId}`
+
+    describe.each`
+      pointsToUse  | numberOfTransactions    | distribution            | voucherUsages          | reserveVoucherBy   | merchantIds                                                | expectedInvoiceItems
+      ${300}       | ${2}                    | ${[250, 50]}            | ${[true, false]}       | ${'voucherApi'}    | ${[firstMerchantId, secondMerchantId]}                     | ${4}
+      ${300}       | ${2}                    | ${[200, 50]}            | ${[true, false]}       | ${'voucherApi'}    | ${[firstMerchantId, secondMerchantId]}                     | ${4}
+      ${350}       | ${3}                    | ${[150, 50, 150]}       | ${[true, false, true]} | ${'voucherApi'}    | ${[firstMerchantId, firstMerchantId, secondMerchantId]}    | ${5}
+      ${500}       | ${2}                    | ${[250, 250]}           | ${[true, true]}        | ${'voucherApi'}    | ${[firstMerchantId, secondMerchantId]}                     | ${4}
+      ${500}       | ${1}                    | ${[500]}                | ${[true]}              | ${'voucherApi'}    | ${[secondMerchantId]}                                      | ${3}
+      ${600}       | ${2}                    | ${[0, 300]}             | ${[false, true]}       | ${'voucherApi'}    | ${[secondMerchantId, firstMerchantId]}                     | ${4}
+      ${731}       | ${2}                    | ${[0, 300]}             | ${[false, false]}      | ${'voucherApi'}    | ${[secondMerchantId, firstMerchantId]}                     | ${4}
+      ${745}       | ${2}                    | ${[0, 0]}               | ${[true, false]}       | ${'voucherApi'}    | ${[secondMerchantId, firstMerchantId]}                     | ${4}
+    `('Invoice for $pointsToUse points on $numberOfTransactions txs using $reserveVoucherBy', ({ pointsToUse, numberOfTransactions, distribution, reserveVoucherBy, voucherUsages, merchantIds, expectedInvoiceItems }) => {
+      let loyaltyTransactionId: number = 0
+      let targetVoucherId: number = 0
+
+      if (distribution.length !== numberOfTransactions) {
+        throw Error('Invalid test suite setting! numberOfTransactions mismatched distribution array')
+      }
+      if (voucherUsages.length !== numberOfTransactions) {
+        throw Error('Invalid test suite setting! numberOfTransactions mismatched voucherUsages array')
+      }
+      if (merchantIds.length !== numberOfTransactions) {
+        throw Error('Invalid test suite setting! numberOfTransactions mismatched merchantIds array')
+      }
+  
+      it('prepare loyalty points', async () => {
+        const tx = await pos.submitLoyaltyTransaction(new PerxLoyaltyTransactionRequest(
+          userAccount,
+          +testableLoyaltyProgramIdOnPerxServer,
+          pointsToUse,
+          {},
+        ))
+        expect(tx).toBeTruthy()
+        expect(tx.loyaltyProgramId).toEqual(+testableLoyaltyProgramIdOnPerxServer)
+  
+        const reserved = await pos.reserveLoyaltyPoints(new PerxLoyaltyTransactionReservationRequest(
+          userAccount,
+          +testableLoyaltyProgramIdOnPerxServer,
+          pointsToUse,
+        ))
+  
+        loyaltyTransactionId = reserved.id
+      })
+  
+      if (reserveVoucherBy === 'voucherApi') {
+        it(`prepare reward to be redeem by Voucher APIs`, async () => {
+          const voucher = await user.issueReward(sourceRewardId)
+          expect(voucher).toBeTruthy()
+          expect(voucher.issuedDate).toBeTruthy()
+          expect(voucher.id).toBeTruthy()
+          targetVoucherId = voucher.id
+    
+          const reservedVochers = await user.reserveVouchers([ `${voucher.id}` ])
+          expect(reservedVochers).toBeInstanceOf(Array)
+          expect(reservedVochers.length).toEqual(1)
+          expect(reservedVochers[0].id).toEqual(+targetVoucherId)
+          expect(reservedVochers[0].state).toEqual('redemption_in_progress')
+        })
+      } else {
+        it(`prepare reward to redeem by Reward APIs`, async () => {
+          const voucher = await user.reserveReward(sourceRewardId)
+          expect(voucher).toBeTruthy()
+          expect(voucher.id).toBeTruthy()
+          targetVoucherId = voucher.id
+        })
+      }
+  
+      it('can confirm by single invoice API', async () => {
+        const txs: PerxInvoiceRequestTransactionData[] = []
+        for (let i=0;i<numberOfTransactions;i++) {
+          txs.push(new PerxInvoiceRequestTransactionData(3000, merchantIds[i], {
+            appliedPoints: distribution[i],
+            appliedVouchers: voucherUsages[i] ? [targetVoucherId] : [],
+            properties: {
+              test: `MERC: ${merchantIds}, PNTS: ${distribution[i]}, VCHR?: ${voucherUsages[i] ? 'YES' : 'NOPE'}`,
+            }
+          }))
+        }
+        const req = new PerxInvoiceRequest(userAccount)
+          .addTransactions(...txs)
+          .used(
+            PerxInvoiceRequestUsedItem.points(loyaltyTransactionId),
+            PerxInvoiceRequestUsedItem.reward(targetVoucherId),
+          )
+
+        const result = await pos.createInvoice(req)
+        expect(result).toBeTruthy()
+        expect(result.data.invoiceItems).toBeInstanceOf(Array)
+        expect(result.data.invoiceItems.length).toEqual(expectedInvoiceItems)
+      })
+    })
+
   }
 
   describe('identifier', () => {
