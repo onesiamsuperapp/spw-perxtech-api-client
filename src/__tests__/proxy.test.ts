@@ -29,8 +29,8 @@ describe('PerxProxyManager', () => {
   }
   const manager = new PerxProxyManager(client)
   const userAccount = new PerxLoyaltyTransactionRequestUserAccount({ type: 'id', id: +testableUserIdOnPerxServer })
-  const user = manager.user({ type: 'id', id: +testableUserIdOnPerxServer })
-  const pos = manager.pos()
+  const user = manager.user({ type: 'id', id: +testableUserIdOnPerxServer }, 'en')
+  const pos = manager.pos('en')
 
   describe('id', () => {
     it('can assureToken with id', async () => {
@@ -47,7 +47,7 @@ describe('PerxProxyManager', () => {
       const user = manager.user({
         type: 'id',
         id: +testableUserIdOnPerxServer,
-      })
+      }, 'en')
 
       const me = await user.getMe()
       expect(me.id).toEqual(+testableUserIdOnPerxServer)
@@ -58,7 +58,7 @@ describe('PerxProxyManager', () => {
       const user = manager.user({
         type: 'id',
         id: +testableUserIdOnPerxServer,
-      })
+      }, 'en')
 
       const firstPage = await user.listCategories(1, 1)
       expect(firstPage).toBeTruthy()
@@ -211,6 +211,7 @@ describe('PerxProxyManager', () => {
     describe.each`
       pointsToUse  | numberOfTransactions    | distribution            | voucherUsages          | reserveVoucherBy   | merchantIds                                                | expectedInvoiceItems
       ${300}       | ${2}                    | ${[250, 50]}            | ${[true, false]}       | ${'voucherApi'}    | ${[firstMerchantId, secondMerchantId]}                     | ${4}
+      ${300}       | ${2}                    | ${[250, 50]}            | ${[true, false]}       | ${'rewardApi'}     | ${[firstMerchantId, secondMerchantId]}                     | ${4}
       ${300}       | ${2}                    | ${[200, 50]}            | ${[true, false]}       | ${'voucherApi'}    | ${[firstMerchantId, secondMerchantId]}                     | ${4}
       ${350}       | ${3}                    | ${[150, 50, 150]}       | ${[true, false, true]} | ${'voucherApi'}    | ${[firstMerchantId, firstMerchantId, secondMerchantId]}    | ${5}
       ${500}       | ${2}                    | ${[250, 250]}           | ${[true, true]}        | ${'voucherApi'}    | ${[firstMerchantId, secondMerchantId]}                     | ${4}
@@ -270,7 +271,17 @@ describe('PerxProxyManager', () => {
           const voucher = await user.reserveReward(sourceRewardId)
           expect(voucher).toBeTruthy()
           expect(voucher.id).toBeTruthy()
-          targetVoucherId = voucher.id
+
+          const issuedVoucher = await user.confirmReservedReward(`${voucher.id}`)
+          expect(issuedVoucher).toBeTruthy()
+          expect(issuedVoucher.id).toEqual(voucher.id)
+
+          const reservedVochers = await user.reserveVouchers([ `${voucher.id}` ])
+          expect(reservedVochers).toBeInstanceOf(Array)
+          expect(reservedVochers.length).toEqual(1)
+          expect(reservedVochers[0].id).toEqual(issuedVoucher.id)
+          
+          targetVoucherId = reservedVochers[0].id
         })
       }
   

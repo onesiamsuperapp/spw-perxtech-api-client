@@ -315,11 +315,18 @@ export interface IPerxPosService {
   getCustomerDetail(applicationToken: string, userId: number): Promise<PerxCustomer>
 }
 
-export type IPerxService = IPerxAuthService & IPerxUserService & IPerxPosService
+export type IPerxService = IPerxAuthService & IPerxUserService & IPerxPosService & { clone(lang: string): IPerxService }
 
 export class PerxService implements IPerxService {
 
   private axios: AxiosInstance
+
+  public clone(lang: string): PerxService {
+    return new PerxService({
+      ...this.config,
+      lang,
+    }, this.debug)
+  }
 
   /**
    * Create perx service
@@ -329,6 +336,9 @@ export class PerxService implements IPerxService {
   public constructor(public readonly config: PerxConfig, public readonly debug: 'request' | 'response' | 'all' | 'none' = 'none') {
     this.axios = axios.create({
       baseURL: this.config.baseURL,
+      headers: config.lang && {
+        'Accpet-Language': config.lang,
+      } || {},
       validateStatus: (status: number) => status < 450,     // all statuses are to be parsed by service layer.
     })
     if (debug === 'request' || debug === 'all') {

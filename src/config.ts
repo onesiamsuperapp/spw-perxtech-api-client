@@ -3,4 +3,5 @@ export interface PerxConfig {
   clientId: string
   clientSecret: string
   tokenDurationInSeconds: number
+  lang?: string
 }

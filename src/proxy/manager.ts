@@ -249,9 +249,9 @@ export interface IPerxPosProxy {
  */
 export interface IPerxProxyManager {
 
-  user(identifier: PerxIdentification): IPerxUserProxy
+  user(identifier: PerxIdentification, lang: string): IPerxUserProxy
 
-  pos(): IPerxPosProxy
+  pos(lang: string): IPerxPosProxy
 }
 
 export interface IPerxToken {
@@ -314,17 +314,22 @@ export class InMemoryTokenPool implements TokenPool {
  */
 export class PerxProxyManager implements IPerxProxyManager {
 
+  private _instances: Record<string, IPerxService> = {}
 
-  public constructor(public readonly perxService: IPerxService, private pool: TokenPool = new InMemoryTokenPool()) {
+  public constructor(private readonly _masterPerxService: IPerxService, private pool: TokenPool = new InMemoryTokenPool()) {
   }
 
-  public user(identification: PerxIdentification): IPerxUserProxy {
-    const user = new PerxUserProxy(() => this.assureToken(identification), this.perxService)
+  private service(lang: string): IPerxService {
+    return this._instances[lang] = this._instances[lang] || this._masterPerxService.clone(lang)
+  }
+
+  public user(identification: PerxIdentification, lang: string): IPerxUserProxy {
+    const user = new PerxUserProxy(() => this.assureToken(identification), this.service(lang))
     return user
   }
 
-  public pos(): IPerxPosProxy {
-    const pos = new PerxPosProxy(() => this.assureApplicationToken(), this.perxService)
+  public pos(lang: string): IPerxPosProxy {
+    const pos = new PerxPosProxy(() => this.assureApplicationToken(), this.service(lang))
     return pos
   }
 
@@ -332,14 +337,12 @@ export class PerxProxyManager implements IPerxProxyManager {
    * Use this method to access exposedToken
    * @returns 
    */
-  public async assureToken(identification: PerxIdentification): Promise<IPerxToken> {
+  public async assureToken(identification: PerxIdentification, perxService: IPerxService = this.service('en')): Promise<IPerxToken> {
     let identifier: string | null = null
 
     const key = identification.type === 'id'
       ? `id:${identification.id}`
       : `identifier:${identification.identifier}`
-    const perxService = this.perxService
-
     const _token = await this.pool.get(key)
     if (_token) {
       return _token
@@ -371,9 +374,8 @@ export class PerxProxyManager implements IPerxProxyManager {
    * @param perxService
    * @returns
    */
-  public async assureApplicationToken(): Promise<IPerxToken> {
+  public async assureApplicationToken(perxService: IPerxService = this.service('en')): Promise<IPerxToken> {
     const applicationTokenCacheKey = 'application'
-    const perxService = this.perxService
     const resp = await this.pool.get(applicationTokenCacheKey)
     if (resp) {
       return resp
