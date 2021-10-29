@@ -337,7 +337,7 @@ export class PerxService implements IPerxService {
     this.axios = axios.create({
       baseURL: this.config.baseURL,
       headers: config.lang && {
-        'Accpet-Language': config.lang,
+        'Accept-Language': config.lang,
       } || {},
       validateStatus: (status: number) => status < 450,     // all statuses are to be parsed by service layer.
     })
