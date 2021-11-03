@@ -84,6 +84,7 @@ describe('PerxProxyManager', () => {
   describe('LoyaltyPoints', () => {
     let program: PerxLoyalty | undefined = undefined
     const pointsToTest = 300
+    let reservationBalanceBeforeReserve = 0
     let reservedTransactionId: string = ''
 
     it('can query the user points', async () => {
@@ -91,6 +92,7 @@ describe('PerxProxyManager', () => {
 
       expect(program).toBeTruthy()
       expect(program.pointBalance).toBeTruthy()
+      reservationBalanceBeforeReserve = program.redemptionInProgressBalance
     })
 
     it('can added some points in', async () => {
@@ -103,6 +105,7 @@ describe('PerxProxyManager', () => {
       const newPrg = await user.getLoyaltyProgram(testableLoyaltyProgramIdOnPerxServer)
       expect(newPrg).toBeTruthy()
       expect(newPrg.pointBalance - program!.pointBalance).toEqual(pointsToTest)
+      expect(newPrg.redemptionInProgressBalance).toEqual(reservationBalanceBeforeReserve)
       program = newPrg
     })
 
@@ -128,6 +131,14 @@ describe('PerxProxyManager', () => {
       reservedTransactionId = `${reserved.id}`
     })
 
+    it('can see the the points has been reserved', async () => {
+      const newPrg = await user.getLoyaltyProgram(testableLoyaltyProgramIdOnPerxServer)
+      expect(newPrg).toBeTruthy()
+      // point balance won't change a bit
+      expect(newPrg.pointBalance).toEqual(program!.pointBalance)
+      expect(newPrg.redemptionInProgressBalance).toEqual(reservationBalanceBeforeReserve + pointsToTest)
+    })
+
     it('can then release the reserved transaction', async () => {
       const released = await pos.releaseLoyaltyPoints(
         userAccount,
@@ -135,6 +146,14 @@ describe('PerxProxyManager', () => {
       )
 
       expect(released).toBeTruthy()
+    })
+
+    it('can then see the points those has been released', async () => {
+      const newPrg = await user.getLoyaltyProgram(testableLoyaltyProgramIdOnPerxServer)
+      expect(newPrg).toBeTruthy()
+      // point balance won't change a bit
+      expect(newPrg.pointBalance).toEqual(program!.pointBalance)
+      expect(newPrg.redemptionInProgressBalance).toEqual(reservationBalanceBeforeReserve)
     })
   })
 
