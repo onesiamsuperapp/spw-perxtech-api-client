@@ -18,6 +18,7 @@ describe('PerxProxyManager', () => {
   const testableUserIdentifierOnPerxServer = (process.env.TEST_PERX_USER_IDENTIFIER || '')
   const testableUserIdOnPerxServer = (process.env.TEST_PERX_USER_ID || '')
   // Optional target, if not provide use first record in query to run the test
+  const testableMerchantIdentifier = (process.env.TEST_PERX_MERCHANT_IDENTIFIER || '')
   const testableRewardId = +(process.env.TEST_PERX_REWARD_ID || '-1')
   const testableMerchantIds = (process.env.TEST_PERX_VALID_MERCHANT_ID || '')
     .split(',')
@@ -40,6 +41,14 @@ describe('PerxProxyManager', () => {
       })
       expect(resp.accessToken).toBeTruthy()
     })
+
+    if (testableMerchantIdentifier) {
+      it('can issue merchant token', async () => {
+        const token = await manager.merchantBearer(testableMerchantIdentifier)
+        expect(typeof token.bearerToken).toEqual('string')
+        expect(token.bearerToken).toBeTruthy()
+      })
+    }
   })
 
   describe('user', () => {

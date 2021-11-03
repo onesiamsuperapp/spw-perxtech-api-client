@@ -1,6 +1,6 @@
 import type { PerxConfig } from './config'
 
-import { Serialize } from 'cerialize'
+import { Deserialize, Serialize } from 'cerialize'
 import axios, { AxiosInstance } from 'axios'
 
 import { PerxError } from './error'
@@ -34,6 +34,7 @@ import {
   IdObjectResponse,
   PerxInvoiceRequest,
   PerxInvoiceCreationResponse,
+  BearerTokenResponse,
 } from './models'
 
 export interface PerxVoucherScope {
@@ -115,6 +116,12 @@ export interface IPerxAuthService {
     * Issue the application's token
     */
    getApplicationToken(): Promise<TokenResponse>
+
+   /**
+    * 
+    * @param merchantIdentifier 
+    */
+   getMerchantBearerToken(merchantIdentifier: string): Promise<BearerTokenResponse>
 }
 
 export interface IPerxUserService {
@@ -374,6 +381,26 @@ export class PerxService implements IPerxService {
     }
 
     return BasePerxResponse.parseAndEval(resp.data, resp.status, TokenResponse)
+  }
+
+  public async getMerchantBearerToken(merchantIdentifier: string): Promise<BearerTokenResponse> {
+    const resp = await this.axios.post('/v4/oauth/token', {
+      client_id: this.config.clientId,
+      client_secret: this.config.clientSecret,
+      grant_type: 'client_credentials',
+      identifier: merchantIdentifier,
+      scope: `merchant_user_account`,
+    })
+
+    if (resp.status == 401) {
+      throw PerxError.unauthorized()
+    }
+
+    const r = Deserialize(resp.data, BearerTokenResponse)
+    if (!r) {
+      throw PerxError.serverRejected('Cannot create bearer token', 'no data converted')
+    }
+    return r
   }
 
   public async getCustomerDetail(applicationToken: string, userId: number): Promise<PerxCustomer> {

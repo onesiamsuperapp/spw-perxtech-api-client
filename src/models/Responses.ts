@@ -223,6 +223,43 @@ export class TokenResponse extends BasePerxResponse {
   scope?: string
 }
 
+export class BearerTokenResponse {
+
+  /**
+   * Error Code
+   */
+  @autoserializeAs('code')
+  code?: number
+
+  /**
+   * Error Message
+   */
+  @autoserializeAs('message')
+  message?: string
+
+  @autoserializeAs('bearer_token')
+  bearerToken!: string
+
+  @autoserializeAs('tenant')
+  tenant!: string
+
+  public get hasError(): boolean {
+    return Boolean(this.error)
+  }
+
+  protected afterDeserialized(json: any) {
+  }
+
+  public get error(): Error | undefined {
+    if (this.code || this.message) {
+      const errorCode = `${this.code || ''}` || 'no-error-code'
+      const errorDescritpion = `$${this.message || ''}` || 'no-error-description'
+      return PerxError.serverRejected(errorCode, errorDescritpion)
+    }
+    return undefined
+  }
+}
+
 @inheritSerialization(ItemListPerxResponse)
 export class PerxRewardsResponse extends ItemListPerxResponse<PerxReward> {
   public constructor() { super(PerxReward) }

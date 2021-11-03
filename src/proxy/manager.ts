@@ -21,6 +21,7 @@ import {
   PerxLoyaltyTransactionRequestUserAccount,
   PerxInvoiceRequest,
   PerxInvoiceCreationResponse,
+  BearerTokenResponse,
 } from '..'
 import { PerxPosProxy } from './pos'
 import { PerxUserProxy } from './user'
@@ -252,6 +253,10 @@ export interface IPerxProxyManager {
   user(identifier: PerxIdentification, lang: string): IPerxUserProxy
 
   pos(lang: string): IPerxPosProxy
+
+  merchantBearer(merchantIdentifier: string): Promise<BearerTokenResponse>
+
+  merchantBearer(merchantIdentifier: string, lang: string): Promise<BearerTokenResponse>
 }
 
 export interface IPerxToken {
@@ -331,6 +336,10 @@ export class PerxProxyManager implements IPerxProxyManager {
   public pos(lang: string): IPerxPosProxy {
     const pos = new PerxPosProxy(() => this.assureApplicationToken(), this.service(lang))
     return pos
+  }
+
+  public async merchantBearer(merchantIdentifier: string, lang: string = 'en'): Promise<BearerTokenResponse> {
+    return this.service(lang).getMerchantBearerToken(merchantIdentifier)
   }
 
   /**
