@@ -35,6 +35,8 @@ import {
   PerxInvoiceRequest,
   PerxInvoiceCreationResponse,
   BearerTokenResponse,
+  PerxMerchantInfoResponse,
+  MerchantInfo,
 } from './models'
 
 export interface PerxVoucherScope {
@@ -320,6 +322,16 @@ export interface IPerxPosService {
    * @param userId
    */
   getCustomerDetail(applicationToken: string, userId: number): Promise<PerxCustomer>
+
+  /**
+   * Create merchant object via POS Access.
+   * 
+   * @param applicationToken 
+   * @param username 
+   * @param email 
+   * @param merchantAccountId 
+   */
+  createMerchantInfo(applicationToken: string, username: string, email: string, merchantAccountId: number): Promise<MerchantInfo>
 }
 
 export type IPerxService = IPerxAuthService & IPerxUserService & IPerxPosService & { clone(lang: string): IPerxService }
@@ -713,6 +725,20 @@ export class PerxService implements IPerxService {
 
     const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxLoyaltyTransactionsHistoryResponse)
     return result
+  }
+
+  public async createMerchantInfo(applicationToken: string, username: string, email: string, merchantAccountId: number): Promise<MerchantInfo> {
+    const resp = await this.axios.post('/v4/pos/merchant_user_accounts', {
+      username,
+      email,
+      merchant_account_id: merchantAccountId,
+    }, {
+      headers: {
+        authorization: `Bearer ${applicationToken}`,
+      },
+    })
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxMerchantInfoResponse)
+    return result.data
   }
 
   private static fromRewardsScopeToQueryParams(scope: Partial<PerxRewardScope>): Record<string, string | string[]> {

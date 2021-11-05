@@ -2,6 +2,7 @@ import { chunk } from 'lodash'
 import { IPerxToken } from '.'
 import {
   IPerxService,
+  MerchantInfo,
   PerxCustomer,
   PerxInvoiceCreationResponse,
   PerxInvoiceRequest,
@@ -73,7 +74,7 @@ export class PerxPosProxy implements IPerxPosProxy {
    * 
    * @param transaction 
    */
-  async submitTransaction(transaction: PerxTransactionReqeust): Promise<PerxTransaction> {
+  public async submitTransaction(transaction: PerxTransactionReqeust): Promise<PerxTransaction> {
     const applicationToken = await this.getToken()
     return this.perxService.submitTransaction(applicationToken.accessToken, transaction)
   }
@@ -83,9 +84,22 @@ export class PerxPosProxy implements IPerxPosProxy {
    * 
    * @param userId 
   */
-  async getCustomerDetail(userId: number): Promise<PerxCustomer> {
+  public async getCustomerDetail(userId: number): Promise<PerxCustomer> {
     const applicationToken = await this.getToken()
     return this.perxService.getCustomerDetail(applicationToken.accessToken, userId)
+  }
+
+  /**
+   * create merchant info
+   * 
+   * @param username 
+   * @param email 
+   * @param merchantId 
+   * @returns 
+   */
+  public async createMerchantInfo(username: string, email: string, merchantId: number): Promise<MerchantInfo> {
+    const applicationToken = await this.getToken()
+    return this.perxService.createMerchantInfo(applicationToken.accessToken, username, email, merchantId)
   }
 
   private async _forEachVoucher<R>(voucherIds: string[], callback: (token: IPerxToken, voucherId: string) => Promise<R>): Promise<R[]> {

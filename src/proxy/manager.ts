@@ -23,6 +23,7 @@ import {
   PerxInvoiceCreationResponse,
   BearerTokenResponse,
 } from '..'
+import { MerchantInfo } from '../models/MerchantInfo'
 import { PerxPosProxy } from './pos'
 import { PerxUserProxy } from './user'
 
@@ -243,6 +244,11 @@ export interface IPerxPosProxy {
    * @param userId 
   */
   getCustomerDetail(userId: number): Promise<PerxCustomer>
+
+  /**
+   * create customer detail via POS Access.
+   */
+  createMerchantInfo(username: string, email: string, merchantId: number): Promise<MerchantInfo>
 }
 
 /**
