@@ -62,7 +62,7 @@ export class PerxLoyalty extends ShortPerxLoyalty {
   @autoserializeAs('points_balance')
   pointBalance: number = 0
 
-  @autoserializeAs('redemption_in_progress')
+  @autoserializeAs('redemption_in_progress_points')
   redemptionInProgressBalance: number = 0
 
   @autoserializeAs('tier_points')
