@@ -265,6 +265,11 @@ export class PerxRewardsResponse extends ItemListPerxResponse<PerxReward> {
   public constructor() { super(PerxReward) }
 }
 
+@inheritSerialization(ObjectPerxResponse)
+export class PerxVoucherResponse extends ObjectPerxResponse<PerxVoucher> {
+  public constructor() { super(PerxVoucher) }
+}
+
 @inheritSerialization(BasePerxResponse)
 export class PerxVouchersResponse extends BasePerxResponse {
 
@@ -273,6 +278,11 @@ export class PerxVouchersResponse extends BasePerxResponse {
 
   @autoserializeAs(PerxPagingVoucherMeta, 'meta')
   meta!: PerxPagingVoucherMeta
+}
+
+@inheritSerialization(ObjectPerxResponse)
+export class PerxRewardResponse extends ObjectPerxResponse<PerxReward> {
+  public constructor() { super(PerxReward) }
 }
 
 @inheritSerialization(ObjectPerxResponse)

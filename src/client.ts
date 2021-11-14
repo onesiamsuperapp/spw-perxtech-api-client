@@ -37,6 +37,8 @@ import {
   BearerTokenResponse,
   PerxMerchantInfoResponse,
   MerchantInfo,
+  PerxRewardResponse,
+  PerxVoucherResponse,
 } from './models'
 
 export interface PerxVoucherScope {
@@ -129,6 +131,14 @@ export interface IPerxAuthService {
 export interface IPerxUserService {
 
   /**
+   * Get single reward by id
+   * 
+   * @param userToken 
+   * @param rewardId 
+   */
+  getReward(userToken: string, rewardId: number): Promise<PerxRewardResponse>
+
+  /**
    * List rewards for specific user
    * 
    * @param userToken 
@@ -195,6 +205,14 @@ export interface IPerxUserService {
     */
   issueVoucher(userToken: string, rewardId: number | string): Promise<PerxVoucher>
  
+  /**
+   * Get single voucher by Id
+   *
+   * @param userToken 
+   * @param voucherId 
+   */
+  getVoucher(userToken: string, voucherId: number): Promise<PerxVoucherResponse>
+
    /**
     * List vouchers for specific users
     * 
@@ -442,6 +460,17 @@ export class PerxService implements IPerxService {
     return BasePerxResponse.parseAndEval(resp.data, resp.status, TokenResponse)
   }
 
+  public async getReward(userToken: string, rewardId: number): Promise<PerxRewardResponse> {
+    const resp = await this.axios.get(`/v4/rewards/${rewardId}`, {
+      headers: {
+        authorization: `Bearer ${userToken}`,
+      }
+    })
+
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxRewardResponse)
+    return result
+  }
+
   public async getRewards(userToken: string, scope: Partial<PerxRewardScope>): Promise<PerxRewardsResponse> {
     const params = PerxService.fromRewardsScopeToQueryParams(scope)
     const resp = await this.axios.get('/v4/rewards', {
@@ -467,6 +496,17 @@ export class PerxService implements IPerxService {
 
     const result = BasePerxResponse.parseAndEval(resp.data, resp.status, VoucherResponse)
     return result.data
+  }
+
+  public async getVoucher(userToken: string, voucherId: number): Promise<PerxVoucherResponse> {
+    const resp = await this.axios.get(`/v4/vouchers/${voucherId}`, {
+      headers: {
+        authorization: `Bearer ${userToken}`,
+      },
+    })
+
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxVoucherResponse)
+    return result
   }
 
   public async getVouchers(userToken: string, scope: Partial<PerxVoucherScope>): Promise<PerxVouchersResponse> {

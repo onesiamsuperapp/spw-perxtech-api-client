@@ -22,6 +22,8 @@ import {
   PerxInvoiceRequest,
   PerxInvoiceCreationResponse,
   BearerTokenResponse,
+  PerxRewardResponse,
+  PerxVoucherResponse,
 } from '..'
 import { MerchantInfo } from '../models/MerchantInfo'
 import { PerxPosProxy } from './pos'
@@ -44,6 +46,13 @@ export type PerxIdentification = PerxId | PerxIdentifier
  * Interface for User Access
  */
 export interface IPerxUserProxy {
+
+  /**
+   * Get single Reward by Id
+   * 
+   * @param scope 
+   */
+  getReward(rewardId: number): Promise<PerxRewardResponse>
 
   /**
    * List Rewards to be claim
@@ -130,6 +139,13 @@ export interface IPerxUserProxy {
    * @param scope 
    */
   confirmReservedReward(rewardId: string): Promise<PerxVoucher>
+
+  /**
+   * Get single perx voucher from API by Id
+   * 
+   * @param voucherId 
+   */
+  getVoucher(voucherId: number): Promise<PerxVoucherResponse>
 
   /**
    * Listing claimed rewards (vouchers)
