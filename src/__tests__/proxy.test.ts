@@ -109,6 +109,7 @@ describe('PerxProxyManager', () => {
         userAccount,
         +testableLoyaltyProgramIdOnPerxServer,
         pointsToTest,
+        null,
         {},
       ))
       const newPrg = await user.getLoyaltyProgram(testableLoyaltyProgramIdOnPerxServer)
@@ -266,6 +267,7 @@ describe('PerxProxyManager', () => {
           userAccount,
           +testableLoyaltyProgramIdOnPerxServer,
           pointsToUse,
+          null,
           {},
         ))
         expect(tx).toBeTruthy()

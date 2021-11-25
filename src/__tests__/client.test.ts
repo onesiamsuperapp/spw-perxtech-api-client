@@ -263,6 +263,7 @@ describe('PerxService', () => {
         { type: 'id', id: +testableUserIdOnPerxServer },
         +testableLoyaltyProgramIdOnPerxServer,
         pointsToEarnAndBurn,
+        null,
         {},
       )
 
@@ -285,6 +286,7 @@ describe('PerxService', () => {
         { type: 'id', id: +testableUserIdOnPerxServer },
         +testableLoyaltyProgramIdOnPerxServer,
         pointsToEarnAndBurn,
+        null,
         {},
       )
 
