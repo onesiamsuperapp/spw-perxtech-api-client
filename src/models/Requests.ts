@@ -120,28 +120,34 @@ export class PerxLoyaltyTransactionRequest {
   @autoserializeAs('loyalty_program_id')
   loyaltyProgramId!: number
 
-  constructor(userAccount: PerxLoyaltyTransactionRequestUserAccount, loyaltyProgramId: number, points: number, properties: Record<string, string|number> = {}) {
+  @autoserializeAs('transaction_reference')
+  transactionReference: string | null = null
+
+  constructor(userAccount: PerxLoyaltyTransactionRequestUserAccount, loyaltyProgramId: number, points: number, transactionReference: string | null = null, properties: Record<string, string|number> = {}) {
     this.userAccount = userAccount
     this.points = points
     this.loyaltyProgramId = loyaltyProgramId
     this.properties = properties
+    this.transactionReference = transactionReference
   }
 
-  public static makeBurnRequest(userAccount: PerxRawUserAccount, loyaltyProgramId: number, pointsToBurn: number, properties: Record<string, string|number> = {}): PerxLoyaltyTransactionRequest {
+  public static makeBurnRequest(userAccount: PerxRawUserAccount, loyaltyProgramId: number, pointsToBurn: number, transactionReference: string | null = null, properties: Record<string, string|number> = {}): PerxLoyaltyTransactionRequest {
     const request = new PerxLoyaltyTransactionRequest(
       new PerxLoyaltyTransactionRequestUserAccount(userAccount),
       loyaltyProgramId,
       -pointsToBurn,
+      transactionReference,
       properties,
     )
     return request
   }
 
-  public static makeEarnRequest(userAccount: PerxRawUserAccount, loyaltyProgramId: number, pointsToEarn: number, properties: Record<string, string|number> = {}): PerxLoyaltyTransactionRequest {
+  public static makeEarnRequest(userAccount: PerxRawUserAccount, loyaltyProgramId: number, pointsToEarn: number, transactionReference: string | null = null, properties: Record<string, string|number> = {}): PerxLoyaltyTransactionRequest {
     const request = new PerxLoyaltyTransactionRequest(
       new PerxLoyaltyTransactionRequestUserAccount(userAccount),
       loyaltyProgramId,
       pointsToEarn,
+      transactionReference,
       properties,
     )
     return request
