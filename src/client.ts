@@ -370,7 +370,7 @@ export class PerxService implements IPerxService {
    *
    * @param config 
    */
-  public constructor(public readonly config: PerxConfig, public readonly debug: 'request' | 'response' | 'all' | 'none' = 'none') {
+  public constructor(public readonly config: PerxConfig, public readonly debug: ((axios: AxiosInstance) => void) | 'request' | 'response' | 'all' | 'none' = 'none') {
     this.axios = axios.create({
       baseURL: this.config.baseURL,
       headers: config.lang && {
@@ -378,6 +378,9 @@ export class PerxService implements IPerxService {
       } || {},
       validateStatus: (status: number) => status < 450,     // all statuses are to be parsed by service layer.
     })
+    if (typeof debug === 'function') {
+      debug(this.axios)
+    }
     if (debug === 'request' || debug === 'all') {
       this.axios.interceptors.request.use((config) => {
         console.log(`REQ> ${config.url}`, config)
