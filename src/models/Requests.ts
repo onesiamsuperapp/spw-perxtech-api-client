@@ -59,8 +59,12 @@ export class PerxTransactionReqeust {
    * @param transactionReference 
    * @param properties 
    */
-  public static makePurchase(userAccountId: string, amount: number, currency: string, transactionReference: string, properties: Record<string, string | number> = {}, transactionDate: Date): PerxTransactionReqeust {
-    const data = new PerxTransactionRequestData(amount, currency, transactionReference, 'purchase', properties, transactionDate)
+  public static makePurchase(userAccountId: string, amount: number, currency: string, transactionReference: string, properties: Record<string, string | number> = {}): PerxTransactionReqeust {
+    const data = new PerxTransactionRequestData(amount, currency, transactionReference, 'purchase', properties)
+    return new PerxTransactionReqeust(userAccountId, data)
+  }
+  public static makePurchaseFix(userAccountId: string, amount: number, currency: string, transactionReference: string, properties: Record<string, string | number> = {}, transactionDate: Date): PerxTransactionReqeust {
+    const data = new PerxTransactionRequestData(amount, currency, transactionReference, 'purchase-fix', properties, transactionDate)
     return new PerxTransactionReqeust(userAccountId, data)
   }
 }
