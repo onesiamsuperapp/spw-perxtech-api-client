@@ -1,7 +1,8 @@
 import { autoserializeAs, inheritSerialization } from 'cerialize'
+import { ISODateTimeSerializer } from '../utils/cerialize'
 import { PerxBaseInvoiceItem, PerxInvoiceItemType } from './Invoice'
 
-export type PerxTransactionRequestDataType = 'purchase'
+export type PerxTransactionRequestDataType = 'purchase' | 'purchase-fix'
 
 /**
  * You may override this class to create your own Custom Transaction Representation.
@@ -20,14 +21,18 @@ export class PerxTransactionRequestData {
   @autoserializeAs('currency')
   currency: string
 
+  @autoserializeAs(ISODateTimeSerializer, 'transaction_date')
+  transactionDate: Date
+
   @autoserializeAs('properties')
   properties: Record<string, string | number>
 
-  public constructor(amount: number, currency: string, transactionReference: string, transactionType: PerxTransactionRequestDataType = 'purchase', properties: Record<string, string | number> = {}) {
+  public constructor(amount: number, currency: string, transactionReference: string, transactionType: PerxTransactionRequestDataType = 'purchase', properties: Record<string, string | number> = {}, transactionDate: Date = new Date()) {
     this.amount = amount
     this.currency = currency
     this.transactionReference = transactionReference
     this.transactionType = transactionType
+    this.transactionDate = transactionDate
     this.properties = properties
   }
 }
@@ -54,8 +59,8 @@ export class PerxTransactionReqeust {
    * @param transactionReference 
    * @param properties 
    */
-  public static makePurchase(userAccountId: string, amount: number, currency: string, transactionReference: string, properties: Record<string, string | number> = {}): PerxTransactionReqeust {
-    const data = new PerxTransactionRequestData(amount, currency, transactionReference, 'purchase', properties)
+  public static makePurchase(userAccountId: string, amount: number, currency: string, transactionReference: string, properties: Record<string, string | number> = {}, transactionDate: Date): PerxTransactionReqeust {
+    const data = new PerxTransactionRequestData(amount, currency, transactionReference, 'purchase', properties, transactionDate)
     return new PerxTransactionReqeust(userAccountId, data)
   }
 }
