@@ -8,6 +8,9 @@ export class PerxVoucherOwner {
   identifier!: string
 }
 
+export type PerxVoucherState = 'issued' | 'redeemed' | 'expired' | 'redemption_in_progress' | 'released'
+export type PerxVoucherType = 'active' | 'all' | 'expired' | 'gifted' | 'redeemed' | 'redemption_in_progress'
+
 export class PerxVoucher {
   @autoserializeAs('id')
   id!: number
@@ -15,11 +18,17 @@ export class PerxVoucher {
   @autoserializeAs('name')
   name!: string
 
+  @autoserializeAs('custom_fields')
+  customFields: Record<string, any> = {}
+
   @autoserializeAs(PerxReward, 'reward')
-  reward!: PerxReward
+  reward: PerxReward | null = null
 
   @autoserializeAs('state')
-  state: 'issued' | 'redeemed' | 'redemption_in_progress' = 'issued'
+  state: PerxVoucherState = 'expired'
+
+  // @autoserializeAs('type')
+  // type: PerxVoucherType = 'expired'
 
   @autoserializeAs(ISODateTimeSerializer, 'voucher_expires_at')
   voucherExpiresAt: Date | null = null

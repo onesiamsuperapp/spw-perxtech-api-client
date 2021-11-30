@@ -1,7 +1,39 @@
 import { autoserializeAs } from 'cerialize'
 import { ISODateTimeSerializer } from '../utils/cerialize'
-import { ShortPerxLoyalty } from './LoyaltyProgram'
-import { PerxCategory, PerxTag } from './Taxonomy'
+
+import {
+  PerxCategory,
+  PerxTag,
+} from './Taxonomy'
+
+/**
+ * Mapped against
+ * 
+ * {
+    "attained": true,
+    "loyalty_id": 2,
+    "loyalty_name": "Titanium",
+    "loyalty_points_required_for_redemption": null,
+    "sneak_peek": false
+    }
+ */
+export class PerxRewardLoyaltyScope {
+
+  @autoserializeAs('loyalty_id')
+  loyaltyId!: number
+
+  @autoserializeAs('attained')
+  attained: boolean = false
+
+  @autoserializeAs('loyalty_name')
+  loyaltyName: string | null = null
+
+  @autoserializeAs('loyalty_points_required_for_redemption')
+  loyaltyPointsRequiredForRedemption: number | null = null
+
+  @autoserializeAs('sneak_peek')
+  sneakPeek: boolean = false
+}
 
 export class PerxImage {
   @autoserializeAs('url')
@@ -40,6 +72,38 @@ export class PerxRewardPrice {
 
   @autoserializeAs('reward_amount')
   rewardAmount: string = '0.0'
+
+  @autoserializeAs('loyalty_program_id')
+  loyaltyProgramId: number | null = null
+}
+
+/**
+ * Mapped against
+ * 
+ * ```json
+ * {
+ *   "code": 4103,
+ *   "message": "No rewards available for the specified user due to account lifetime limit"
+ * }
+ * ```
+ */
+export class PerxRewardInventoryLimitErrorKlass {
+  @autoserializeAs('code')
+  code: number = 0
+
+  @autoserializeAs('message')
+  message: string = 'no error message mapped'
+}
+
+export class PerxRewardInventoryBalance {
+  @autoserializeAs('available_amount')
+  availableAmount: number = 0
+
+  @autoserializeAs('limit_type')
+  limitType: 'account_lifetime' | 'account_interval' = 'account_lifetime'
+
+  @autoserializeAs(PerxRewardInventoryLimitErrorKlass, 'limit_error_klass')
+  limitErrorKlass: PerxRewardInventoryLimitErrorKlass | null = null
 }
 
 export class PerxRewardInventory {
@@ -52,8 +116,8 @@ export class PerxRewardInventory {
   @autoserializeAs('minutes_per_period')
   minutesPerPeriod: number | null = null
 
-  // @autoserializeAs('period_start')
-  // periodStart: Date <Unknown Type>
+  @autoserializeAs(ISODateTimeSerializer, 'period_start')
+  periodStart: Date | null = null
 
   @autoserializeAs('reward_limit_per_period')
   rewardLimitPerPeriod: number | null = null
@@ -64,8 +128,8 @@ export class PerxRewardInventory {
   @autoserializeAs('reward_limit_per_user')
   rewardLimitPerUser: number | null = null
 
-  @autoserializeAs('reward_limit_per_user_balance')
-  rewardLimitPerUserBalance: number | null = null
+  @autoserializeAs(PerxRewardInventoryBalance, 'reward_limit_per_user_balance')
+  rewardLimitPerUserBalance: PerxRewardInventoryBalance | null = null
 
   @autoserializeAs('minutes_per_user_period')
   minutesPerUserPeriod: number | null = null
@@ -76,8 +140,48 @@ export class PerxRewardInventory {
   @autoserializeAs('reward_limit_per_user_per_period')
   rewardLimitPerUserPerPeriod: number | null = null
 
-  @autoserializeAs('reward_limit_per_user_per_period_balance')
-  rewardLimitPerUserPerPeriodBalance: number | null = null
+  @autoserializeAs(PerxRewardInventoryBalance, 'reward_limit_per_user_per_period_balance')
+  rewardLimitPerUserPerPeriodBalance: PerxRewardInventoryBalance | null = null
+}
+
+/**
+ * Representation of Reward's reservation
+ * 
+ * Example Payload
+ * 
+    "id": 173,
+    "voucher_code": "*****************",
+    "voucher_key": null,
+    "voucher_type": "code",
+    "state": "reserved",
+    "custom_fields": {
+        "reward_price": {}
+    },
+    "reserved_expires_at": "2021-09-21T01:42:58.000Z"
+ */
+export class PerxRewardReservation {
+  
+  @autoserializeAs('id')
+  id!: number
+
+  @autoserializeAs('voucher_code')
+  voucherCode!: string
+
+  @autoserializeAs('voucher_key')
+  voucherKey: string | null = null
+
+  @autoserializeAs('state')
+  state!: string
+
+  @autoserializeAs('voucher_type')
+  voucherType: string | null = null
+
+  @autoserializeAs('custom_fields')
+  customFields: any = {}
+
+  @autoserializeAs(ISODateTimeSerializer, 'reserved_expires_at')
+  reservedExpiresAt: Date | null = null
+
 }
 
 export class PerxReward {
@@ -96,6 +200,9 @@ export class PerxReward {
 
   // @autoserializeAs('favourite')
   // favourite!: <type is unknown>
+
+  @autoserializeAs('steps_to_redeem')
+  stepsToRedeem: string | null = null
 
   @autoserializeAs('merchant_id')
   merchantId: number | null = null
@@ -121,7 +228,7 @@ export class PerxReward {
   @autoserializeAs('ecommerce_only')
   ecommerceOnly: boolean = false
 
-  @autoserializeAs('brands')
+  @autoserializeAs(PerxBrand, 'brands')
   brands: PerxBrand[] = []
 
   @autoserializeAs('subtitle')
@@ -157,8 +264,8 @@ export class PerxReward {
   @autoserializeAs('terms_and_conditions')
   termsAndConditions: string | null = null
 
-  @autoserializeAs(ShortPerxLoyalty, 'loyalty')
-  loyalty: ShortPerxLoyalty[] = []
+  @autoserializeAs(PerxRewardLoyaltyScope, 'loyalty')
+  loyalty: PerxRewardLoyaltyScope[] = []
 
   @autoserializeAs(PerxTag, 'tags')
   tags: PerxTag[] = []

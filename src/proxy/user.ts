@@ -1,42 +1,92 @@
 import type { IPerxUserProxy } from './manager'
-import type { IPerxService, PerxCustomer, PerxFilterScope, PerxLoyalty, PerxReward, PerxVoucher, TokenResponse } from '..'
+import type {
+  IPerxService,
+  PerxCustomer,
+  PerxRewardScope,
+  PerxLoyalty,
+  PerxLoyaltyTransactionsHistoryResponse,
+  PerxRewardSearchResultResponse,
+  PerxVoucher,
+  PerxVoucherScope,
+  PerxVouchersResponse,
+  PerxRewardsResponse,
+  PerxCategory,
+  PerxRewardReservation,
+  IPerxToken,
+  PerxCategoriesResultResponse,
+  PerxRewardResponse,
+  PerxVoucherResponse,
+} from '..'
 import { chunk } from 'lodash'
 
 export class PerxUserProxy implements IPerxUserProxy {
 
-  public constructor(public readonly getToken: () => Promise<TokenResponse>, private readonly perxService: IPerxService) {
+  public constructor(public readonly getToken: () => Promise<IPerxToken>, private readonly perxService: IPerxService) {
   }
 
-  /**
-   * Query list of Rewards from Perx (so that it can be claimed)
-   * 
-   * @param scope
-   * @returns
-   */
-  public async queryRewards(scope: Partial<PerxFilterScope>): Promise<PerxReward[]> {
+  public async getReward(rewardId: number): Promise<PerxRewardResponse> {
+    const token = await this.getToken()
+    return this.perxService.getReward(token.accessToken, rewardId)
+  }
+
+  public async queryRewards(scope: Partial<PerxRewardScope>): Promise<PerxRewardsResponse> {
     const token = await this.getToken()
     return this.perxService.getRewards(token.accessToken, scope)
   }
 
-  /**
-   * Issue the reward from service layer
-   * 
-   * @param rewardId 
-   */
+  public async searchRewards(keyword: string, page: number = 1, size: number = 25): Promise<PerxRewardSearchResultResponse> {
+    const token = await this.getToken()
+    return this.perxService.searchRewards(token.accessToken, keyword, page, size)
+  }
+
   public async issueReward(rewardId: string): Promise<PerxVoucher> {
     const token = await this.getToken()
     return this.perxService.issueVoucher(token.accessToken, rewardId)
   }
 
-  /**
-   * Query list of vouchers from Perx
-   * 
-   * @param scope 
-   * @returns 
-   */
-  public async queryVouchers(scope: Partial<PerxFilterScope>): Promise<PerxVoucher[]> {
+  public async queryVouchers(scope: Partial<PerxVoucherScope>): Promise<PerxVouchersResponse> {
     const token = await this.getToken()
     return this.perxService.getVouchers(token.accessToken, scope)
+  }
+
+  public async listCategories(page: number, pageSize: number): Promise<PerxCategoriesResultResponse> {
+    return this.listCategoriesByParentId(null, page, pageSize)
+  }
+
+  public async listCategoriesByParentId(parentId: number | null, page: number, pageSize: number): Promise<PerxCategoriesResultResponse> {
+    const token = await this.getToken()
+    return this.perxService.getCategories(token.accessToken, parentId, page, pageSize)
+  }
+
+  public async listAllCategories(parentId: number | null = null): Promise<PerxCategory[]> {
+    const token = await this.getToken()
+    let hasNextPage = false
+    let page = 1
+    const pageSize = 50
+    const output: PerxCategory[] = []
+    do {
+      const resp = await this.perxService.getCategories(token.accessToken, parentId, page, pageSize)
+      output.push(...resp.data)
+      const totalPages = resp.meta.totalPages
+      hasNextPage = totalPages > page
+      page = resp.meta.nextPage || (page + 1)
+    } while (hasNextPage)
+    return output
+  }
+
+  public async reserveReward(rewardId: string, timeoutInMs: number = 900 * 1000): Promise<PerxRewardReservation> {
+    const token = await this.getToken()
+    return this.perxService.reserveReward(token.accessToken, rewardId, timeoutInMs)
+  }
+
+  public async releaseReservedReward(reservationId: string): Promise<PerxVoucher> {
+    const token = await this.getToken()
+    return this.perxService.releaseRewardReservation(token.accessToken, reservationId)
+  }
+
+  public async confirmReservedReward(reservationId: string): Promise<PerxVoucher> {
+    const token = await this.getToken()
+    return this.perxService.confirmRewardReservation(token.accessToken, reservationId)
   }
 
   public async reserveVouchers(voucherIds: string[]): Promise<PerxVoucher[]> {
@@ -51,15 +101,14 @@ export class PerxUserProxy implements IPerxUserProxy {
     })
   }
 
+  public async getVoucher(voucherId: number): Promise<PerxVoucherResponse> {
+    const userToken = await this.getToken()
+    return this.perxService.getVoucher(userToken.accessToken, voucherId)
+  }
+
   public async redeemVouchers(voucherIds: string[]): Promise<PerxVoucher[]> {
     return this._forEachVoucher(voucherIds, (token, voucherId) => {
       return this.perxService.redeemVoucher(token.accessToken, voucherId)
-    })
-  }
-
-  public async releaseVouchers(voucherIds: string[]): Promise<PerxVoucher[]> {
-    return this._forEachVoucher(voucherIds, (token, voucherId) => {
-      return this.perxService.releaseVoucher(token.accessToken, voucherId)
     })
   }
 
@@ -73,13 +122,17 @@ export class PerxUserProxy implements IPerxUserProxy {
     return this.perxService.getLoyaltyProgram(token.accessToken, loyaltyProgramId)
   }
 
-
   public async queryLoyaltyPrograms(): Promise<PerxLoyalty[]> {
     const token = await this.getToken()
     return this.perxService.getLoyaltyPrograms(token.accessToken)
   }
 
-  private async _forEachVoucher<R>(voucherIds: string[], callback: (token: TokenResponse, voucherId: string) => Promise<R>): Promise<R[]> {
+  public async queryTransactionsHistory(page: number = 1, perPage: number = 25): Promise<PerxLoyaltyTransactionsHistoryResponse> {
+    const token = await this.getToken()
+    return this.perxService.queryLoyaltyTransactionsHistory(token.accessToken, page, perPage)
+  }
+
+  private async _forEachVoucher<R>(voucherIds: string[], callback: (token: IPerxToken, voucherId: string) => Promise<R>): Promise<R[]> {
     const token = await this.getToken()
     let results: R[] = []
     for(const chunkedVoucherIds of chunk(voucherIds, 5)) {

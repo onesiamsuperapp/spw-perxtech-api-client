@@ -47,6 +47,9 @@ export class PerxLoyaltyAgingPoint {
 @inheritSerialization(ShortPerxLoyalty)
 export class PerxLoyalty extends ShortPerxLoyalty {
 
+  @autoserializeAs('current_membership_tier_id')
+  currentMembershipTierId: number | null = null
+
   @autoserializeAs('current_membership_tier_name')
   currentMembershipTierName: string | null = null
 
@@ -58,6 +61,9 @@ export class PerxLoyalty extends ShortPerxLoyalty {
 
   @autoserializeAs('points_balance')
   pointBalance: number = 0
+
+  @autoserializeAs('redemption_in_progress_points')
+  redemptionInProgressBalance: number = 0
 
   @autoserializeAs('tier_points')
   tierPoints: number = 0
