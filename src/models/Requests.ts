@@ -63,8 +63,21 @@ export class PerxTransactionReqeust {
     const data = new PerxTransactionRequestData(amount, currency, transactionReference, 'purchase', properties)
     return new PerxTransactionReqeust(userAccountId, data)
   }
-  public static makePurchaseFix(userAccountId: string, amount: number, currency: string, transactionReference: string, properties: Record<string, string | number> = {}, transactionDate: Date): PerxTransactionReqeust {
-    const data = new PerxTransactionRequestData(amount, currency, transactionReference, 'purchase-fix', properties, transactionDate)
+
+  /**
+   * Make custom transaction with custom transactionType.
+   * 
+   * @param transactionType 
+   * @param userAccountId 
+   * @param amount 
+   * @param currency 
+   * @param transactionReference 
+   * @param properties 
+   * @param transactionDate 
+   * @returns 
+   */
+  public static makeCustomTransaction(transactionType: PerxTransactionRequestDataType, userAccountId: string, amount: number, currency: string, transactionReference: string, properties: Record<string, string | number> = {}, transactionDate: Date): PerxTransactionReqeust {
+    const data = new PerxTransactionRequestData(amount, currency, transactionReference, transactionType, properties, transactionDate)
     return new PerxTransactionReqeust(userAccountId, data)
   }
 }
