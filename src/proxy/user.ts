@@ -16,6 +16,8 @@ import type {
   PerxCategoriesResultResponse,
   PerxRewardResponse,
   PerxVoucherResponse,
+  PerxMerchantResponse,
+  PerxMerchant,
 } from '..'
 import { chunk } from 'lodash'
 
@@ -130,6 +132,16 @@ export class PerxUserProxy implements IPerxUserProxy {
   public async queryTransactionsHistory(page: number = 1, perPage: number = 25): Promise<PerxLoyaltyTransactionsHistoryResponse> {
     const token = await this.getToken()
     return this.perxService.queryLoyaltyTransactionsHistory(token.accessToken, page, perPage)
+  }
+
+  public async listAllMerchants(page: number = 1, perPage: number = 25, favorite: boolean | undefined = undefined): Promise<PerxMerchantResponse> {
+    const token = await this.getToken()
+    return this.perxService.listAllMerchants(token.accessToken, page, perPage, favorite)
+  }
+
+  public async getMerchant(merchantId: number): Promise<PerxMerchant> {
+    const token = await this.getToken()
+    return this.perxService.getMerchant(token.accessToken, merchantId)
   }
 
   private async _forEachVoucher<R>(voucherIds: string[], callback: (token: IPerxToken, voucherId: string) => Promise<R>): Promise<R[]> {

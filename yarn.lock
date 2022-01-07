@@ -2688,6 +2688,15 @@ path-parse@^1.0.6:
   resolved "https://registry.yarnpkg.com/path-parse/-/path-parse-1.0.7.tgz#fbc114b60ca42b30d9daf5858e4bd68bbedb6735"
   integrity sha512-LDJzPVEEEPR+y48z93A0Ed0yXb8pAByGWo/k5YYdYgpY2/2EsOsksJrq7lOHxryrVOn1ejG6oAp8ahvOIQD8sw==
 
+perxtech-api-client@^0.0.39:
+  version "0.0.39"
+  resolved "https://registry.yarnpkg.com/perxtech-api-client/-/perxtech-api-client-0.0.39.tgz#3498d1b239672669f98f5490182827ef32cdc127"
+  integrity sha512-4/fnI3TXIpBh9rsmRpUAYdV97/5tDQPjExZ7/6mHNJ1O7eNHOVe7ip6pYS4KsUEPlp2mF4yn6rzNrwDOZd6u2A==
+  dependencies:
+    axios "^0.21.1"
+    cerialize "^0.1.18"
+    lodash "^4.17.21"
+
 picocolors@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/picocolors/-/picocolors-1.0.0.tgz#cb5bdc74ff3f51892236eaf79d68bc44564ab81c"
