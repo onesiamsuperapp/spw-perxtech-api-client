@@ -212,7 +212,7 @@ export interface IPerxUserProxy {
    * @param  {number} perPage
    * @returns
    */
-  listAllMerchants(favorite: boolean, perPage: number): Promise<PerxMerchantResponse>
+  listAllMerchants(page: number, perPage: number, favorite: boolean | undefined): Promise<PerxMerchantResponse>
 
   /**
    * Query merchants by merchant id from Perx
@@ -220,7 +220,7 @@ export interface IPerxUserProxy {
    * @param  {boolean} favorite
    * @returns
    */
-  getMerchant(merchantId: number, favorite: boolean): Promise<PerxMerchant>
+  getMerchant(merchantId: number): Promise<PerxMerchant>
 }
 
 /**

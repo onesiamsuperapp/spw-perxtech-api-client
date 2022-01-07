@@ -290,7 +290,7 @@ export interface IPerxUserService {
    * @param  {number} perPage
    * @returns
    */
-  listAllMerchants(userToken: string, favorite: boolean, perPage: number): Promise<PerxMerchantResponse>
+  listAllMerchants(userToken: string, page: number, perPage: number, favorite: boolean | undefined): Promise<PerxMerchantResponse>
 
   /**
    * Query merchants by merchant id from Perx
@@ -298,7 +298,7 @@ export interface IPerxUserService {
    * @param  {boolean} favorite
    * @returns
    */
-  getMerchant(userToken: string, merchantId: number, favorite: boolean): Promise<PerxMerchant>
+  getMerchant(userToken: string, merchantId: number): Promise<PerxMerchant>
 }
 
 export interface IPerxPosService {
@@ -788,13 +788,14 @@ export class PerxService implements IPerxService {
     return result
   }
 
-  public async listAllMerchants(userToken: string, favorite: boolean = false, perPage: number): Promise<PerxMerchantResponse> {
+  public async listAllMerchants(userToken: string, page: number,  perPage: number, favorite: boolean | undefined = undefined): Promise<PerxMerchantResponse> {
     const resp = await this.axios.get('/v4/merchants', {
       headers: {
         authorization: `Bearer ${userToken}`,
       },
       params: {
         favorite,
+        page,
         size: perPage,
       }
     })
@@ -803,14 +804,11 @@ export class PerxService implements IPerxService {
     return result
   }
 
-  public async getMerchant(userToken: string, merchantId: number, favorite: boolean = false): Promise<PerxMerchant> {
+  public async getMerchant(userToken: string, merchantId: number): Promise<PerxMerchant> {
     const resp = await this.axios.get(`/v4/merchants/${merchantId}`, {
       headers: {
         authorization: `Bearer ${userToken}`,
       },
-      params: {
-        favorite,
-      }
     })
 
     const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxMerchantResponse)
