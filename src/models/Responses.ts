@@ -12,6 +12,7 @@ import { PerxReward } from './Reward'
 import { PerxRewardSearchResult } from './SearchResult'
 import { PerxTransaction } from './Transaction'
 import { PerxVoucher } from './Voucher'
+import { PerxMerchant } from './Merchant'
 
 export class BasePerxResponse {
 
@@ -353,4 +354,9 @@ export class PerxInvoiceCreationResponse extends ObjectPerxResponse<PerxInvoice>
 @inheritSerialization(ObjectPerxResponse)
 export class PerxMerchantInfoResponse extends ObjectPerxResponse<MerchantInfo> {
   public constructor() { super(MerchantInfo) }
+}
+
+@inheritSerialization(ObjectPerxResponse)
+export class PerxMerchantResponse extends ObjectPerxResponse<PerxMerchant> {
+  public constructor() { super(PerxMerchant) }
 }

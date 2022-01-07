@@ -39,6 +39,8 @@ import {
   MerchantInfo,
   PerxRewardResponse,
   PerxVoucherResponse,
+  PerxMerchant,
+  PerxMerchantResponse,
 } from './models'
 
 export interface PerxVoucherScope {
@@ -281,6 +283,22 @@ export interface IPerxUserService {
    * @param perPage desinate the page size
    */
   queryLoyaltyTransactionsHistory(userToken: string, page: number, perPage: number): Promise<PerxLoyaltyTransactionsHistoryResponse>
+
+  /**
+   * Query all merchants from Perx
+   * @param  {boolean} favorite
+   * @param  {number} perPage
+   * @returns
+   */
+  listAllMerchants(userToken: string, favorite: boolean, perPage: number): Promise<PerxMerchantResponse>
+
+  /**
+   * Query merchants by merchant id from Perx
+   * @param  {number} merchantId
+   * @param  {boolean} favorite
+   * @returns
+   */
+  getMerchant(userToken: string, merchantId: number, favorite: boolean): Promise<PerxMerchant>
 }
 
 export interface IPerxPosService {
@@ -768,6 +786,35 @@ export class PerxService implements IPerxService {
 
     const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxLoyaltyTransactionsHistoryResponse)
     return result
+  }
+
+  public async listAllMerchants(userToken: string, favorite: boolean = false, perPage: number): Promise<PerxMerchantResponse> {
+    const resp = await this.axios.get('/v4/merchants', {
+      headers: {
+        authorization: `Bearer ${userToken}`,
+      },
+      params: {
+        favorite,
+        size: perPage,
+      }
+    })
+
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxMerchantResponse)
+    return result
+  }
+
+  public async getMerchant(userToken: string, merchantId: number, favorite: boolean = false): Promise<PerxMerchant> {
+    const resp = await this.axios.get(`/v4/merchants/${merchantId}`, {
+      headers: {
+        authorization: `Bearer ${userToken}`,
+      },
+      params: {
+        favorite,
+      }
+    })
+
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxMerchantResponse)
+    return result.data
   }
 
   public async createMerchantInfo(applicationToken: string, username: string, email: string, merchantAccountId: number): Promise<MerchantInfo> {
