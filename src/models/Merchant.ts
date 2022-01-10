@@ -3,7 +3,7 @@ import {
   PerxCategory,
   PerxTag,
 } from './Taxonomy'
-import { PerxImage } from '..'
+import { PerxImage } from './Reward'
 
 export class PerxMerchant {
 
@@ -13,11 +13,11 @@ export class PerxMerchant {
   @autoserializeAs('name')
   name: string = ''
 
-  @autoserializeAs(PerxImage, 'images')
-  images: PerxImage[] = []
-
   @autoserializeAs('ecommerce_only')
   ecommerceOnly: string | null = null
+
+  @autoserializeAs(PerxImage, 'images')
+  images: PerxImage[] = []
 
   @autoserializeAs('website')
   website: string | null = null
