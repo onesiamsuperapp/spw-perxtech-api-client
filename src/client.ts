@@ -299,6 +299,18 @@ export interface IPerxUserService {
    * @returns
    */
   getMerchant(userToken: string, merchantId: number): Promise<PerxMerchant>
+
+
+  /**
+   * Execute custom trigger on Perx with specific user.
+   * 
+   * This API is fire & forget API. No response is provided. 
+   * However invalid key will be responsed with Axios error (400 Bad Request)
+   * 
+   * @param userToken 
+   * @param perxCustomTriggerId 
+   */
+  performCustomTrigger(userToken: string, perxCustomTriggerId: string): Promise<void>
 }
 
 export interface IPerxPosService {
@@ -627,6 +639,28 @@ export class PerxService implements IPerxService {
 
     const result = BasePerxResponse.parseAndEval(resp.data, resp.status, VoucherResponse)
     return result.data
+  }
+
+  /**
+   * According to Perx's response, this API doesn't response any payload.
+   * 
+   * This API is fire & forget.
+   * 
+   * @param userToken 
+   * @param perxCustomTriggerId 
+   * @returns nothing
+   */
+  public async performCustomTrigger(userToken: string, perxCustomTriggerId: string): Promise<void> {
+    const resp = await this.axios.put(`/v4/app_triggers/${perxCustomTriggerId}`, {}, {
+      headers: {
+        authorization: `Bearer ${userToken}`,
+      }
+    })
+    // Just eval for error if status is not 200
+    if (resp && resp.data && resp.status >= 400) {
+      BasePerxResponse.parseAndEval(resp.data, resp.status, BasePerxResponse)
+    }
+    return
   }
 
   public async getLoyaltyProgram(userToken: string, loyaltyProgramId: string | number): Promise<PerxLoyalty> {

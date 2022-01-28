@@ -144,6 +144,11 @@ export class PerxUserProxy implements IPerxUserProxy {
     return this.perxService.getMerchant(token.accessToken, merchantId)
   }
 
+  public async performCustomTrigger(perxCustomTriggerId: string): Promise<void> {
+    const token = await this.getToken()
+    return this.perxService.performCustomTrigger(token.accessToken, perxCustomTriggerId)
+  }
+
   private async _forEachVoucher<R>(voucherIds: string[], callback: (token: IPerxToken, voucherId: string) => Promise<R>): Promise<R[]> {
     const token = await this.getToken()
     let results: R[] = []

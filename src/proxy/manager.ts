@@ -221,6 +221,13 @@ export interface IPerxUserProxy {
    * @returns
    */
   getMerchant(merchantId: number): Promise<PerxMerchant>
+
+  /**
+   * Execute custom trigger on Perx for specific user.
+   * 
+   * @param perxCustomTriggerId 
+   */
+  performCustomTrigger(perxCustomTriggerId: string): Promise<void>
 }
 
 /**

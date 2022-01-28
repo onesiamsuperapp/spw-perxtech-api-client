@@ -17,6 +17,7 @@ describe('PerxProxyManager', () => {
   const testableLoyaltyProgramIdOnPerxServer = (process.env.TEST_PERX_LOYALTY_PROGRAM_ID || '')
   const testableUserIdentifierOnPerxServer = (process.env.TEST_PERX_USER_IDENTIFIER || '')
   const testableUserIdOnPerxServer = (process.env.TEST_PERX_USER_ID || '')
+  const testablePerxTriggerId = (process.env.TEST_CUSTOM_TRIGGER_ID || '')
   // Optional target, if not provide use first record in query to run the test
   const testableMerchantIdentifier = (process.env.TEST_PERX_MERCHANT_IDENTIFIER || '')
   const testableRewardId = +(process.env.TEST_PERX_REWARD_ID || '-1')
@@ -231,6 +232,16 @@ describe('PerxProxyManager', () => {
       })
     })
   }
+
+  if (testablePerxTriggerId) {
+    it('Allow user to trigger with ruleId', async () => {
+      await expect(user.performCustomTrigger(testablePerxTriggerId)).resolves.not.toThrow()
+    })
+  }
+
+  it('Throw error "The record requested does not exist" when trigger bad ruleId', async ()=> {
+    await expect(user.performCustomTrigger('some-invalid-rule-id')).rejects.toThrow(/record requested does not exist/)
+  })
 
   if (testableRewardId && testableMerchantIds.length >= 2) {
     const firstMerchantId = testableMerchantIds[0]
