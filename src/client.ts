@@ -41,6 +41,7 @@ import {
   PerxVoucherResponse,
   PerxMerchant,
   PerxMerchantResponse,
+  PerxMerchantsResponse,
 } from './models'
 
 export interface PerxVoucherScope {
@@ -290,7 +291,7 @@ export interface IPerxUserService {
    * @param  {number} perPage
    * @returns
    */
-  listAllMerchants(userToken: string, page: number, perPage: number, favorite: boolean | undefined): Promise<PerxMerchantResponse>
+  listAllMerchants(userToken: string, page: number, perPage: number, favorite: boolean | undefined): Promise<PerxMerchantsResponse>
 
   /**
    * Query merchants by merchant id from Perx
@@ -823,7 +824,7 @@ export class PerxService implements IPerxService {
     return result
   }
 
-  public async listAllMerchants(userToken: string, page: number,  perPage: number, favorite: boolean | undefined = undefined): Promise<PerxMerchantResponse> {
+  public async listAllMerchants(userToken: string, page: number,  perPage: number, favorite: boolean | undefined = undefined): Promise<PerxMerchantsResponse> {
     const resp = await this.axios.get('/v4/merchants', {
       headers: {
         authorization: `Bearer ${userToken}`,
@@ -835,7 +836,7 @@ export class PerxService implements IPerxService {
       }
     })
 
-    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxMerchantResponse)
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxMerchantsResponse)
     return result
   }
 

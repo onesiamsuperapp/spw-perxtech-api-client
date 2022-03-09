@@ -360,3 +360,8 @@ export class PerxMerchantInfoResponse extends ObjectPerxResponse<MerchantInfo> {
 export class PerxMerchantResponse extends ObjectPerxResponse<PerxMerchant> {
   public constructor() { super(PerxMerchant) }
 }
+
+@inheritSerialization(ItemListPerxResponse)
+export class PerxMerchantsResponse extends ItemListPerxResponse<PerxMerchant> {
+  public constructor() { super(PerxMerchant) }
+}

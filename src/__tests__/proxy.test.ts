@@ -1,5 +1,5 @@
 import { uniq } from 'lodash'
-import { PerxInvoiceRequest, PerxInvoiceRequestTransactionData, PerxInvoiceRequestUsedItem, PerxLoyalty, PerxLoyaltyTransactionRequest, PerxLoyaltyTransactionRequestUserAccount, PerxLoyaltyTransactionReservationRequest } from '..'
+import { PerxInvoiceRequest, PerxInvoiceRequestTransactionData, PerxInvoiceRequestUsedItem, PerxLoyalty, PerxLoyaltyTransactionRequest, PerxLoyaltyTransactionRequestUserAccount, PerxLoyaltyTransactionReservationRequest, PerxMerchant } from '..'
 import { IPerxService, PerxService } from '../client'
 import { PerxProxyManager } from '../proxy'
 
@@ -243,6 +243,21 @@ describe('PerxProxyManager', () => {
     await expect(user.performCustomTrigger('some-invalid-rule-id')).rejects.toThrow(/record requested does not exist/)
   })
 
+  describe('can list merchants', () => {
+    it.each`
+      count
+      ${1}
+      ${2}
+      ${3}
+    `('with count $count', async ({ count }) => {
+      const listMerchants = await user.listAllMerchants(1, count)
+      expect(listMerchants.data.length).toEqual(count)
+      expect(listMerchants.data.filter((o) => o instanceof PerxMerchant).length).toEqual(count)
+      expect(uniq(listMerchants.data.map((o) => o.id).filter(Boolean)).length).toEqual(count)
+      expect(listMerchants.error).toBe(undefined)
+    })
+  })
+
   if (testableRewardId && testableMerchantIds.length >= 2) {
     const firstMerchantId = testableMerchantIds[0]
     const secondMerchantId = testableMerchantIds[1]
@@ -350,7 +365,6 @@ describe('PerxProxyManager', () => {
         expect(result.data.invoiceItems.length).toEqual(expectedInvoiceItems)
       })
     })
-
   }
 
   describe('identifier', () => {

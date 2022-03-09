@@ -24,7 +24,7 @@ import {
   BearerTokenResponse,
   PerxRewardResponse,
   PerxVoucherResponse,
-  PerxMerchantResponse,
+  PerxMerchantsResponse,
   PerxMerchant,
 } from '..'
 import { MerchantInfo } from '../models/MerchantInfo'
@@ -209,11 +209,13 @@ export interface IPerxUserProxy {
 
   /**
    * Query all merchants from Perx
-   * @param  {boolean} favorite
+   * @param  {number} page
    * @param  {number} perPage
+   * @param  {boolean} favorite
    * @returns
    */
-  listAllMerchants(page: number, perPage: number, favorite: boolean | undefined): Promise<PerxMerchantResponse>
+  listAllMerchants(page: number, perPage: number): Promise<PerxMerchantsResponse>
+  listAllMerchants(page: number, perPage: number, favorite: boolean): Promise<PerxMerchantsResponse>
 
   /**
    * Query merchants by merchant id from Perx
