@@ -20,6 +20,7 @@ import type {
   PerxMerchantsResponse,
 } from '..'
 import { chunk } from 'lodash'
+import { PerxCampaign, PerxCampaignsResponse } from '../models'
 
 export class PerxUserProxy implements IPerxUserProxy {
 
@@ -159,5 +160,16 @@ export class PerxUserProxy implements IPerxUserProxy {
       results = results.concat(r)
     }
     return results
+  }
+
+  public async listAllCampaign(page: number = 1, perPage: number = 25, campaignType: string | undefined = undefined): Promise<PerxCampaignsResponse> {
+    const token = await this.getToken()
+    return this.perxService.listAllCampaign(token.accessToken, page, perPage, campaignType)
+  }
+
+  public async getCampaign(campaignId: number): Promise<PerxCampaign> {
+    const token = await this.getToken()
+    const result = await this.perxService.getCampaign(token.accessToken, campaignId)
+    return result
   }
 }

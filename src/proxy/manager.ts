@@ -27,6 +27,7 @@ import {
   PerxMerchantsResponse,
   PerxMerchant,
 } from '..'
+import { PerxCampaign, PerxCampaignsResponse } from '../models'
 import { MerchantInfo } from '../models/MerchantInfo'
 import { PerxPosProxy } from './pos'
 import { PerxUserProxy } from './user'
@@ -231,6 +232,22 @@ export interface IPerxUserProxy {
    * @param perxCustomTriggerId 
    */
   performCustomTrigger(perxCustomTriggerId: string): Promise<void>
+
+  /**
+   * Query all campaign from Perx
+   */
+  listAllCampaign(page: number, perPage: number): Promise<PerxCampaignsResponse>
+  listAllCampaign(page: number, perPage: number, campaignType: string): Promise<PerxCampaignsResponse>
+
+  /**
+   * Query campaign by campaign id from Perx
+   */
+  getCampaign(campaignId: number): Promise<PerxCampaign>
+
+  /**
+   * Get user access token
+   */
+  getToken(): Promise<IPerxToken>
 }
 
 /**

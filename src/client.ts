@@ -42,6 +42,9 @@ import {
   PerxMerchant,
   PerxMerchantResponse,
   PerxMerchantsResponse,
+  PerxCampaign,
+  PerxCampaignResponse,
+  PerxCampaignsResponse,
 } from './models'
 
 export interface PerxVoucherScope {
@@ -301,7 +304,6 @@ export interface IPerxUserService {
    */
   getMerchant(userToken: string, merchantId: number): Promise<PerxMerchant>
 
-
   /**
    * Execute custom trigger on Perx with specific user.
    * 
@@ -312,6 +314,22 @@ export interface IPerxUserService {
    * @param perxCustomTriggerId 
    */
   performCustomTrigger(userToken: string, perxCustomTriggerId: string): Promise<void>
+
+  /**
+   * Query all campaign from Perx
+   * @param userToken 
+   * @param page 
+   * @param perPage 
+   * @param campaignType 
+   */
+  listAllCampaign(userToken: string, page: number, perPage: number, campaignType: string | undefined): Promise<PerxCampaignsResponse>
+
+  /**
+   * Query campaign by campaign id from Perx
+   * @param userToken 
+   * @param campaignId 
+   */
+  getCampaign(userToken: string, campaignId: number): Promise<PerxCampaign>
 }
 
 export interface IPerxPosService {
@@ -898,5 +916,32 @@ export class PerxService implements IPerxService {
       out.filter_for_merchants = scope.filterForMerchants
     }
     return out
+  }
+
+  public async listAllCampaign(userToken: string, page: number, perPage: number, campaignType: string | undefined = undefined): Promise<PerxCampaignsResponse> {
+    const resp = await this.axios.get('/v4/campaigns', {
+      headers: {
+        authorization: `Bearer ${userToken}`,
+      },
+      params: {
+        page,
+        size: perPage,
+        campaign_type: campaignType || undefined
+      }
+    })
+
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxCampaignsResponse)
+    return result
+  }
+
+  public async getCampaign(userToken: string, campaignId: number): Promise<PerxCampaign> {
+    const resp = await this.axios.get(`/v4/campaigns/${campaignId}`, {
+      headers: {
+        authorization: `Bearer ${userToken}`,
+      },
+    })
+
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxCampaignResponse)
+    return result.data
   }
 }

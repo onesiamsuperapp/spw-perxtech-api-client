@@ -1,6 +1,7 @@
 import { uniq } from 'lodash'
 import { PerxInvoiceRequest, PerxInvoiceRequestTransactionData, PerxInvoiceRequestUsedItem, PerxLoyalty, PerxLoyaltyTransactionRequest, PerxLoyaltyTransactionRequestUserAccount, PerxLoyaltyTransactionReservationRequest, PerxMerchant } from '..'
 import { IPerxService, PerxService } from '../client'
+import { PerxCampaign } from '../models'
 import { PerxProxyManager } from '../proxy'
 
 describe('PerxProxyManager', () => {
@@ -25,6 +26,8 @@ describe('PerxProxyManager', () => {
     .split(',')
     .map((o) => o.trim())
     .filter(Boolean)
+  const testableGameId = (process.env.TEST_PERX_GAME_ID || '')
+  
 
   if (!testableUserIdentifierOnPerxServer) {
     throw new Error('Unable to run test without proper configuration. Please revise your .env file. (in root folder)')
@@ -375,5 +378,33 @@ describe('PerxProxyManager', () => {
       })
       expect(resp.accessToken).toBeTruthy()
     })
+  })
+
+  describe('campaign', () => {
+    if (testableGameId) {
+      const campaignIds = testableGameId.split(',').map(Number)
+      it(`can list campaign with campaign type = game`, async () => {
+        const listCampaign = await user.listAllCampaign(1, 50, 'game')
+        const resultCampaignIds = listCampaign.data.map(o => o.id)
+        expect(listCampaign.data.length).toBeGreaterThan(1)
+        expect(listCampaign.data.filter((o) => o instanceof PerxCampaign).length).toBeGreaterThan(1)
+        expect(uniq(listCampaign.data.map((o) => o.id).filter(Boolean)).length).toBeGreaterThan(1)
+        expect(listCampaign.error).toBe(undefined)
+        if (campaignIds) {
+          const doArraysIntersect = (array1: number[], array2:number[]) => array1.some(item1 => array2.includes(item1))
+          expect(doArraysIntersect(resultCampaignIds, campaignIds)).toBe(true)
+        }
+      })
+
+      it(`can get campaign by campaignId`, async () => {
+        if (campaignIds) {
+          for (const id of campaignIds) {
+            const campaignData = await user.getCampaign(id)
+            expect(campaignData).toBeTruthy()
+            expect(campaignData.id).toEqual(id)
+          }
+        }
+      })
+    }
   })
 })
