@@ -64,4 +64,31 @@ export class PerxCampaign {
 
   @autoserializeAs(PerxTag, 'tags')
   tags: PerxTag[] = []
+
+  private _token: string = ''
+
+  private _microSiteBaseUrl: string = ''
+
+  /**
+   * Automatically invoke this API when client has been invoked.
+   * 
+   * This method will set a volatile context for compute the micrositeUrl.
+   * 
+   * Consumer may just call `makeMicrositeUrl` to produce the expected micrositeUrl on its own.
+   * 
+   * @param token 
+   * @param baseUrl 
+   */
+  public configMicrositeContext(token: string, baseUrl: string) {
+    this._token = token
+    this._microSiteBaseUrl = baseUrl
+  }
+
+  public makeMicrositeUrl(token: string, baseUrl: string) {
+    return `${baseUrl}/loading?token=${token}&cid=${this.id}`
+  }
+
+  public get micrositeUrl(): string {
+    return this.makeMicrositeUrl(this._token, this._microSiteBaseUrl)
+  }
 }

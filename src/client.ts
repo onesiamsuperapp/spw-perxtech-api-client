@@ -931,6 +931,10 @@ export class PerxService implements IPerxService {
     })
 
     const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxCampaignsResponse)
+
+    if (result.data) {
+      result.data.forEach((p) => p.configMicrositeContext(userToken, this.config.microSiteBaseUrl || ''))
+    }
     return result
   }
 
@@ -942,6 +946,9 @@ export class PerxService implements IPerxService {
     })
 
     const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxCampaignResponse)
+    if (result.data) {
+      result.data.configMicrositeContext(userToken, this.config.microSiteBaseUrl || '')
+    }
     return result.data
   }
 }
