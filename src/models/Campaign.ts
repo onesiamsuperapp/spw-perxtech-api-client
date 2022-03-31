@@ -91,4 +91,11 @@ export class PerxCampaign {
   public get micrositeUrl(): string {
     return this.makeMicrositeUrl(this._token, this._microSiteBaseUrl)
   }
+
+  public toJSON(): { [p: string]: any } {
+    return {
+      ...this,
+      micrositeUrl: this.micrositeUrl
+    }
+  }
 }
