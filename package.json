@@ -1,5 +1,5 @@
 {
-  "name": "perxtech-api-client",
+  "name": "spw-perxtech-api-client",
   "version": "0.0.48",
   "description": "PerxTech API client written in TypeScript",
   "main": "lib/cjs/index.js",
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/peatiscoding/perxtech-api-client.git"
+    "url": "git+https://github.com/onesiamsuperapp/spw-perxtech-api-client.git"
   },
   "keywords": [
     "perxtech",
