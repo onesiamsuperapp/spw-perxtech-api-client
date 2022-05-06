@@ -1,18 +1,18 @@
 PerxTech API Client
 ==
 
-![Published](https://github.com/peatiscoding/perxtech-api-client/actions/workflows/publish.yml/badge.svg)
+![Published](https://github.com/onesiamsuperapp/spw-perxtech-api-client/actions/workflows/publish.yml/badge.svg)
 
 The Perx's API client implemented for node.js using TypeScript.
 
 # Install:
 
 ```
-npm install perxtech-api-client
+npm install spw-perxtech-api-client
 
 or 
 
-yarn add perxtech-api-client
+yarn add spw-perxtech-api-client
 ```
 
 # Usage
