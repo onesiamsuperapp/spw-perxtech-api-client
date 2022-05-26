@@ -23,7 +23,7 @@ import {
   IPerxService,
   TokenResponse,
   PerxReward,
-} from 'perxtech-api-client'
+} from 'spw-perxtech-api-client'
 
 
 const perxClient: IPerxService = new PerxService({
