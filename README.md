@@ -74,3 +74,7 @@ npm run test
 # Contribution
 
 This client is written for certain project therefore not all APIs are implemented. If you have your needs and need to pass in ones. PR are more than welcomes.
+
+```
+update 18 aug 22
+```
