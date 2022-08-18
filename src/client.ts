@@ -76,6 +76,13 @@ export interface PerxRewardScope {
   categoryNamePrefix: string
 
   /**
+   * categoryId
+   * translated to: `category_ids` 
+  * 
+   */
+  categoryId: number
+
+  /**
    * mapped to: `filter_for_catalogs`
    * !warning: from manualy testing The API doesn't support multiple value
    */
@@ -914,6 +921,9 @@ export class PerxService implements IPerxService {
     }
     if (scope.filterForMerchants) {
       out.filter_for_merchants = scope.filterForMerchants
+    }
+    if (scope.categoryId) {
+      out.category_ids = `${scope.categoryId}`
     }
     return out
   }
