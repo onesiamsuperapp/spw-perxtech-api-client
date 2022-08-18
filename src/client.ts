@@ -80,7 +80,7 @@ export interface PerxRewardScope {
    * translated to: `category_ids` 
   * 
    */
-  categoryId: number
+  categoryId: string
 
   /**
    * mapped to: `filter_for_catalogs`
