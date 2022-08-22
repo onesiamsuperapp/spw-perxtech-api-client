@@ -54,6 +54,7 @@ export interface PerxVoucherScope {
   order: 'asc' | 'desc'
   state: PerxVoucherState
   type: 'active' | 'all' | 'expired' | 'gifted' | 'redeemed' | 'redemption_in_progress'
+  categoryId: string
 }
 
 export interface PerxRewardScope {
@@ -580,6 +581,7 @@ export class PerxService implements IPerxService {
         type: scope.type || undefined,
         sort_by: scope.sortBy || undefined,
         order: scope.order || undefined,
+        category_ids: scope.categoryId || undefined,
       },
     })
 
