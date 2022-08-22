@@ -54,7 +54,7 @@ export interface PerxVoucherScope {
   order: 'asc' | 'desc'
   state: PerxVoucherState
   type: 'active' | 'all' | 'expired' | 'gifted' | 'redeemed' | 'redemption_in_progress'
-  categoryId: string
+  categoryId: string[]
 }
 
 export interface PerxRewardScope {
