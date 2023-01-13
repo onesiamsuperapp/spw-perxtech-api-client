@@ -450,6 +450,9 @@ export class PerxService implements IPerxService {
       this.axios.interceptors.response.use((resp) => {
         console.log(`RESP< ${resp.config.url}`, resp.data)
         return resp
+      }, (error) => {
+        console.log(`ERR.RESP< ${error.response.config.method} ${error.response.config.url}`, error.response.data)
+        throw error
       })
     }
   }
