@@ -187,6 +187,14 @@ export interface IPerxUserProxy {
   getLoyaltyProgram(loyaltyProgramId: number | string): Promise<PerxLoyalty>
 
   /**
+   * Query loyalty program from Perx
+   * 
+   * @param loyaltyProgramId
+   * @returns
+   */
+   getLoyaltyTransactions(loyaltyProgramId: number | string): Promise<PerxLoyalty>
+
+  /**
    * Listing loyalty programs from Perx
    * 
    * @returns

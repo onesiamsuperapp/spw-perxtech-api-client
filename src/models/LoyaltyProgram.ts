@@ -44,6 +44,33 @@ export class PerxLoyaltyAgingPoint {
   pointsExpiring: number = 0
 }
 
+export class PerxLoyaltyPointsHistory {
+
+  @autoserializeAs('id')
+  id!: number
+
+  @autoserializeAs('name')
+  name: string = ''
+
+  @autoserializeAs('identifier')
+  identifier: string | null = null
+
+  @autoserializeAs('points_date')
+  pointsDate: string | null = null
+
+  @autoserializeAs('points')
+  points: number = 0
+
+  @autoserializeAs('points_balance')
+  pointsBalance: number = 0
+
+  @autoserializeAs('points_balance_converted_to_currency')
+  pointsBalanceConvertedToCurrency: number | null = null
+
+  @autoserializeAs('properties')
+  properties: Record<string, any> = {}
+}
+
 @inheritSerialization(ShortPerxLoyalty)
 export class PerxLoyalty extends ShortPerxLoyalty {
 
@@ -79,4 +106,7 @@ export class PerxLoyalty extends ShortPerxLoyalty {
 
   @autoserializeAs('membership_state')
   membershipState: 'active' | 'inactive' = 'inactive'
+
+  @autoserializeAs(PerxLoyaltyPointsHistory, 'points_history')
+  pointsHistory?: PerxLoyaltyPointsHistory[] = []
 }
