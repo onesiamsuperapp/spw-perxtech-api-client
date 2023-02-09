@@ -1,18 +1,18 @@
-PerxTech API Client
+PerxTech Mock Client
 ==
 
-![Published](https://github.com/onesiamsuperapp/spw-perxtech-api-client/actions/workflows/publish.yml/badge.svg)
+![Published](https://github.com/onesiamsuperapp/spw-perxtech-mock-client/actions/workflows/publish.yml/badge.svg)
 
 The Perx's API client implemented for node.js using TypeScript.
 
 # Install:
 
 ```
-npm install spw-perxtech-api-client
+npm install spw-perxtech-mock-client
 
 or 
 
-yarn add spw-perxtech-api-client
+yarn add spw-perxtech-mock-client
 ```
 
 # Usage
@@ -23,7 +23,7 @@ import {
   IPerxService,
   TokenResponse,
   PerxReward,
-} from 'spw-perxtech-api-client'
+} from 'spw-perxtech-mock-client'
 
 
 const perxClient: IPerxService = new PerxService({
