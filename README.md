@@ -3,7 +3,7 @@ PerxTech Mock Client
 
 ![Published](https://github.com/onesiamsuperapp/spw-perxtech-mock-client/actions/workflows/publish.yml/badge.svg)
 
-The Perx's API client implemented for node.js using TypeScript.
+The Perx's Mock client implemented for node.js using TypeScript.
 
 # Install:
 
