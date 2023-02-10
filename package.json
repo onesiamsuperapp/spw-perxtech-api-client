@@ -1,13 +1,14 @@
 {
   "name": "spw-perxtech-mock-client",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "PerxTech Mock client written in TypeScript",
   "main": "lib/cjs/index.js",
   "module": "lib/esm/index.js",
   "scripts": {
     "build": "tsc -p tsconfig.json && tsc -p tsconfig.cjs.json",
     "clean": "rm -rf node_modules/ && rm -rf libs/",
-    "test": "jest --config=jest.config.ts --runInBand"
+    "test": "jest --config=jest.config.ts --runInBand",
+    "test:campaign": "jest --config=jest.config.ts --runInBand src/__tests__/CampaignMockup.test.ts"
   },
   "repository": {
     "type": "git",

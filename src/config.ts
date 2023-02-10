@@ -5,4 +5,5 @@ export interface PerxConfig {
   tokenDurationInSeconds: number
   lang?: string
   microSiteBaseUrl?: string
+  delay?: number
 }
