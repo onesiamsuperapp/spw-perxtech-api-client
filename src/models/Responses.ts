@@ -166,6 +166,28 @@ export class PerxPagingMeta {
   // "campaigns_index": [],
   // "catalogues_index": []
 }
+export class LoyaltyTransactionsMeta {
+  @autoserializeAs('count')
+  count!: number
+
+  @autoserializeAs('size')
+  size!: number
+
+  @autoserializeAs('total_pages')
+  totalPages!: number
+
+  @autoserializeAs('page')
+  page!: number
+
+  @autoserializeAs('from_period')
+  fromPeriod!: string | null
+
+  @autoserializeAs('to_period')
+  toPeriod!: string | null
+
+  @autoserializeAs('points_within_start_end_period')
+  pointsWithinStartEndPeriod!: number
+}
 
 @inheritSerialization(BasePerxResponse)
 export abstract class ObjectPerxResponse<Obj> extends BasePerxResponse {
@@ -295,6 +317,16 @@ export class VoucherResponse extends ObjectPerxResponse<PerxVoucher> {
 @inheritSerialization(ObjectPerxResponse)
 export class LoyaltyProgramResponse extends ObjectPerxResponse<PerxLoyalty> {
   public constructor() { super(PerxLoyalty) }
+}
+
+@inheritSerialization(BasePerxResponse)
+export class LoyaltyTransactionsResponse extends BasePerxResponse {
+
+  @autoserializeAs(PerxLoyalty, 'data')
+  public data!: PerxLoyalty
+
+  @autoserializeAs(LoyaltyTransactionsMeta, 'meta')
+  meta!: LoyaltyTransactionsMeta
 }
 
 @inheritSerialization(ItemListPerxResponse)
