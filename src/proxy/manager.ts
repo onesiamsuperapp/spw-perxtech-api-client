@@ -27,7 +27,7 @@ import {
   PerxMerchantsResponse,
   PerxMerchant,
 } from '..'
-import { PerxCampaign, PerxCampaignsResponse } from '../models'
+import { LoyaltyTransactionsResponse, PerxCampaign, PerxCampaignsResponse } from '../models'
 import { MerchantInfo } from '../models/MerchantInfo'
 import { PerxPosProxy } from './pos'
 import { PerxUserProxy } from './user'
@@ -192,9 +192,9 @@ export interface IPerxUserProxy {
    * @param loyaltyProgramId
    * @returns
    */
-   getLoyaltyTransactions(loyaltyProgramId: number | string): Promise<PerxLoyalty>
-   getLoyaltyTransactions(loyaltyProgramId: number | string, page: number): Promise<PerxLoyalty>
-   getLoyaltyTransactions(loyaltyProgramId: number | string, page: number, size: number): Promise<PerxLoyalty>
+   getLoyaltyTransactions(loyaltyProgramId: number | string): Promise<LoyaltyTransactionsResponse>
+   getLoyaltyTransactions(loyaltyProgramId: number | string, page: number): Promise<LoyaltyTransactionsResponse>
+   getLoyaltyTransactions(loyaltyProgramId: number | string, page: number, size: number): Promise<LoyaltyTransactionsResponse>
 
   /**
    * Listing loyalty programs from Perx

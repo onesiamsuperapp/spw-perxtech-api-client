@@ -20,7 +20,7 @@ import type {
   PerxMerchantsResponse,
 } from '..'
 import { chunk } from 'lodash'
-import { PerxCampaign, PerxCampaignsResponse } from '../models'
+import { LoyaltyTransactionsResponse, PerxCampaign, PerxCampaignsResponse } from '../models'
 
 export class PerxUserProxy implements IPerxUserProxy {
 
@@ -125,7 +125,7 @@ export class PerxUserProxy implements IPerxUserProxy {
     return this.perxService.getLoyaltyProgram(token.accessToken, loyaltyProgramId)
   }
 
-  public async getLoyaltyTransactions(loyaltyProgramId: number | string, page: number = 1, size: number = 25): Promise<PerxLoyalty> {
+  public async getLoyaltyTransactions(loyaltyProgramId: number | string, page: number = 1, size: number = 25): Promise<LoyaltyTransactionsResponse> {
     const token = await this.getToken()
     return this.perxService.getLoyaltyTransactions(token.accessToken, loyaltyProgramId, page, size)
   }

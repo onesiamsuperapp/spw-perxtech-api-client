@@ -45,6 +45,7 @@ import {
   PerxCampaign,
   PerxCampaignResponse,
   PerxCampaignsResponse,
+  LoyaltyTransactionsResponse,
 } from './models'
 
 export interface PerxVoucherScope {
@@ -263,7 +264,7 @@ export interface IPerxUserService {
  /**
    * Query perx loyalty points
    */
-  getLoyaltyTransactions(userToken: string, loyaltyProgramId: string | number, page: number, size: number): Promise<PerxLoyalty>
+  getLoyaltyTransactions(userToken: string, loyaltyProgramId: string | number, page: number, size: number): Promise<LoyaltyTransactionsResponse>
  
   /**
    * Query perx loyalty list
@@ -729,7 +730,7 @@ export class PerxService implements IPerxService {
     return result.data
   }
 
-  public async getLoyaltyTransactions(userToken: string, loyaltyProgramId: string | number, page: number, size: number): Promise<PerxLoyalty> {
+  public async getLoyaltyTransactions(userToken: string, loyaltyProgramId: string | number, page: number, size: number): Promise<LoyaltyTransactionsResponse> {
     const resp = await this.axios.get(`/v4/loyalty/${loyaltyProgramId}/transactions`, {
       headers: {
         authorization: `Bearer ${userToken}`,
@@ -740,8 +741,8 @@ export class PerxService implements IPerxService {
       }
     })
 
-    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, LoyaltyProgramResponse)
-    return result.data
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, LoyaltyTransactionsResponse)
+    return result
   }
 
   public async getMe(userToken: string): Promise<PerxCustomer> {
