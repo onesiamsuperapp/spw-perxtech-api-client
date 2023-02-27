@@ -263,7 +263,7 @@ export interface IPerxUserService {
  /**
    * Query perx loyalty points
    */
-  getLoyaltyTransactions(userToken: string, loyaltyProgramId: string | number): Promise<PerxLoyalty>
+  getLoyaltyTransactions(userToken: string, loyaltyProgramId: string | number, page: number, size: number): Promise<PerxLoyalty>
  
   /**
    * Query perx loyalty list
@@ -729,10 +729,14 @@ export class PerxService implements IPerxService {
     return result.data
   }
 
-  public async getLoyaltyTransactions(userToken: string, loyaltyProgramId: string | number): Promise<PerxLoyalty> {
+  public async getLoyaltyTransactions(userToken: string, loyaltyProgramId: string | number, page: number, size: number): Promise<PerxLoyalty> {
     const resp = await this.axios.get(`/v4/loyalty/${loyaltyProgramId}/transactions`, {
       headers: {
         authorization: `Bearer ${userToken}`,
+      },
+      params: {
+        page,
+        size,
       }
     })
 
