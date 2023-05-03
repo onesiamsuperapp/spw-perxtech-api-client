@@ -58,6 +58,7 @@ export interface PerxVoucherScope {
   categoryId: string[]
   catalogId: string[]
   tagIds: string[]
+  spwVoucherIds: string[]
 }
 
 export interface PerxRewardScope {
@@ -593,7 +594,8 @@ export class PerxService implements IPerxService {
         order: scope.order || undefined,
         category_ids: scope.categoryId || undefined,
         catalog_ids: scope.catalogId || undefined,
-        tag_ids: scope.tagIds || undefined
+        tag_ids: scope.tagIds || undefined,
+        spw_voucher_ids: scope.spwVoucherIds || undefined
       },
     })
 
