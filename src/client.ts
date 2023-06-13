@@ -1052,7 +1052,7 @@ export class PerxService implements IPerxService {
 
   public async listAggregatedExpiryPoint(applicationToken: string, userIdentity: string, scope: Partial<PerxExpiryPointScope>): Promise<PerxExpiryAggregationResponse> {
     const params = PerxService.fromExpiryAggregationScopeToQueryParams(scope)
-    const resp = await this.axios.get('/v4/loyalty/aggregated_expiry', {
+    const resp = await this.axios.get('/v4/pos/loyalty/aggregated_expiry', {
       headers: {
         authorization: `Bearer ${applicationToken}`,
       },
