@@ -3,7 +3,7 @@ import {
   isArray,
   get,
 } from 'lodash'
-import { MerchantInfo, PerxCategory, PerxInvoice, PerxLoyaltyTransactionHistoryEntry, PerxRewardReservation } from '.'
+import { ExpiryPoint, MerchantInfo, PerxCategory, PerxInvoice, PerxLoyaltyTransactionHistoryEntry, PerxRewardReservation } from '.'
 import { PerxError } from '../error'
 import { PerxCustomer } from './Customer'
 import { PerxLoyalty } from './LoyaltyProgram'
@@ -407,4 +407,9 @@ export class PerxCampaignResponse extends ObjectPerxResponse<PerxCampaign> {
 @inheritSerialization(ItemListPerxResponse)
 export class PerxCampaignsResponse extends ItemListPerxResponse<PerxCampaign> {
   public constructor() { super(PerxCampaign) }
+}
+
+@inheritSerialization(ItemListPerxResponse)
+export class PerxExpiryAggregationResponse extends ItemListPerxResponse<ExpiryPoint> {
+  public constructor() { super(ExpiryPoint) }
 }

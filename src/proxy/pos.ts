@@ -4,6 +4,8 @@ import {
   IPerxService,
   MerchantInfo,
   PerxCustomer,
+  PerxExpiryAggregationResponse,
+  PerxExpiryPointScope,
   PerxInvoiceCreationResponse,
   PerxInvoiceRequest,
   PerxLoyaltyTransaction,
@@ -112,5 +114,16 @@ export class PerxPosProxy implements IPerxPosProxy {
       results = results.concat(r)
     }
     return results
+  }
+
+  /**
+   * Get point expiry aggregation list
+   * @param userIdentity 
+   * @param scope 
+   * @returns 
+   */
+  public async listAggregatedExpiryPoint(userIdentity: string, scope: Partial<PerxExpiryPointScope>): Promise<PerxExpiryAggregationResponse>{
+    const applicationToken = await this.getToken()
+    return this.perxService.listAggregatedExpiryPoint(applicationToken.accessToken, userIdentity, scope)
   }
 }
