@@ -142,7 +142,7 @@ export interface PerxExpiryPointScope {
   /**
    * Viz coin loyalty id
    */
-  loyaltyProgramId: string
+  loyaltyProgramId: string | number
 
   /**
    * start date search expire point
@@ -1005,7 +1005,7 @@ export class PerxService implements IPerxService {
       out.size = `${scope.pageSize}`
     }
     if (scope.loyaltyProgramId) {
-      out.loyalty_program_id = scope.loyaltyProgramId
+      out.loyalty_program_id = `${scope.loyaltyProgramId}`
     }
     if (scope.startDate) {
       out.start_date = `${scope.startDate}`
