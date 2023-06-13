@@ -46,6 +46,7 @@ import {
   PerxCampaignResponse,
   PerxCampaignsResponse,
   LoyaltyTransactionsResponse,
+  PerxExpiryAggregationResponse,
 } from './models'
 
 export interface PerxVoucherScope {
@@ -124,6 +125,34 @@ export interface PerxRewardScope {
    * sortBy's order
    */
   order: 'asc' | 'desc'
+}
+
+export interface PerxExpiryPointScope {
+
+  /**
+   * Page's sequence start with 1 *NOT* 0.
+   */
+  page: number
+
+  /**
+   * How much should Perx retrieve per page
+   */
+  pageSize: number
+
+  /**
+   * Viz coin loyalty id
+   */
+  loyaltyProgramId: string
+
+  /**
+   * start date search expire point
+   */
+  startDate: string
+
+  /**
+   * end date search expire point
+   */
+  endDate: string
 }
 
 export interface IPerxAuthService {
@@ -415,6 +444,14 @@ export interface IPerxPosService {
    * @param merchantAccountId 
    */
   createMerchantInfo(applicationToken: string, username: string, email: string, merchantAccountId: number): Promise<MerchantInfo>
+
+  /**
+   * Get point expire aggregation list
+   * @param applicationToken 
+   * @param userIdentity 
+   * @param scope 
+   */
+  listAggregatedExpiryPoint(applicationToken: string, userIdentity: string, scope: Partial<PerxExpiryPointScope>): Promise<PerxExpiryAggregationResponse>
 }
 
 export type IPerxService = IPerxAuthService & IPerxUserService & IPerxPosService & { clone(lang: string): IPerxService }
@@ -959,6 +996,26 @@ export class PerxService implements IPerxService {
     return out
   }
 
+  private static fromExpiryAggregationScopeToQueryParams(scope: Partial<PerxExpiryPointScope>): Record<string, string | string[]> {
+    const out: Record<string, string | string[]> = {}
+    if (scope.page) {
+      out.page = `${scope.page}`
+    }
+    if (scope.pageSize) {
+      out.size = `${scope.pageSize}`
+    }
+    if (scope.loyaltyProgramId) {
+      out.loyalty_program_id = scope.loyaltyProgramId
+    }
+    if (scope.startDate) {
+      out.start_date = `${scope.startDate}`
+    }
+    if (scope.endDate) {
+      out.end_date = `${scope.endDate}`
+    }
+    return out
+  }
+
   public async listAllCampaign(userToken: string, page: number, perPage: number, campaignType: string | undefined = undefined): Promise<PerxCampaignsResponse> {
     const resp = await this.axios.get('/v4/campaigns', {
       headers: {
@@ -991,5 +1048,20 @@ export class PerxService implements IPerxService {
       result.data.configMicrositeContext(userToken, this.config.microSiteBaseUrl || '')
     }
     return result.data
+  }
+
+  public async listAggregatedExpiryPoint(applicationToken: string, userIdentity: string, scope: Partial<PerxExpiryPointScope>): Promise<PerxExpiryAggregationResponse> {
+    const params = PerxService.fromExpiryAggregationScopeToQueryParams(scope)
+    const resp = await this.axios.get('/v4/loyalty/aggregated_expiry', {
+      headers: {
+        authorization: `Bearer ${applicationToken}`,
+      },
+      params: {
+        ...params,
+        user_identifier: userIdentity
+      }
+    })
+    const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxExpiryAggregationResponse)
+    return result
   }
 }

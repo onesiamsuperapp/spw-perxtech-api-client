@@ -26,8 +26,9 @@ import {
   PerxVoucherResponse,
   PerxMerchantsResponse,
   PerxMerchant,
+  PerxExpiryPointScope,
 } from '..'
-import { LoyaltyTransactionsResponse, PerxCampaign, PerxCampaignsResponse } from '../models'
+import { LoyaltyTransactionsResponse, PerxCampaign, PerxCampaignsResponse, PerxExpiryAggregationResponse } from '../models'
 import { MerchantInfo } from '../models/MerchantInfo'
 import { PerxPosProxy } from './pos'
 import { PerxUserProxy } from './user'
@@ -320,6 +321,12 @@ export interface IPerxPosProxy {
    * create customer detail via POS Access.
    */
   createMerchantInfo(username: string, email: string, merchantId: number): Promise<MerchantInfo>
+
+  /**
+   * get list point expiry aggregation
+   * @param userIdentity only use mobileNo value
+   */
+  listAggregatedExpiryPoint(userIdentity: string, scope: Partial<PerxExpiryPointScope>): Promise<PerxExpiryAggregationResponse>
 }
 
 /**
