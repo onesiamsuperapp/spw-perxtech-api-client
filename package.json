@@ -10,7 +10,7 @@
     "lint": "eslint --max-warnings=0 src",
     "prepare": "npm run build && husky install",
     "test:unit": "jest --config=jest.config.ts --coverage",
-    "test:integration": "DOTENV_CONFIG_PATH=./.env.test jest --config=jest-integration.config.ts --runInBand --detectOpenHandles --bail"
+    "test:integration": "jest --config=jest-integration.config.ts --runInBand --detectOpenHandles --bail"
   },
   "repository": {
     "type": "git",
