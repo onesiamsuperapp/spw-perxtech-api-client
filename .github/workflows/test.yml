@@ -10,14 +10,9 @@ jobs:
   testing:
     strategy:
       matrix:
-        node-version: [12.x, 14.x]
+        node-version: [14.x]
     name: Node
     runs-on: ubuntu-latest
-    env:
-      NEW_RELIC_API_EVENT_BASE_URL: ${{ secrets.NEW_RELIC_API_EVENT_BASE_URL }}
-      NEW_RELIC_API_METRIC_BASE_URL: ${{ secrets.NEW_RELIC_API_METRIC_BASE_URL }}
-      NEW_RELIC_API_ACCOUNT_ID: ${{ secrets.NEW_RELIC_API_ACCOUNT_ID }}
-      NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
     steps:
       - name: Checkout ${{ matrix.node-version }}
         uses: actions/checkout@v3
