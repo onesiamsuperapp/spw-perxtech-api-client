@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Enable linting when ready to refactor code
+#npm run lint
+npm run test:unit
