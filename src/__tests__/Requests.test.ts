@@ -122,7 +122,8 @@ describe('PerxLoyaltyTransactionRequest', () => {
       transactionType: undefined,
       userAccount: { identifier: '0001', type: 'identifier' },
       points: 50,
-      loyaltyProgramId: 1234
+      loyaltyProgramId: 1234,
+      transactionReference: null
     }
     const perxRequestUserAccount = new PerxLoyaltyTransactionRequest(perxUserAccountIdentifier, 1234, 50)
     expect(perxRequestUserAccount).toEqual(expected)
@@ -282,7 +283,7 @@ describe('PerxLoyaltyTransactionRequest', () => {
         amount: 200,
         merchantIdentifier: 'merchant-0001',
         properties: {
-          applied_vouchers: '001,002',
+          applied_vouchers: undefined,
           applied_points: '200',
           merchant_identifier: 'merchant-0001'
         }
@@ -305,8 +306,8 @@ describe('PerxLoyaltyTransactionRequest', () => {
         amount: 200,
         merchantIdentifier: 'merchant-0001',
         properties: {
-          applied_vouchers: '001,002',
-          applied_points: '200',
+          applied_vouchers: undefined,
+          applied_points: undefined,
           merchant_identifier: 'merchant-0001'
         }
       }
@@ -341,7 +342,7 @@ describe('PerxLoyaltyTransactionRequest', () => {
       const expected = {
         transactionData: [],
         usedItems: [],
-        userAccount: { id: 123 }
+        userAccount: { identifier: '123' }
       }
       const perxInvoiceInvoiceRequest = new PerxInvoiceRequest(perxLoyaltyTransactionRequestUserAccount)
       expect(perxInvoiceInvoiceRequest).toEqual(expected)
