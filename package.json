@@ -9,7 +9,7 @@
     "clean": "rm -rf node_modules/ && rm -rf libs/",
     "lint": "eslint --max-warnings=0 src",
     "prepare": "npm run build && husky install",
-    "test:unit": "jest --config=jest.config.ts --runInBand --detectOpenHandles",
+    "test:unit": "jest --config=jest.config.ts --coverage",
     "test:integration": "jest --config=jest-integration.config.ts --runInBand --detectOpenHandles"
   },
   "repository": {
