@@ -7,7 +7,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json && tsc -p tsconfig.cjs.json",
     "clean": "rm -rf node_modules/ && rm -rf libs/",
-    "test": "jest --config=jest.config.ts --runInBand src/__tests__/integral/ src/__tests__/client.test"
+    "test:unit": "jest --config=jest.config.ts --runInBand --detectOpenHandles --coverage",
+    "test:integration": "jest --config=jest.integration.config.ts --runInBand --detectOpenHandles"
   },
   "repository": {
     "type": "git",

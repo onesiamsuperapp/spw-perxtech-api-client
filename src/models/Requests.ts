@@ -221,14 +221,14 @@ export class PerxInvoiceRequestUsedItem extends PerxBaseInvoiceItem {
  * `appliedPoints: string` will be stored into properties automatically as string
  */
 export type PerxInvoiceRequestTransactionDataRaw = {
-  transactionType: PerxTransactionRequestDataType
+  transactionType?: PerxTransactionRequestDataType
   properties: Record<string, string | number>
   transactionReference: string
   currency: string
   // Will be stored in `properties` node with key: `applied_vouchers`
-  appliedVouchers: (number|string)[]
+  appliedVouchers?: (number|string)[]
   // Will be stored in `properties` node with key: `applied_points`
-  appliedPoints: (number|string)
+  appliedPoints?: (number|string)
 }
 
 /**

@@ -1,8 +1,8 @@
 import { uniq } from 'lodash'
 import { PerxInvoiceRequest, PerxInvoiceRequestTransactionData, PerxInvoiceRequestUsedItem, PerxLoyalty, PerxLoyaltyTransactionRequest, PerxLoyaltyTransactionRequestUserAccount, PerxLoyaltyTransactionReservationRequest, PerxMerchant } from '..'
-import { IPerxService, PerxService } from '../client'
-import { PerxCampaign } from '../models'
-import { PerxProxyManager } from '../proxy'
+import { IPerxService, PerxService } from '../../src/client'
+import { PerxCampaign } from '../../src/models'
+import { PerxProxyManager } from '../../src/proxy'
 
 describe('PerxProxyManager', () => {
 
