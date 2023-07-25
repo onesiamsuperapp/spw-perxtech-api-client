@@ -1,5 +1,5 @@
 ---
-name: Test
+name: Unit Tests
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
       - main
 
 jobs:
-  testing:
+  unit-testing:
     strategy:
       matrix:
         node-version: [12.x,14.x]
@@ -33,7 +33,7 @@ jobs:
       - name: Setup and Test ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ env.node_version }}
+          node-version: ${{ matrix.node-version }}
 
       - name: Install node modules
         shell: bash
@@ -43,6 +43,8 @@ jobs:
         shell: bash
         run: npm run test:unit
 
+      # Only run integration tests in one version, the current tests not support concurrent testing
       - name: Integration testing
         shell: bash
+        if: ${{ matrix.node-version == '14.x' }}
         run: npm run test:integration
