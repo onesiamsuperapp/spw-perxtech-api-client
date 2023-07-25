@@ -1,0 +1,40 @@
+---
+name: Test
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  testing:
+    strategy:
+      matrix:
+        node-version: [12.x, 14.x]
+    name: Node
+    runs-on: ubuntu-latest
+    env:
+      NEW_RELIC_API_EVENT_BASE_URL: ${{ secrets.NEW_RELIC_API_EVENT_BASE_URL }}
+      NEW_RELIC_API_METRIC_BASE_URL: ${{ secrets.NEW_RELIC_API_METRIC_BASE_URL }}
+      NEW_RELIC_API_ACCOUNT_ID: ${{ secrets.NEW_RELIC_API_ACCOUNT_ID }}
+      NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
+    steps:
+      - name: Checkout ${{ matrix.node-version }}
+        uses: actions/checkout@v3
+
+      - name: Setup and Test ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.node_version }}
+
+      - name: Install node modules
+        shell: bash
+        run: npm i
+
+      - name: Unit testing
+        shell: bash
+        run: npm run test:unit
+
+      - name: Integration testing
+        shell: bash
+        run: npm run test:integration
