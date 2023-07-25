@@ -8,7 +8,7 @@ import {
   PerxReward,
   PerxRewardReservation,
   PerxPagingMeta,
-} from '..'
+} from '../../src'
 
 describe('PerxService', () => {
 
