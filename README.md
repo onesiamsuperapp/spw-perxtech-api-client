@@ -1,7 +1,8 @@
 PerxTech API Client
 ==
 
-![Published](https://github.com/onesiamsuperapp/spw-perxtech-api-client/actions/workflows/publish.yml/badge.svg)
+![Release](https://github.com/onesiamsuperapp/spw-perxtech-api-client/actions/workflows/release.yml/badge.svg)
+![Test](https://github.com/onesiamsuperapp/spw-perxtech-api-client/actions/workflows/test.yml/badge.svg)
 
 The Perx's API client implemented for node.js using TypeScript.
 
@@ -74,7 +75,3 @@ npm run test
 # Contribution
 
 This client is written for certain project therefore not all APIs are implemented. If you have your needs and need to pass in ones. PR are more than welcomes.
-
-```
-update 18 aug 22
-```
