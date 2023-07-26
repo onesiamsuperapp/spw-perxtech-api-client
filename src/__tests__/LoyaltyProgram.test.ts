@@ -30,7 +30,7 @@ describe('ShortPerxLoyalty', () => {
 describe('PerxPointBalance', () => {
   test('should have correct default values', () => {
     const perxPointBalance = new PerxPointBalance();
-    expect(Serialize(perxPointBalance)).toEqual({});
+    expect(Serialize(perxPointBalance)).toEqual({ points: 0 });
   });
 
   test('should have correct instance', () => {
@@ -49,7 +49,11 @@ describe('PerxPointBalance', () => {
 describe('PerxLoyaltyTier', () => {
   test('should have correct default values', () => {
     const perxLoyaltyTier = new PerxLoyaltyTier();
-    expect(Serialize(perxLoyaltyTier)).toEqual({});
+    expect(Serialize(perxLoyaltyTier)).toEqual({
+      attained: false,
+      name: '',
+      points_requirement: null,
+    });
   });
 
   test('should have correct instance', () => {
@@ -68,7 +72,10 @@ describe('PerxLoyaltyTier', () => {
 describe('PerxLoyaltyAgingPoint', () => {
   test('should have correct default values', () => {
     const perxLoyaltyAgingPoint = new PerxLoyaltyAgingPoint();
-    expect(Serialize(perxLoyaltyAgingPoint)).toEqual({});
+    expect(Serialize(perxLoyaltyAgingPoint)).toEqual({
+      expiring_on_date: null,
+      points_expiring: 0,
+    });
   });
 
   test('should have correct instance', () => {
