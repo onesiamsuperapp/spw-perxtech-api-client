@@ -8,7 +8,7 @@ import {
   PerxReward,
   PerxRewardReservation,
   PerxPagingMeta,
-} from '..'
+} from '../../src'
 
 describe('PerxService', () => {
 
@@ -205,15 +205,15 @@ describe('PerxService', () => {
           expect(loyalty.tierPoints).toBeTruthy()
           expect(typeof loyalty.id).toEqual('number')
           expect(loyalty.id).toEqual(+testableLoyaltyProgramIdOnPerxServer)
-          expect(loyalty.pointBalance).toBeTruthy()
+          expect(loyalty.pointBalance).toBeDefined()
         })
 
         it('can query list user loyalty program', async () => {
           const loyalties = await client.getLoyaltyPrograms(ctx.accessToken)
           expect(loyalties.length).toBeGreaterThan(0)
-          expect(loyalties[0].tierPoints).toBeTruthy()
+          expect(loyalties[0].tierPoints).toBeDefined()
           expect(typeof loyalties[0].id).toEqual('number')
-          expect(loyalties[0].pointBalance).toBeTruthy()
+          expect(loyalties[0].pointBalance).toBeDefined()
         })
 
         it('can query get users transaction histroy from Perx', async () => {

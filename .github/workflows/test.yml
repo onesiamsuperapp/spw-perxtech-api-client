@@ -1,0 +1,50 @@
+---
+name: Test
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        node-version: [12.x,14.x]
+    name: Node
+    runs-on: ubuntu-latest
+    env:
+      TEST_PERX_API_URL: ${{ secrets.TEST_PERX_API_URL }}
+      TEST_PERX_CLIENT_ID: ${{ secrets.TEST_PERX_CLIENT_ID }}
+      TEST_PERX_CLIENT_SECRET: ${{ secrets.TEST_PERX_CLIENT_SECRET }}
+      TEST_PERX_LOYALTY_PROGRAM_ID: ${{ vars.TEST_PERX_LOYALTY_PROGRAM_ID }}
+      TEST_PERX_REWARD_ID: ${{ vars.TEST_PERX_REWARD_ID }}
+      TEST_PERX_REWARD_SEARCH_KEYWORD: ${{ vars.TEST_PERX_REWARD_SEARCH_KEYWORD }}
+      TEST_PERX_USER_ID: ${{ vars.TEST_PERX_USER_ID }}
+      TEST_PERX_USER_IDENTIFIER: ${{ vars.TEST_PERX_USER_IDENTIFIER }}
+      TEST_CUSTOM_TRIGGER_ID: ${{ vars.TEST_CUSTOM_TRIGGER_ID }}
+      TEST_PERX_MERCHANT_IDENTIFIER: ${{ vars.TEST_PERX_MERCHANT_IDENTIFIER }}
+      TEST_PERX_VALID_MERCHANT_ID: ${{ vars.TEST_PERX_VALID_MERCHANT_ID }}
+      TEST_PERX_GAME_ID: ${{ vars.TEST_PERX_GAME_ID }}
+    steps:
+      - name: Checkout ${{ matrix.node-version }}
+        uses: actions/checkout@v3
+
+      - name: Setup and Test ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install node modules
+        shell: bash
+        run: npm i
+
+      - name: Unit testing
+        shell: bash
+        run: npm run test:unit
+
+      # Only run integration tests in one version, the current tests not support concurrent testing
+      - name: Integration testing
+        shell: bash
+        if: ${{ matrix.node-version == '14.x' }}
+        run: npm run test:integration

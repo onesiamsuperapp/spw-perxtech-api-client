@@ -52,3 +52,7 @@ coverage
 lib
 
 .env
+.scannerwork
+.vscode
+
+package-lock.json
