@@ -18,10 +18,10 @@ import { PerxCampaign } from './Campaign'
 export class BasePerxResponse {
 
   @autoserializeAs('error')
-  protected errorCode?: string
+  public errorCode?: string
 
   @autoserializeAs('error_description')
-  protected errorDescription?: string
+  public errorDescription?: string
 
   public get hasError(): boolean {
     return Boolean(this.error)
