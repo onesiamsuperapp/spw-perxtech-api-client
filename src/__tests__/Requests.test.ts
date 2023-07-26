@@ -277,7 +277,6 @@ describe('PerxLoyaltyTransactionRequest', () => {
         itemType: 'StoredValue::Transaction',
       };
       const perxInvoiceRequestUsedItem = PerxInvoiceRequestUsedItem.points(321);
-      console.log(perxInvoiceRequestUsedItem);
       expect(perxInvoiceRequestUsedItem).toEqual(expected);
     });
 
@@ -316,7 +315,6 @@ describe('PerxLoyaltyTransactionRequest', () => {
       };
       const perxInvoiceRequestTransactionData =
         new PerxInvoiceRequestTransactionData(200, 'merchant-0001', input);
-      console.log(perxInvoiceRequestTransactionData);
       expect(perxInvoiceRequestTransactionData).toEqual(expected);
     });
 
@@ -342,7 +340,6 @@ describe('PerxLoyaltyTransactionRequest', () => {
       };
       const perxInvoiceRequestTransactionData =
         new PerxInvoiceRequestTransactionData(200, 'merchant-0001', input);
-      console.log(perxInvoiceRequestTransactionData);
       expect(perxInvoiceRequestTransactionData).toEqual(expected);
     });
 
@@ -367,7 +364,6 @@ describe('PerxLoyaltyTransactionRequest', () => {
       };
       const perxInvoiceRequestTransactionData =
         new PerxInvoiceRequestTransactionData(200, 'merchant-0001', input);
-      console.log(perxInvoiceRequestTransactionData);
       expect(perxInvoiceRequestTransactionData).toEqual(expected);
     });
 
@@ -391,7 +387,6 @@ describe('PerxLoyaltyTransactionRequest', () => {
       };
       const perxInvoiceRequestTransactionData =
         new PerxInvoiceRequestTransactionData(200, 'merchant-0001', input);
-      console.log(perxInvoiceRequestTransactionData);
       expect(perxInvoiceRequestTransactionData).toEqual(expected);
     });
   });
@@ -410,7 +405,6 @@ describe('PerxLoyaltyTransactionRequest', () => {
       const perxInvoiceInvoiceRequest = new PerxInvoiceRequest(
         perxUserAccountIdentifier
       );
-      console.log(perxInvoiceInvoiceRequest);
       expect(perxInvoiceInvoiceRequest).toEqual(expected);
     });
 
