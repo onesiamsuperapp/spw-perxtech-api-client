@@ -3,8 +3,8 @@ import {
   PerxPointBalance,
   PerxLoyaltyTier,
   PerxLoyaltyAgingPoint,
-  // PerxLoyaltyPointsHistory,
-  // PerxLoyalty,
+  PerxLoyaltyPointsHistory,
+  PerxLoyalty,
 } from '../models';
 import { Serialize, Deserialize } from 'cerialize';
 
@@ -88,5 +88,63 @@ describe('PerxLoyaltyAgingPoint', () => {
       PerxLoyaltyAgingPoint
     );
     expect(perxLoyaltyAgingPoint).toBeInstanceOf(PerxLoyaltyAgingPoint);
+  });
+});
+
+describe('PerxLoyaltyPointsHistory', () => {
+  test('should have correct default values', () => {
+    const perxLoyaltyPointsHistory = new PerxLoyaltyPointsHistory();
+    expect(Serialize(perxLoyaltyPointsHistory)).toEqual({
+      identifier: null,
+      name: '',
+      points: 0,
+      points_balance: 0,
+      points_balance_converted_to_currency: null,
+      points_date: null,
+      properties: {},
+    });
+  });
+
+  test('should have correct instance', () => {
+    const perxLoyaltyPointsHistoryData = {
+      aggregated_points: null,
+      date: null,
+    };
+    const perxLoyaltyPointsHistory: PerxLoyaltyPointsHistory = Deserialize(
+      perxLoyaltyPointsHistoryData,
+      PerxLoyaltyPointsHistory
+    );
+    expect(perxLoyaltyPointsHistory).toBeInstanceOf(PerxLoyaltyPointsHistory);
+  });
+});
+
+describe('PerxLoyalty', () => {
+  test('should have correct default values', () => {
+    const perxLoyaltyPointsHistory = new PerxLoyalty();
+    expect(Serialize(perxLoyaltyPointsHistory)).toEqual({
+      aging_points: [],
+      current_membership_tier_id: null,
+      current_membership_tier_name: null,
+      membership_expiry: null,
+      membership_state: 'inactive',
+      points_balance: 0,
+      points_balances: [],
+      points_history: [],
+      redemption_in_progress_points: 0,
+      tier_points: 0,
+      tiers: [],
+    });
+  });
+
+  test('should have correct instance', () => {
+    const perxLoyaltyPointsHistoryData = {
+      aggregated_points: null,
+      date: null,
+    };
+    const perxLoyaltyPointsHistory: PerxLoyalty = Deserialize(
+      perxLoyaltyPointsHistoryData,
+      PerxLoyalty
+    );
+    expect(perxLoyaltyPointsHistory).toBeInstanceOf(PerxLoyalty);
   });
 });
