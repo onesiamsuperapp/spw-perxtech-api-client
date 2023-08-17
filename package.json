@@ -51,7 +51,8 @@
     "ts-node": "9.1.1",
     "typescript": "4.4.4",
     "@mikro-orm/core": "4.5.3",
-    "@mikro-orm/mysql-base": "4.5.3"
+    "@mikro-orm/mysql-base": "4.5.3",
+    "nock": "^13.3.2"
   },
   "optionalDependencies": {
     "@commitlint/cli": "17.6.7",

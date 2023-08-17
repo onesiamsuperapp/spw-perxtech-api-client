@@ -520,7 +520,7 @@ export class PerxService implements IPerxService {
     // }
   }
 
-  private async _sendMetric(
+  public async _sendMetric(
     endpoint: string,
     path: string,
     responseTime: number,
@@ -910,6 +910,7 @@ export class PerxService implements IPerxService {
     })
 
     const result = BasePerxResponse.parseAndEval(resp.data, resp.status, IdObjectResponse)
+    console.log('dataid ', result.data)
     return result.data.id === transactionId
   }
 

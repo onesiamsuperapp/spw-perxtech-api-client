@@ -253,7 +253,7 @@ export class BearerTokenResponse {
    * Error Code
    */
   @autoserializeAs('code')
-  code?: number
+  code?: number | string
 
   /**
    * Error Message

@@ -1,6 +1,6 @@
 import { Deserialize } from 'cerialize';
 import { makePolicy, ComparePolicy } from './utils/compare';
-import { PerxPagingMeta, BasePerxResponse, PerxError } from '..';
+import { PerxPagingMeta, BasePerxResponse, PerxError, BearerTokenResponse } from '..';
 
 const _fixture = {
   lastPage: {
@@ -153,5 +153,26 @@ describe('BasePerxResponse', () => {
       error = e as PerxError;
     }
     expect(error?.code).toBe(`perx-error:${errorCode}`);
+  });
+});
+
+describe('BearerTokenResponse', () => {
+  test('should return undefined error when no error code and description', () => {
+    const bearerTokenResponse = new BearerTokenResponse();
+    expect(bearerTokenResponse.error).toBeUndefined();
+    expect(bearerTokenResponse.hasError).toBe(false);
+  });
+  test('should return PerxError when error code or description is set', () => {
+    const errorCode = 'invalid-token';
+    const errorDescription = 'The access token is invalid.';
+    const response = new BearerTokenResponse();
+    response.code = errorCode;
+    response.message = errorDescription;
+    const error = response.error as PerxError;
+    expect(error).toBeDefined();
+    expect(error).toBeInstanceOf(PerxError);
+    expect(error?.errorMessage).toBe(`$${errorDescription}`);
+    expect(error?.code).toBe(`perx-error:${errorCode}`);
+    expect(response.hasError).toBe(true);
   });
 });

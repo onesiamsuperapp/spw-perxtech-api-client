@@ -15,18 +15,22 @@ import {
 
 describe('PerxTransactionRequestData', () => {
   test('should init with default value', () => {
+    const dateNow = new Date();
     const expected = {
       amount: 123,
       currency: 'THB',
       properties: {},
-      transactionDate: new Date(),
+      transactionDate: dateNow,
       transactionReference: 'transaction-ref-001',
       transactionType: 'purchase',
     };
     const perxRequestData = new PerxTransactionRequestData(
       123,
       'THB',
-      'transaction-ref-001'
+      'transaction-ref-001',
+      'purchase',
+      {},
+      dateNow
     );
     expect(perxRequestData).toEqual(expected);
   });
@@ -390,48 +394,68 @@ describe('PerxLoyaltyTransactionRequest', () => {
       expect(perxInvoiceRequestTransactionData).toEqual(expected);
     });
   });
+});
 
-  describe('PerxInvoiceRequest', () => {
-    test('should init with default value', () => {
-      const perxUserAccountIdentifier: PerxRawUserAccountIdentifier = {
-        identifier: '0001',
-        type: 'identifier',
-      };
-      const expected = {
-        transactionData: [],
-        usedItems: [],
-        userAccount: { identifier: '0001' },
-      };
-      const perxInvoiceInvoiceRequest = new PerxInvoiceRequest(
-        perxUserAccountIdentifier
-      );
-      expect(perxInvoiceInvoiceRequest).toEqual(expected);
-    });
+describe('PerxInvoiceRequest', () => {
+  test('should init with default value', () => {
+    const perxUserAccountIdentifier: PerxRawUserAccountIdentifier = {
+      identifier: '0001',
+      type: 'identifier',
+    };
+    const expected = {
+      transactionData: [],
+      usedItems: [],
+      userAccount: { identifier: '0001' },
+    };
+    const perxInvoiceInvoiceRequest = new PerxInvoiceRequest(
+      perxUserAccountIdentifier
+    );
+    expect(perxInvoiceInvoiceRequest).toEqual(expected);
+  });
 
-    test('should init with default value pass type PerxLoyaltyTransactionRequestUserAccount', () => {
-      const perxUserAccountIdentifier: PerxRawUserAccount = {
-        type: 'identifier',
-        identifier: '123',
-      };
-      const perxLoyaltyTransactionRequestUserAccount =
-        new PerxLoyaltyTransactionRequestUserAccount(perxUserAccountIdentifier);
-      const expected = {
-        transactionData: [],
-        usedItems: [],
-        userAccount: { identifier: '123' },
-      };
-      const perxInvoiceInvoiceRequest = new PerxInvoiceRequest(
-        perxLoyaltyTransactionRequestUserAccount
-      );
-      expect(perxInvoiceInvoiceRequest).toEqual(expected);
-    });
+  test('should init with default value pass type PerxLoyaltyTransactionRequestUserAccount', () => {
+    const perxUserAccountIdentifier: PerxRawUserAccount = {
+      type: 'identifier',
+      identifier: '123',
+    };
+    const perxLoyaltyTransactionRequestUserAccount =
+      new PerxLoyaltyTransactionRequestUserAccount(perxUserAccountIdentifier);
+    const expected = {
+      transactionData: [],
+      usedItems: [],
+      userAccount: { identifier: '123' },
+    };
+    const perxInvoiceInvoiceRequest = new PerxInvoiceRequest(
+      perxLoyaltyTransactionRequestUserAccount
+    );
+    expect(perxInvoiceInvoiceRequest).toEqual(expected);
+  });
 
-    test('should be return this when call addTransactions', () => {
-      const perxUserAccountIdentifier: PerxRawUserAccountIdentifier = {
-        identifier: '0001',
-        type: 'identifier',
+  test('should be return this when call addTransactions', () => {
+    const perxUserAccountIdentifier: PerxRawUserAccountIdentifier = {
+      identifier: '0001',
+      type: 'identifier',
+    };
+    const perxInvoiceRequestTransactionData1: PerxInvoiceRequestTransactionData =
+      {
+        amount: 1234,
+        currency: 'THB',
+        merchantIdentifier: 'merchant-0001',
+        properties: {},
+        transactionReference: 'transaction-ref-0001',
+        transactionType: 'purchase-overall',
       };
-      const perxInvoiceRequestTransactionData1: PerxInvoiceRequestTransactionData =
+    const perxInvoiceRequestTransactionData2: PerxInvoiceRequestTransactionData =
+      {
+        amount: 5678,
+        currency: 'THB',
+        merchantIdentifier: 'merchant-0002',
+        properties: {},
+        transactionReference: 'transaction-ref-0002',
+        transactionType: 'purchase-fix',
+      };
+    const expected = {
+      transactionData: [
         {
           amount: 1234,
           currency: 'THB',
@@ -439,8 +463,7 @@ describe('PerxLoyaltyTransactionRequest', () => {
           properties: {},
           transactionReference: 'transaction-ref-0001',
           transactionType: 'purchase-overall',
-        };
-      const perxInvoiceRequestTransactionData2: PerxInvoiceRequestTransactionData =
+        },
         {
           amount: 5678,
           currency: 'THB',
@@ -448,74 +471,55 @@ describe('PerxLoyaltyTransactionRequest', () => {
           properties: {},
           transactionReference: 'transaction-ref-0002',
           transactionType: 'purchase-fix',
-        };
-      const expected = {
-        transactionData: [
-          {
-            amount: 1234,
-            currency: 'THB',
-            merchantIdentifier: 'merchant-0001',
-            properties: {},
-            transactionReference: 'transaction-ref-0001',
-            transactionType: 'purchase-overall',
-          },
-          {
-            amount: 5678,
-            currency: 'THB',
-            merchantIdentifier: 'merchant-0002',
-            properties: {},
-            transactionReference: 'transaction-ref-0002',
-            transactionType: 'purchase-fix',
-          },
-        ],
-        usedItems: [],
-        userAccount: { identifier: '0001' },
-      };
-      const perxInvoiceInvoiceRequest = new PerxInvoiceRequest(
-        perxUserAccountIdentifier
-      );
-      const resultTransaction = perxInvoiceInvoiceRequest.addTransactions(
-        perxInvoiceRequestTransactionData1,
-        perxInvoiceRequestTransactionData2
-      );
-      expect(resultTransaction).toEqual(expected);
-    });
+        },
+      ],
+      usedItems: [],
+      userAccount: { identifier: '0001' },
+    };
+    const perxInvoiceInvoiceRequest = new PerxInvoiceRequest(
+      perxUserAccountIdentifier
+    );
+    const resultTransaction = perxInvoiceInvoiceRequest.addTransactions(
+      perxInvoiceRequestTransactionData1,
+      perxInvoiceRequestTransactionData2
+    );
+    expect(resultTransaction).toEqual(expected);
+  });
 
-    test('should be return this when call used', () => {
-      const perxUserAccountIdentifier: PerxRawUserAccountIdentifier = {
-        identifier: '0001',
-        type: 'identifier',
-      };
-      const expected = {
-        transactionData: [],
-        usedItems: [
-          {
-            itemId: 1234,
-            itemType: 'Reward::Transaction',
-          },
-          {
-            itemId: 5678,
-            itemType: 'StoredValue::Transaction',
-          },
-        ],
-        userAccount: { identifier: '0001' },
-      };
-      const perxInvoiceInvoiceRequest = new PerxInvoiceRequest(
-        perxUserAccountIdentifier
-      );
-      const perxInvoiceRequestUsedItem1 = new PerxInvoiceRequestUsedItem(
-        'Reward::Transaction',
-        1234
-      );
-      const perxInvoiceRequestUsedItem2 = new PerxInvoiceRequestUsedItem(
-        'StoredValue::Transaction',
-        5678
-      );
-      const resultTransaction = perxInvoiceInvoiceRequest.used(
-        perxInvoiceRequestUsedItem1,
-        perxInvoiceRequestUsedItem2
-      );
-      expect(resultTransaction).toEqual(expected);
-    });
+  test('should be return this when call used', () => {
+    const perxUserAccountIdentifier: PerxRawUserAccountIdentifier = {
+      identifier: '0001',
+      type: 'identifier',
+    };
+    const expected = {
+      transactionData: [],
+      usedItems: [
+        {
+          itemId: 1234,
+          itemType: 'Reward::Transaction',
+        },
+        {
+          itemId: 5678,
+          itemType: 'StoredValue::Transaction',
+        },
+      ],
+      userAccount: { identifier: '0001' },
+    };
+    const perxInvoiceInvoiceRequest = new PerxInvoiceRequest(
+      perxUserAccountIdentifier
+    );
+    const perxInvoiceRequestUsedItem1 = new PerxInvoiceRequestUsedItem(
+      'Reward::Transaction',
+      1234
+    );
+    const perxInvoiceRequestUsedItem2 = new PerxInvoiceRequestUsedItem(
+      'StoredValue::Transaction',
+      5678
+    );
+    const resultTransaction = perxInvoiceInvoiceRequest.used(
+      perxInvoiceRequestUsedItem1,
+      perxInvoiceRequestUsedItem2
+    );
+    expect(resultTransaction).toEqual(expected);
   });
 });
