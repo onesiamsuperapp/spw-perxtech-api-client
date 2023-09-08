@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/onesiamsuperapp/spw-perxtech-api-client/compare/v1.0.0...v1.0.1) (2023-09-08)
+
+
+### Bug Fixes
+
+* typo to perxLoyaltyTransaction ([ec43f3a](https://github.com/onesiamsuperapp/spw-perxtech-api-client/commit/ec43f3a88d31df3d59f67c9fde7b43e61d5f3026))
+
 # 1.0.0 (2023-07-26)
 
 
