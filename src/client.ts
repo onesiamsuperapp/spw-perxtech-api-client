@@ -991,7 +991,7 @@ export class PerxService implements IPerxService {
       out.filter_for_merchants = scope.filterForMerchants
     }
     if (scope.categoryId) {
-      out.category_ids = `${scope.categoryId}`
+      out.categoryId = `${scope.categoryId}`
     }
     return out
   }
