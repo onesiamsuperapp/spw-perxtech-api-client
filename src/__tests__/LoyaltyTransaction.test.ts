@@ -15,10 +15,10 @@ describe('PerxLoyaltyTransaction', () => {
       points: 0,
       properties: {},
     };
-    const perxLoyaltyTransactio: PerxLoyaltyTransaction = Deserialize(
+    const perxLoyaltyTransaction: PerxLoyaltyTransaction = Deserialize(
       perxLoyaltyTransactioData,
       PerxLoyaltyTransaction
     );
-    expect(perxLoyaltyTransactio).toBeInstanceOf(PerxLoyaltyTransaction);
+    expect(perxLoyaltyTransaction).toBeInstanceOf(PerxLoyaltyTransaction);
   });
 });
