@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/onesiamsuperapp/spw-perxtech-api-client/compare/v1.0.1...v1.0.2) (2023-09-08)
+
+
+### Bug Fixes
+
+* change category_ids to categoryId ([0ea2092](https://github.com/onesiamsuperapp/spw-perxtech-api-client/commit/0ea20921735b68183d9e1a90a1df35a42871b001))
+
 ## [1.0.1](https://github.com/onesiamsuperapp/spw-perxtech-api-client/compare/v1.0.0...v1.0.1) (2023-09-08)
 
 
