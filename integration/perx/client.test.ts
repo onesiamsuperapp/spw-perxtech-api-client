@@ -103,7 +103,7 @@ describe('PerxService', () => {
         expect(rewards).toBeInstanceOf(Array)
         expect(rewards.length).toBeGreaterThanOrEqual(1)
         expect(rewards.every(mustMatch)).toBeTruthy()
-  
+
         if (ctx.rewardId <= 0) {
           ctx.rewardId = rewards[0].id
         }
@@ -174,27 +174,23 @@ describe('PerxService', () => {
           expect(voucher.state).toEqual('issued')
         })
       })
-  
-      it('can claim the rewards as voucher', async () => {
+
+      it('can claim, reserve and redeem the rewards as voucher', async () => {
         const voucher = await client.issueVoucher(ctx.accessToken, `${ctx.rewardId}`)
         expect(voucher).toBeTruthy()
         expect(typeof voucher.id).toBe('number')
         expect(voucher.state).toEqual('issued')
         ctx.voucherId = voucher.id
-      })
-  
-      it('can reserve the voucher', async () => {
+
         const reservedVoucher = await client.redeemVoucher(ctx.accessToken, ctx.voucherId, false)
         expect(reservedVoucher).toBeTruthy()
         expect(reservedVoucher.id).toEqual(ctx.voucherId)
         expect(reservedVoucher.state).toEqual('redemption_in_progress')
-      })
 
-      it('can commit the voucher', async () => {
-        const reservedVoucher = await client.redeemVoucher(ctx.accessToken, ctx.voucherId, true)
-        expect(reservedVoucher).toBeTruthy()
-        expect(reservedVoucher.id).toEqual(ctx.voucherId)
-        expect(reservedVoucher.state).toEqual('redeemed')
+        const redeemedVoucher = await client.redeemVoucher(ctx.accessToken, ctx.voucherId, true)
+        expect(redeemedVoucher).toBeTruthy()
+        expect(redeemedVoucher.id).toEqual(ctx.voucherId)
+        expect(redeemedVoucher.state).toEqual('redeemed')
       })
     })
 
