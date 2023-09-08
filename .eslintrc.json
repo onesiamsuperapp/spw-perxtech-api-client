@@ -16,7 +16,8 @@
     "@typescript-eslint"
   ],
   "ignorePatterns": [
-    "src/migrations/**/*.ts"
+    "src/migrations/**/*.ts",
+    "src/**/__tests__/"
   ],
   "rules": {
     "@typescript-eslint/ban-ts-comment": "warn",

@@ -1,10 +1,7 @@
 import type { PerxConfig } from './config'
-
 import { Deserialize, Serialize } from 'cerialize'
-import axios, { AxiosInstance } from 'axios'
-
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
 import { PerxError } from './error'
-
 import {
   BasePerxResponse,
   PerxRewardsResponse,
@@ -48,7 +45,8 @@ import {
   LoyaltyTransactionsResponse,
   PerxExpiryAggregationResponse,
 } from './models'
-
+import { InstrumentServiceInterface, NewRelicInstrumentService } from 'spw-instrumentation'
+import { CountMetricInput, GaugeMetricInput, InstrumentMetric, MetricFactory } from 'spw-instrumentation/lib/cjs/metric'
 export interface PerxVoucherScope {
   size: number
   page: number
@@ -161,18 +159,18 @@ export interface IPerxAuthService {
    * 
    * @param userIdentifier 
    */
-   getUserToken(userIdentifier: string): Promise<TokenResponse>
+  getUserToken(userIdentifier: string): Promise<TokenResponse>
 
-   /**
-    * Issue the application's token
-    */
-   getApplicationToken(): Promise<TokenResponse>
+  /**
+   * Issue the application's token
+   */
+  getApplicationToken(): Promise<TokenResponse>
 
-   /**
-    * 
-    * @param merchantIdentifier 
-    */
-   getMerchantBearerToken(merchantIdentifier: string): Promise<BearerTokenResponse>
+  /**
+   * 
+   * @param merchantIdentifier 
+   */
+  getMerchantBearerToken(merchantIdentifier: string): Promise<BearerTokenResponse>
 }
 
 export interface IPerxUserService {
@@ -202,7 +200,7 @@ export interface IPerxUserService {
    * @param size page size to load results
    */
   searchRewards(userToken: string, keyword: string, page: number, size: number): Promise<PerxRewardSearchResultResponse>
-  
+
   /**
    * Reserve reward for particular user
    * 
@@ -243,15 +241,15 @@ export interface IPerxUserService {
    * @param reservationId 
    */
   confirmRewardReservation(userToken: string, reservationId: string): Promise<PerxVoucher>
- 
-   /**
-    * Issue a voucher from particular reward for specific user
-    *
-    * @param userToken 
-    * @param rewardId 
-    */
+
+  /**
+   * Issue a voucher from particular reward for specific user
+   *
+   * @param userToken 
+   * @param rewardId 
+   */
   issueVoucher(userToken: string, rewardId: number | string): Promise<PerxVoucher>
- 
+
   /**
    * Get single voucher by Id
    *
@@ -260,60 +258,60 @@ export interface IPerxUserService {
    */
   getVoucher(userToken: string, voucherId: number): Promise<PerxVoucherResponse>
 
-   /**
-    * List vouchers for specific users
-    * 
-    * @param userToken
-    * @param scope 
-    */
+  /**
+   * List vouchers for specific users
+   * 
+   * @param userToken
+   * @param scope 
+   */
   getVouchers(userToken: string, scope: Partial<PerxVoucherScope>): Promise<PerxVouchersResponse>
- 
-   /**
-    * Redeem the voucher with specific voucherId and pass confirm boolean flag
-    * 
-    * For 2 phase action
-    * if confirm flag = false, to reserve
-    * if confirm flag = true, to confirm
-    * 
-    * For single shot
-    * if confirm flag = undefined, to confirm right away
-    * 
-    * @param userToken 
-    * @param voucherId 
-    * @param confirm 
-    * @returns 
-    */
+
+  /**
+   * Redeem the voucher with specific voucherId and pass confirm boolean flag
+   * 
+   * For 2 phase action
+   * if confirm flag = false, to reserve
+   * if confirm flag = true, to confirm
+   * 
+   * For single shot
+   * if confirm flag = undefined, to confirm right away
+   * 
+   * @param userToken 
+   * @param voucherId 
+   * @param confirm 
+   * @returns 
+   */
   redeemVoucher(userToken: string, voucherId: number | string): Promise<PerxVoucher>
   redeemVoucher(userToken: string, voucherId: number | string, confirm: boolean): Promise<PerxVoucher>
- 
+
   /**
    * Query perx loyalty points
    */
   getLoyaltyProgram(userToken: string, loyaltyProgramId: string | number): Promise<PerxLoyalty>
- 
- /**
-   * Query perx loyalty points
-   */
+
+  /**
+    * Query perx loyalty points
+    */
   getLoyaltyTransactions(userToken: string, loyaltyProgramId: string | number, page: number, size: number): Promise<LoyaltyTransactionsResponse>
- 
+
   /**
    * Query perx loyalty list
    */
   getLoyaltyPrograms(userToken: string): Promise<PerxLoyalty[]>
 
-   /**
-    * Fetch specific perx's customer
-    * 
-    * @param userToken
-    * @param customerId
-    */
+  /**
+   * Fetch specific perx's customer
+   * 
+   * @param userToken
+   * @param customerId
+   */
   getCustomer(userToken: string, customerId: string | number): Promise<PerxCustomer>
 
-   /**
-    * Fetch myself as customer
-    * 
-    * @param userToken
-    */
+  /**
+   * Fetch myself as customer
+   * 
+   * @param userToken
+   */
   getMe(userToken: string): Promise<PerxCustomer>
 
   /**
@@ -454,11 +452,19 @@ export interface IPerxPosService {
   listAggregatedExpiryPoint(applicationToken: string, userIdentity: string, scope: Partial<PerxExpiryPointScope>): Promise<PerxExpiryAggregationResponse>
 }
 
+export interface CustomAxiosRequestConfig extends AxiosRequestConfig {
+  metadata?: {
+    startTime: number;
+  };
+}
+
 export type IPerxService = IPerxAuthService & IPerxUserService & IPerxPosService & { clone(lang: string): IPerxService }
 
 export class PerxService implements IPerxService {
 
   private axios: AxiosInstance
+  protected instrument: InstrumentServiceInterface
+  protected metricFactory: MetricFactory
 
   public clone(lang: string): PerxService {
     return new PerxService({
@@ -480,24 +486,74 @@ export class PerxService implements IPerxService {
       } || {},
       validateStatus: (status: number) => status < 450,     // all statuses are to be parsed by service layer.
     })
+
+    this.instrument = NewRelicInstrumentService.shared()
+    this.metricFactory = this.instrument.getMetricFactory()
+
     if (typeof debug === 'function') {
       debug(this.axios)
     }
-    if (debug === 'request' || debug === 'all') {
-      this.axios.interceptors.request.use((config) => {
+    // if (debug === 'request' || debug === 'all') {
+      this.axios.interceptors.request.use((config: CustomAxiosRequestConfig) => {
         console.log(`REQ> ${config.url}`, config)
+        config.metadata = { startTime: Date.now() };
         return config
       })
+    // }
+    // if (debug === 'response' || debug === 'all') {
+      this.axios.interceptors.response.use(
+        async (resp: any) => {
+          console.log(`RESP< ${resp.config.url}`, resp.data)
+          const startTime: number = resp.config.metadata.startTime
+          const endTime: number = Date.now()
+          const responseTime = endTime - startTime;
+          await this._sendMetric(this.config.baseURL, resp.config.url!, responseTime, resp.status, 'success')
+          return resp
+        }, async (error) => {
+          console.log(`ERR.RESP< ${error.response.config.method} ${error.response.config.url}`, error.response.data)
+          const startTime: number = error.response.config.metadata.startTime
+          const endTime: number = Date.now()
+          const responseTime = endTime - startTime;
+          await this._sendMetric(this.config.baseURL, error.config.url!, responseTime, error.response.status, 'fail')
+          throw error
+        })
+    // }
+  }
+
+  public async _sendMetric(
+    endpoint: string,
+    path: string,
+    responseTime: number,
+    httpStatus: number,
+    status: string,
+    errorCode?: string,
+  ): Promise<void> {
+    const attributes = {
+      'endpoint': endpoint,
+      'path': path,
+      'response.time': responseTime,
+      'http.status': httpStatus,
+      'error.code': errorCode || '',
+      'status': status,
     }
-    if (debug === 'response' || debug === 'all') {
-      this.axios.interceptors.response.use((resp) => {
-        console.log(`RESP< ${resp.config.url}`, resp.data)
-        return resp
-      }, (error) => {
-        console.log(`ERR.RESP< ${error.response.config.method} ${error.response.config.url}`, error.response.data)
-        throw error
-      })
+    const countMetricInput: CountMetricInput = {
+      name: 'spw.custom.perx.api.request',
+      value: 1,
+      attributes: attributes,
+      'interval.ms': 1000,
+      timestamp: Date.now(),
     }
+    const gaugeMetricInput: GaugeMetricInput = {
+      name: 'spw.custom.perx.api.response.time',
+      value: responseTime,
+      attributes: attributes,
+      timestamp: Date.now(),
+    }
+    const metrics: InstrumentMetric[] = [
+      this.metricFactory.makeCountMetic(countMetricInput),
+      this.metricFactory.makeGaugeMetric(gaugeMetricInput),
+    ]
+    await this.instrument.sendMetric(metrics)
   }
 
   /**
@@ -652,7 +708,7 @@ export class PerxService implements IPerxService {
         timeout: timeoutInMs,
       }
     })
-  
+
     const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxRewardReservationResponse)
     return result.data
   }
@@ -852,8 +908,9 @@ export class PerxService implements IPerxService {
       },
       params: {}
     })
-    
+
     const result = BasePerxResponse.parseAndEval(resp.data, resp.status, IdObjectResponse)
+    console.log('dataid ', result.data)
     return result.data.id === transactionId
   }
 
@@ -864,7 +921,7 @@ export class PerxService implements IPerxService {
         authorization: `Bearer ${applicationToken}`,
       },
     })
-  
+
     const result = BasePerxResponse.parseAndEval(resp.data, resp.status, PerxInvoiceCreationResponse)
     return result
   }
@@ -917,7 +974,7 @@ export class PerxService implements IPerxService {
     return result
   }
 
-  public async listAllMerchants(userToken: string, page: number,  perPage: number, favorite: boolean | undefined = undefined): Promise<PerxMerchantsResponse> {
+  public async listAllMerchants(userToken: string, page: number, perPage: number, favorite: boolean | undefined = undefined): Promise<PerxMerchantsResponse> {
     const resp = await this.axios.get('/v4/merchants', {
       headers: {
         authorization: `Bearer ${userToken}`,

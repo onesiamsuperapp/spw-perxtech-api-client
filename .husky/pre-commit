@@ -2,5 +2,6 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 # Enable linting when ready to refactor code
-#yarn lint
+yarn build
+# yarn lint
 yarn test:unit
