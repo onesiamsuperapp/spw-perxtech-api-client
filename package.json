@@ -1,6 +1,6 @@
 {
   "name": "spw-perxtech-api-client",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "PerxTech API client written in TypeScript",
   "main": "lib/cjs/index.js",
   "module": "lib/esm/index.js",

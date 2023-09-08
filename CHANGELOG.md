@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/onesiamsuperapp/spw-perxtech-api-client/compare/v1.0.2...v1.0.3) (2023-09-08)
+
+
+### Bug Fixes
+
+* remove include file in tsconfig ([666e1bd](https://github.com/onesiamsuperapp/spw-perxtech-api-client/commit/666e1bd7f2299e4431e785b37d5f3a9d03ee6362))
+
 ## [1.0.2](https://github.com/onesiamsuperapp/spw-perxtech-api-client/compare/v1.0.1...v1.0.2) (2023-09-08)
 
 
