@@ -5,4 +5,7 @@ export interface PerxConfig {
   tokenDurationInSeconds: number
   lang?: string
   microSiteBaseUrl?: string
+  newRelic: {
+    environment: string
+  },
 }

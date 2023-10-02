@@ -564,6 +564,9 @@ describe('PerxService', () => {
     clientId: 'client_id',
     clientSecret: 'client_secret',
     tokenDurationInSeconds: 500,
+    newRelic: {
+      environment: 'test',
+    },
   });
   beforeEach(() => {
     jest

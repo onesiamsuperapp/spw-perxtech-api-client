@@ -535,6 +535,7 @@ export class PerxService implements IPerxService {
       'http.status': httpStatus,
       'error.code': errorCode || '',
       'status': status,
+      'environment': this.config.newRelic.environment || 'N/A',
     }
     const countMetricInput: CountMetricInput = {
       name: 'spw.custom.perx.api.request',
