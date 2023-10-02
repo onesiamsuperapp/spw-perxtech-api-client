@@ -19,6 +19,9 @@ describe('PerxService', () => {
     clientId: (process.env.TEST_PERX_CLIENT_ID || ''),
     clientSecret: (process.env.TEST_PERX_CLIENT_SECRET || ''),
     tokenDurationInSeconds: testingTokenDurationInSeconds, // 5 mins is more than enough
+    newRelic: {
+      environment: 'test',
+    },
   })
 
   const testableUserIdentifierOnPerxServer = (process.env.TEST_PERX_USER_IDENTIFIER || '')
