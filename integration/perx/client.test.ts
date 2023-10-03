@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable no-magic-numbers */
 import {
   IPerxService,
   PerxService,
@@ -11,23 +13,22 @@ import {
 } from '../../src'
 
 describe('PerxService', () => {
-
   const testingTokenDurationInSeconds = 300
 
   const client: IPerxService = new PerxService({
-    baseURL: (process.env.TEST_PERX_API_URL || ''),
-    clientId: (process.env.TEST_PERX_CLIENT_ID || ''),
-    clientSecret: (process.env.TEST_PERX_CLIENT_SECRET || ''),
+    baseURL: process.env.TEST_PERX_API_URL || '',
+    clientId: process.env.TEST_PERX_CLIENT_ID || '',
+    clientSecret: process.env.TEST_PERX_CLIENT_SECRET || '',
     tokenDurationInSeconds: testingTokenDurationInSeconds, // 5 mins is more than enough
     newRelic: {
       environment: 'test',
     },
   })
 
-  const testableUserIdentifierOnPerxServer = (process.env.TEST_PERX_USER_IDENTIFIER || '')
-  const testableUserIdOnPerxServer = (process.env.TEST_PERX_USER_ID || '')
-  const testableLoyaltyProgramIdOnPerxServer = (process.env.TEST_PERX_LOYALTY_PROGRAM_ID || '')
-  const testableSearchKeyword = (process.env.TEST_PERX_REWARD_SEARCH_KEYWORD || '')
+  const testableUserIdentifierOnPerxServer = process.env.TEST_PERX_USER_IDENTIFIER || ''
+  const testableUserIdOnPerxServer = process.env.TEST_PERX_USER_ID || ''
+  const testableLoyaltyProgramIdOnPerxServer = process.env.TEST_PERX_LOYALTY_PROGRAM_ID || ''
+  const testableSearchKeyword = process.env.TEST_PERX_REWARD_SEARCH_KEYWORD || ''
 
   // Optional target, if not provide use first record in query to run the test
   const testableRewardId = +(process.env.TEST_PERX_REWARD_ID || '-1')
@@ -67,7 +68,7 @@ describe('PerxService', () => {
       ${{}}                         | ${() => true }
       ${{state: 'expired'}}         | ${(o: PerxVoucher) => o.state === 'expired' }
       ${{type: 'expired'}}          | ${(o: PerxVoucher) => o.state === 'expired' }
-      ${{type: 'all'}}              | ${(o: PerxVoucher) => ['expired', 'issued','redemption_in_progress', 'released', 'redeemed'].indexOf(o.state) >= 0 }
+      ${{type: 'all'}}              | ${(o: PerxVoucher) => ['expired', 'issued', 'redemption_in_progress', 'released', 'redeemed'].indexOf(o.state) >= 0 }
       ${{state: 'issued'}}          | ${(o: PerxVoucher) => o.state === 'issued' }
       ${{state: 'redeemed'}}        | ${(o: PerxVoucher) => o.state === 'redeemed' }
     `('list vouchers $scope', async ({ scope, mustMatch }: { scope: PerxVoucherScope, mustMatch: (o: PerxVoucher) => boolean}) => {
@@ -131,9 +132,14 @@ describe('PerxService', () => {
         if (firstPageMeta) {
           it('can search rewards on last page', async () => {
             const meta = firstPageMeta!
-            const lastPageCount = (meta.count % pageSize) || pageSize
+            const lastPageCount = meta.count % pageSize || pageSize
             const lastPage = meta.totalPages
-            const lastSearchResults = await client.searchRewards(ctx.accessToken, testableSearchKeyword, lastPage, pageSize)
+            const lastSearchResults = await client.searchRewards(
+              ctx.accessToken,
+              testableSearchKeyword,
+              lastPage,
+              pageSize,
+            )
             expect(lastSearchResults.data).toBeInstanceOf(Array)
             expect(lastSearchResults.data.length).toEqual(lastPageCount)
             expect(lastSearchResults.data[0].documentType).toEqual('reward')
@@ -153,7 +159,7 @@ describe('PerxService', () => {
         })
 
         it('can release reserved reward', async () => {
-          let voucher = await client.releaseRewardReservation(ctx.accessToken, `${reservation!.id}`)
+          const voucher = await client.releaseRewardReservation(ctx.accessToken, `${reservation!.id}`)
           expect(voucher).toBeTruthy()
           expect(typeof voucher.id).toBe('number')
           expect(voucher.state).toEqual('released')
@@ -171,7 +177,7 @@ describe('PerxService', () => {
         })
 
         it('can release reserved reward', async () => {
-          let voucher = await client.confirmRewardReservation(ctx.accessToken, `${reservation!.id}`)
+          const voucher = await client.confirmRewardReservation(ctx.accessToken, `${reservation!.id}`)
           expect(voucher).toBeTruthy()
           expect(typeof voucher.id).toBe('number')
           expect(voucher.state).toEqual('issued')
@@ -238,7 +244,7 @@ describe('PerxService', () => {
   })
 
   describe('application session', () => {
-    const pointsToEarnAndBurn: number = 121
+    const pointsToEarnAndBurn = 121
     const ctx = {
       accessToken: '',
     }
