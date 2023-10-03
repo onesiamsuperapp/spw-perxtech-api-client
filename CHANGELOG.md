@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/onesiamsuperapp/spw-perxtech-api-client/compare/v1.0.3...v1.0.4) (2023-10-03)
+
+
+### Bug Fixes
+
+* missing utils index ([#27](https://github.com/onesiamsuperapp/spw-perxtech-api-client/issues/27)) ([f9b31d0](https://github.com/onesiamsuperapp/spw-perxtech-api-client/commit/f9b31d017df75dfb4ad8b9cf8f905af97cd2763c))
+
 ## [1.0.3](https://github.com/onesiamsuperapp/spw-perxtech-api-client/compare/v1.0.2...v1.0.3) (2023-09-08)
 
 
