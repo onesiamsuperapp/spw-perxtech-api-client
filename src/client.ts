@@ -1,3 +1,4 @@
+/* eslint-disable indent */
 import type { PerxConfig } from './config'
 import { Deserialize, Serialize } from 'cerialize'
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
@@ -490,34 +491,56 @@ export class PerxService implements IPerxService {
     this.instrument = NewRelicInstrumentService.shared()
     this.metricFactory = this.instrument.getMetricFactory()
 
+    this.axios.interceptors.request.use((config: CustomAxiosRequestConfig) => {
+      config.metadata = { startTime: Date.now() }
+      return config
+    })
+
+    this.axios.interceptors.response.use(
+      async (resp) => {
+        const conf = resp.config as CustomAxiosRequestConfig
+        const startTime: number = conf.metadata?.startTime || Date.now()
+        const endTime: number = Date.now()
+        const responseTime = endTime - startTime;
+        await this._sendMetric(this.config.baseURL, resp.config.url || '', responseTime, resp.status, 'success')
+        return resp
+      }, async (error) => {
+        const startTime: number = error.response.config.metadata.startTime
+        const endTime: number = Date.now()
+        const responseTime = endTime - startTime
+        await this._sendMetric(
+          this.config.baseURL,
+          error.config.url || '',
+          responseTime,
+          error.response.status,
+          'fail',
+        )
+        throw error
+      })
+
     if (typeof debug === 'function') {
       debug(this.axios)
     }
-    // if (debug === 'request' || debug === 'all') {
+    if (debug === 'request' || debug === 'all') {
       this.axios.interceptors.request.use((config: CustomAxiosRequestConfig) => {
-        console.log(`REQ> ${config.url}`, config)
-        config.metadata = { startTime: Date.now() };
+        console.log(`REQ> ${config.url}`, {
+          data: config.data,
+          params: config.params,
+          headers: config.headers,
+        })
         return config
       })
-    // }
-    // if (debug === 'response' || debug === 'all') {
+    }
+    if (debug === 'response' || debug === 'all') {
       this.axios.interceptors.response.use(
-        async (resp: any) => {
+        async (resp) => {
           console.log(`RESP< ${resp.config.url}`, resp.data)
-          const startTime: number = resp.config.metadata.startTime
-          const endTime: number = Date.now()
-          const responseTime = endTime - startTime;
-          await this._sendMetric(this.config.baseURL, resp.config.url!, responseTime, resp.status, 'success')
           return resp
         }, async (error) => {
           console.log(`ERR.RESP< ${error.response.config.method} ${error.response.config.url}`, error.response.data)
-          const startTime: number = error.response.config.metadata.startTime
-          const endTime: number = Date.now()
-          const responseTime = endTime - startTime;
-          await this._sendMetric(this.config.baseURL, error.config.url!, responseTime, error.response.status, 'fail')
           throw error
         })
-    // }
+    }
   }
 
   public async _sendMetric(
