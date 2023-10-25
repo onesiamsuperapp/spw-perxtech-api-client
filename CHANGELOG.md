@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/onesiamsuperapp/spw-perxtech-api-client/compare/v1.0.4...v1.1.0) (2023-10-25)
+
+
+### Features
+
+* sp-6203 reduce log message ([03c44c7](https://github.com/onesiamsuperapp/spw-perxtech-api-client/commit/03c44c7ac9f5aa87b7ea0e2c504cb03ac228ba1e))
+
 ## [1.0.4](https://github.com/onesiamsuperapp/spw-perxtech-api-client/compare/v1.0.3...v1.0.4) (2023-10-03)
 
 
