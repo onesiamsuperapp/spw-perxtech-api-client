@@ -8,7 +8,6 @@ import {
   PerxLoyaltyTransactionRequest,
   PerxIdentification,
 } from '..';
-import { NewRelicInstrumentService } from 'spw-instrumentation';
 import * as cerialize from 'cerialize';
 import nock from 'nock';
 
@@ -567,11 +566,6 @@ describe('PerxService', () => {
     newRelic: {
       environment: 'test',
     },
-  });
-  beforeEach(() => {
-    jest
-      .spyOn(NewRelicInstrumentService.shared(), 'sendMetric')
-      .mockResolvedValueOnce({ requestId: 'req-0001' });
   });
   afterEach(() => {
     nock.cleanAll();

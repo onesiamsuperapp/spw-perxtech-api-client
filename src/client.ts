@@ -502,13 +502,13 @@ export class PerxService implements IPerxService {
         const startTime: number = conf.metadata?.startTime || Date.now()
         const endTime: number = Date.now()
         const responseTime = endTime - startTime;
-        await this._sendMetric(this.config.baseURL, resp.config.url || '', responseTime, resp.status, 'success')
+        this._sendMetric(this.config.baseURL, resp.config.url || '', responseTime, resp.status, 'success')
         return resp
       }, async (error) => {
         const startTime: number = error.response.config.metadata.startTime
         const endTime: number = Date.now()
         const responseTime = endTime - startTime
-        await this._sendMetric(
+        this._sendMetric(
           this.config.baseURL,
           error.config.url || '',
           responseTime,
@@ -543,14 +543,14 @@ export class PerxService implements IPerxService {
     }
   }
 
-  public async _sendMetric(
+  public _sendMetric(
     endpoint: string,
     path: string,
     responseTime: number,
     httpStatus: number,
     status: string,
     errorCode?: string,
-  ): Promise<void> {
+  ): void {
     const attributes = {
       'endpoint': endpoint,
       'path': path,
@@ -577,7 +577,7 @@ export class PerxService implements IPerxService {
       this.metricFactory.makeCountMetic(countMetricInput),
       this.metricFactory.makeGaugeMetric(gaugeMetricInput),
     ]
-    await this.instrument.sendMetric(metrics)
+    this.instrument.sendMetric(metrics)
   }
 
   /**
