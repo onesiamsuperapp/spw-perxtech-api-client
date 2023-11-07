@@ -1,3 +1,11 @@
+## [1.1.1](https://github.com/onesiamsuperapp/spw-perxtech-api-client/compare/v1.1.0...v1.1.1) (2023-11-07)
+
+
+### Bug Fixes
+
+* sp-6504 sending metric without waiting for response ([5719388](https://github.com/onesiamsuperapp/spw-perxtech-api-client/commit/5719388e18519031acf19cd5bc3a5f29b4bfb641))
+* sp-6504 sending metric without waiting for response ([d99db25](https://github.com/onesiamsuperapp/spw-perxtech-api-client/commit/d99db2589080537c9aaa1248c67d9bca8a1aed25))
+
 # [1.1.0](https://github.com/onesiamsuperapp/spw-perxtech-api-client/compare/v1.0.4...v1.1.0) (2023-10-25)
 
 
