@@ -497,14 +497,14 @@ export class PerxService implements IPerxService {
     })
 
     this.axios.interceptors.response.use(
-      async (resp) => {
+      (resp) => {
         const conf = resp.config as CustomAxiosRequestConfig
         const startTime: number = conf.metadata?.startTime || Date.now()
         const endTime: number = Date.now()
-        const responseTime = endTime - startTime;
+        const responseTime = endTime - startTime
         this._sendMetric(this.config.baseURL, resp.config.url || '', responseTime, resp.status, 'success')
         return resp
-      }, async (error) => {
+      }, (error) => {
         const startTime: number = error.response.config.metadata.startTime
         const endTime: number = Date.now()
         const responseTime = endTime - startTime
