@@ -7032,10 +7032,10 @@ sprintf-js@~1.0.2:
   resolved "https://registry.yarnpkg.com/sprintf-js/-/sprintf-js-1.0.3.tgz#04e6926f662895354f3dd015203633b857297e2c"
   integrity sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g==
 
-spw-instrumentation@1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/spw-instrumentation/-/spw-instrumentation-1.0.3.tgz#4a0065974f9596bda1c15f02059d9ba27a165524"
-  integrity sha512-RQABqREw+SR/R9UqqvaRXvzJ/X/nEWKcbzF3DOZDGqItgrZ9O6nkydARh/hzsAIgV0GvYS54DacNiWcfat/QPA==
+spw-instrumentation@2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/spw-instrumentation/-/spw-instrumentation-2.0.0.tgz#ff519cc44b26f4256a78e044d810827fe69454ef"
+  integrity sha512-OLac43OKXDQDcf5WHYPbuMZec2xfqWYYMiRQu0X7dLl7YlExdX4mbCfagnIE4oCfI2VX7k+aOsR31ZeS9JQwPg==
   dependencies:
     spw-kobp "0.0.42"
 
