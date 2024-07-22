@@ -3,7 +3,7 @@ import type { PerxConfig } from './config'
 import { Deserialize, Serialize } from 'cerialize'
 import axios, { AxiosResponse, AxiosInstance } from 'axios'
 import { PerxError } from './error'
-import { logAxiosResponse, CustomAxiosRequestConfig } from './utils'
+import { logAxiosResponse, logAxiosErrorResponse, CustomAxiosRequestConfig } from './utils'
 import {
   BasePerxResponse,
   PerxRewardsResponse,
@@ -513,13 +513,13 @@ export class PerxService implements IPerxService {
         return resp
       }, (error) => {
         try {
-          const responseTime = logAxiosResponse(error.response)
+          const responseTime = logAxiosErrorResponse(error)
 
           this._sendMetric(
             this.config.baseURL,
             error.config.url || '',
             responseTime,
-            error.response.status,
+            error.response?.status,
             'fail',
           )
         } catch (error) {
