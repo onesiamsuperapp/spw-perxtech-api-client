@@ -5,6 +5,21 @@
 
 * **feat:** [SP-7993] [SP-7994] [SP-7995] improve perx response log message
 
+
+# [2.0.0](https://github.com/onesiamsuperapp/spw-perxtech-api-client/compare/v1.1.1...v2.0.0) (2024-01-03)
+
+
+### Build System
+
+* **common:** stop sending metric to new relic ([9a4f348](https://github.com/onesiamsuperapp/spw-perxtech-api-client/commit/9a4f3482ffd2045ca9991bae65c0d8fdf13bb716))
+
+
+### BREAKING CHANGES
+
+* **common:** Stop sending metric to new relic by default
+
+By upgrade spw-instrumentation to version 2.0.0 metric will not be send to new relic
+
 ## [1.1.1](https://github.com/onesiamsuperapp/spw-perxtech-api-client/compare/v1.1.0...v1.1.1) (2023-11-07)
 
 
