@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/onesiamsuperapp/spw-perxtech-api-client/compare/v2.0.0...v2.1.0) (2024-07-23)
+
+
+### Features
+
+* [SP-7993] [SP-7994] [SP-7995] improve perx response log message ([77aea88](https://github.com/onesiamsuperapp/spw-perxtech-api-client/commit/77aea882b74f77013412f744263762837cc2bc3c))
+
 # [2.0.0](https://github.com/onesiamsuperapp/spw-perxtech-api-client/compare/v1.1.1...v2.0.0) (2024-01-03)
 
 
