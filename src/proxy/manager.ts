@@ -53,22 +53,22 @@ export interface IPerxUserProxy {
 
   /**
    * Get single Reward by Id
-   * 
-   * @param scope 
+   *
+   * @param scope
    */
   getReward(rewardId: number): Promise<PerxRewardResponse>
 
   /**
    * List Rewards to be claim
-   * 
-   * @param scope 
+   *
+   * @param scope
    */
   queryRewards(scope: Partial<PerxRewardScope>): Promise<PerxRewardsResponse>
 
   /**
    * Search existing Perx's rewards
-   * 
-   * @param keyword 
+   *
+   * @param keyword
    */
   searchRewards(keyword: string): Promise<PerxRewardSearchResultResponse>
   searchRewards(keyword: string, page: number): Promise<PerxRewardSearchResultResponse>
@@ -95,36 +95,36 @@ export interface IPerxUserProxy {
 
   /**
    * List all categories (chaining calls automatically)
-   * 
+   *
    * @param parentId
    */
   listAllCategories(parentId: number): Promise<PerxCategory[]>
 
   /**
    * Cliam a reward, resulting a Voucher.
-   * 
+   *
    * @param rewardId
    */
   issueReward(rewardId: string): Promise<PerxVoucher>
 
   /**
    * Reserve a reward for particular token's owner (expires in 15mins)
-   * 
+   *
    * WARNING: call this method while there is a reservation of the same
-   * Reward exists will not issue a new token for the user. Rather it 
+   * Reward exists will not issue a new token for the user. Rather it
    * will pick current one to return!
-   * 
+   *
    * @param rewardId
    */
   reserveReward(rewardId: string): Promise<PerxRewardReservation>
 
   /**
    * Reserve a reward with specific timeout.
-   * 
+   *
    * WARNING: call this method while there is a reservation of the same
-   * Reward exists will not issue a new token for the user. Rather it 
+   * Reward exists will not issue a new token for the user. Rather it
    * will pick current one to return!
-   * 
+   *
    * @param rewardId
    * @param timeoutInMs
    */
@@ -132,56 +132,56 @@ export interface IPerxUserProxy {
 
   /**
    * release reserved reward
-   * 
-   * @param scope 
+   *
+   * @param scope
    */
   releaseReservedReward(rewardId: string): Promise<PerxVoucher>
 
   /**
    * confirm the the reserved reward
-   * 
-   * @param scope 
+   *
+   * @param scope
    */
   confirmReservedReward(rewardId: string): Promise<PerxVoucher>
 
   /**
    * Get single perx voucher from API by Id
-   * 
-   * @param voucherId 
+   *
+   * @param voucherId
    */
   getVoucher(voucherId: number): Promise<PerxVoucherResponse>
 
   /**
    * Listing claimed rewards (vouchers)
-   * 
-   * @param scope 
+   *
+   * @param scope
    */
   queryVouchers(scope: Partial<PerxVoucherScope>): Promise<PerxVouchersResponse>
 
   /**
    * Redeem the vouchers without marking/confirming/releasing
-   * 
-   * @param voucherIds 
+   *
+   * @param voucherIds
    */
   redeemVouchers(voucherIds: string[]): Promise<PerxVoucher[]>
 
   /**
    * Mark the voucher as redemption in progress (can only be released by `pos.releaseVouchers()`)
-   * 
-   * @param voucherIds 
+   *
+   * @param voucherIds
    */
   reserveVouchers(voucherIds: string[]): Promise<PerxVoucher[]>
 
   /**
    * Confirm all vouchers those has been marked with `user.reserveVouchers`.
-   * 
+   *
    * @param voucherIds
    */
   confirmVouchers(voucherIds: string[]): Promise<PerxVoucher[]>
 
   /**
    * Query loyalty program from Perx
-   * 
+   *
    * @param loyaltyProgramId
    * @returns
    */
@@ -189,7 +189,7 @@ export interface IPerxUserProxy {
 
   /**
    * Query loyalty program from Perx
-   * 
+   *
    * @param loyaltyProgramId
    * @returns
    */
@@ -199,15 +199,15 @@ export interface IPerxUserProxy {
 
   /**
    * Listing loyalty programs from Perx
-   * 
+   *
    * @returns
    */
   queryLoyaltyPrograms(): Promise<PerxLoyalty[]>
 
   /**
    * Query Perx transactions history of given user
-   * @param page 
-   * @param perPage 
+   * @param page
+   * @param perPage
    */
   queryTransactionsHistory(): Promise<PerxLoyaltyTransactionsHistoryResponse>
   queryTransactionsHistory(page: number): Promise<PerxLoyaltyTransactionsHistoryResponse>
@@ -239,8 +239,8 @@ export interface IPerxUserProxy {
 
   /**
    * Execute custom trigger on Perx for specific user.
-   * 
-   * @param perxCustomTriggerId 
+   *
+   * @param perxCustomTriggerId
    */
   performCustomTrigger(perxCustomTriggerId: string): Promise<void>
 
@@ -268,52 +268,52 @@ export interface IPerxPosProxy {
 
   /**
    * create invoice based on given request.
-   * 
-   * @param request 
+   *
+   * @param request
    */
   createInvoice(request: PerxInvoiceRequest): Promise<PerxInvoiceCreationResponse>
 
   /**
    * Release the reserved vouchers
-   * 
-   * @param voucherIds 
+   *
+   * @param voucherIds
    */
   releaseVouchers(voucherIds: string[]): Promise<PerxVoucher[]>
-  
+
   /**
    * Hard burn/earn points
-   * 
-   * @param applicationToken 
-   * @param request 
+   *
+   * @param applicationToken
+   * @param request
    */
   submitLoyaltyTransaction(request: PerxLoyaltyTransactionRequest): Promise<PerxLoyaltyTransaction>
 
   /**
    * Reserve the loyalty points give back the `loyaltyTransactionId` that holding the specified loyalty points.
-   * 
-   * @param request 
+   *
+   * @param request
    */
   reserveLoyaltyPoints(request: PerxLoyaltyTransactionReservationRequest): Promise<PerxLoyaltyTransaction>
 
   /**
    * release the loyalty points witheld by specific `loyaltyTransactionId`
-   * 
-   * @param account 
+   *
+   * @param account
    * @param loyaltyTransactionId
    */
   releaseLoyaltyPoints(account: PerxLoyaltyTransactionRequestUserAccount, loyaltyTransactionId: string): Promise<boolean>
 
   /**
    * Submit new transaction to perx service via POS Access.
-   * 
-   * @param transaction 
+   *
+   * @param transaction
    */
   submitTransaction(transaction: PerxTransactionReqeust): Promise<PerxTransaction>
 
   /**
    * get customer detail via POS Access.
-   * 
-   * @param userId 
+   *
+   * @param userId
   */
   getCustomerDetail(userId: number): Promise<PerxCustomer>
 
@@ -351,29 +351,28 @@ export interface TokenPool {
 
   /**
    * Responsible for storing the token with given ttlInMs
-   * 
-   * @param key 
-   * @param token 
-   * @param ttlInMs 
+   *
+   * @param key
+   * @param token
+   * @param ttlInMs
    */
   cache(key: string, token: IPerxToken, ttlInMs: number): Promise<void>
 
   /**
    * Responsible for retriving the token from the cache pool. If
    * the cahced item is invalid, or no longer available return null.
-   * 
-   * @param key 
+   *
+   * @param key
    */
   get(key: string): Promise<IPerxToken | null>
 }
 
 /**
  * Default implementation of Token pool handler
- * 
+ *
  * API consumer can replace this with Other Implementation such as Redis.
  */
 export class InMemoryTokenPool implements TokenPool {
-
   /**
    * !Never access this parameter directly!
    * !use `assureToken` instead.
@@ -384,7 +383,7 @@ export class InMemoryTokenPool implements TokenPool {
     const nowMs = new Date().getTime()
     this._mem[key] = {
       response: token,
-      expiredAt: new Date(nowMs + ttlInMs)
+      expiredAt: new Date(nowMs + ttlInMs),
     }
   }
 
@@ -399,13 +398,14 @@ export class InMemoryTokenPool implements TokenPool {
 }
 
 /**
- * 
+ *
  */
 export class PerxProxyManager implements IPerxProxyManager {
-
   private _instances: Record<string, IPerxService> = {}
 
-  public constructor(private readonly _masterPerxService: IPerxService, private pool: TokenPool = new InMemoryTokenPool()) {
+  public constructor(
+    private readonly _masterPerxService: IPerxService,
+    private pool: TokenPool = new InMemoryTokenPool()) {
   }
 
   private service(lang: string): IPerxService {
@@ -428,7 +428,7 @@ export class PerxProxyManager implements IPerxProxyManager {
 
   /**
    * Use this method to access exposedToken
-   * @returns 
+   * @returns
    */
   public async assureToken(identification: PerxIdentification, perxService: IPerxService = this.service('en')): Promise<IPerxToken> {
     let identifier: string | null = null
@@ -463,7 +463,7 @@ export class PerxProxyManager implements IPerxProxyManager {
 
   /**
    * Issue the Applciation's level token, cache it.
-   * 
+   *
    * @param perxService
    * @returns
    */
