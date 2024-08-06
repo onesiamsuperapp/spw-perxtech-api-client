@@ -2,6 +2,7 @@ import { autoserializeAs } from 'cerialize';
 import { ISODateTimeSerializer } from '../utils/cerialize';
 
 /**
+ * หลังจาก deploy จะต้องเปลี่ยนจาก date ไปใช้ "timestamp" เนื่องจาก perx ทำการแก้เส้นเดิมไม่มี v2
  *  {
       "date": "2023-04-01",
       "aggregated_points": 0,
