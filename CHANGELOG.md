@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/onesiamsuperapp/spw-perxtech-api-client/compare/v2.1.0...v2.1.1) (2024-08-06)
+
+
+### Bug Fixes
+
+* **SP-8992:** handle support field response from perx ([1c360dc](https://github.com/onesiamsuperapp/spw-perxtech-api-client/commit/1c360dc33634c7dcc1364fb9ad254bede1d7217c))
+
 # [2.1.0](https://github.com/onesiamsuperapp/spw-perxtech-api-client/compare/v2.0.0...v2.1.0) (2024-07-23)
 
 
